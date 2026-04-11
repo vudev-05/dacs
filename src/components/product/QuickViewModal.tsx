@@ -127,11 +127,11 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                             <div className="p-10 lg:p-16 flex flex-col justify-center">
                                 <div className="mb-4">
                                     <span className="text-xs font-black text-primary uppercase tracking-[0.3em] bg-primary/10 px-4 py-2 rounded-full">
-                                        {category}
+                                        {t(`categories.${category}` as any) !== `categories.${category}` ? t(`categories.${category}` as any) : category}
                                     </span>
                                 </div>
                                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 leading-[1.1] tracking-tighter uppercase">
-                                    {name}
+                                    {product.slug && t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : name}
                                 </h2>
 
                                 <div className="flex items-center gap-2 mb-6">
@@ -209,13 +209,13 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                                             <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600">
                                                 <ShoppingBag className="w-5 h-5" />
                                             </div>
-                                            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wide leading-tight">Giao nhanh<br />3-5 ngày</div>
+                                            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wide leading-tight">{isVietnamese ? "Giao nhanh" : "Fast Delivery"}<br />{isVietnamese ? "3-5 ngày" : "3-5 days"}</div>
                                         </div>
                                         <div className="flex items-center gap-3 p-3 rounded-2xl bg-amber-50/50">
                                             <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600">
                                                 <Star className="w-5 h-5" />
                                             </div>
-                                            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wide leading-tight">Chất lượng<br />Đảm bảo</div>
+                                            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wide leading-tight">{isVietnamese ? "Chất lượng" : "Quality"}<br />{isVietnamese ? "Đảm bảo" : "Guaranteed"}</div>
                                         </div>
                                     </div>
                                 </div>

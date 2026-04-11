@@ -16,6 +16,7 @@ import { LanguageProvider } from "@/lib/i18n/context";
 import { ThemeProvider } from "@/lib/theme/ThemeContext";
 import LiveSalesPopup from "@/components/shared/LiveSalesPopup";
 import DynamicFavicon from "@/components/shared/DynamicFavicon";
+import ProgressBarClient from "@/components/shared/ProgressBarClient";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -294,7 +295,7 @@ export default async function RootLayout({
           }} />
         )}
       </head>
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased text-slate-900 bg-[#fdfdff]`}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased text-slate-900 bg-white`}>
         {/* Google Tag Manager (noscript) — must be immediately after <body> per GTM spec */}
         {gtmId && (
           <noscript>
@@ -315,6 +316,7 @@ export default async function RootLayout({
             <ThemeProvider>
               <CartProvider>
                 <ChatOpenProvider>
+                  <ProgressBarClient />
                   {children}
                   <DynamicFavicon />
                   <LiveSalesPopup />

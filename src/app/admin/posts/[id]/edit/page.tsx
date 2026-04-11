@@ -4,6 +4,7 @@ import PostForm from "@/components/admin/PostForm";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function EditPostPage() {
     const { id } = useParams<{ id: string }>();
@@ -68,9 +69,9 @@ export default function EditPostPage() {
                 <div className="h-96 flex flex-col items-center justify-center text-zinc-400 font-bold bg-zinc-900 rounded-3xl border border-zinc-800 gap-4">
                     <p className="text-red-400 text-lg">{error || "Không tìm thấy bài viết"}</p>
                     <p className="text-zinc-500 text-sm">Post ID: {id}</p>
-                    <a href="/admin/posts" className="mt-4 px-6 py-2 bg-zinc-700 rounded-xl text-zinc-200 hover:bg-zinc-600 transition-colors text-sm font-medium">
+                    <Link href="/admin/posts" className="mt-4 px-6 py-2 bg-zinc-700 rounded-xl text-zinc-200 hover:bg-zinc-600 transition-colors text-sm font-medium">
                         ← Quay lại danh sách
-                    </a>
+                    </Link>
                 </div>
             </div>
         );

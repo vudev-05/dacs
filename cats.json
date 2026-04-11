@@ -1,0 +1,388 @@
+{
+    "categories":  [
+                       {
+                           "id":  101,
+                           "name":  "C√° Kh√¥ \u0026 H·∫£i S·∫£n",
+                           "nameEn":  null,
+                           "slug":  "ca-kho-hai-san",
+                           "products":  [
+                                            {
+                                                "id":  63,
+                                                "slug":  "kho-ca-khoai",
+                                                "name":  "KH√? C√Å KHOAI",
+                                                "nameEn":  null,
+                                                "price":  25,
+                                                "salePrice":  21,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529380182_3ba8b5d822f1ac5671f4277b254cda8e.jpg"
+                                            },
+                                            {
+                                                "id":  4,
+                                                "slug":  "tep-kho-say-an-lien",
+                                                "name":  "T√?P KH√? S·∫§Y ƒ?N LI·ª?N",
+                                                "nameEn":  null,
+                                                "price":  20,
+                                                "salePrice":  16,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505531276630_3d23214e028833e7e043f8fa7338ddde.jpg"
+                                            },
+                                            {
+                                                "id":  7,
+                                                "slug":  "tom-kho",
+                                                "name":  "T√?M KH√?",
+                                                "nameEn":  null,
+                                                "price":  54,
+                                                "salePrice":  45,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529670293_5694fbd75609a37f25b1b1106ac9952f.jpg"
+                                            },
+                                            {
+                                                "id":  18,
+                                                "slug":  "ca-com-chien-mam",
+                                                "name":  "C√Å C∆†M CHI√?N M·∫ÆM",
+                                                "nameEn":  null,
+                                                "price":  22,
+                                                "salePrice":  18,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529267120_83f1d127221fdb985f26b1457cdf7508.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  102,
+                           "name":  "Tr√°i C√¢y S·∫•y \u0026 M·ª©t",
+                           "nameEn":  null,
+                           "slug":  "trai-cay-say",
+                           "products":  [
+                                            {
+                                                "id":  1,
+                                                "slug":  "banh-gung-tao-do-duong-nhan",
+                                                "name":  "B√ÅNH G·ª™NG T√ÅO ƒê·ª? D∆Ø·ª†NG NHAN",
+                                                "nameEn":  null,
+                                                "price":  17,
+                                                "salePrice":  14,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/33906c73-ca93-48c6-9d3d-8fa09370b330.jpg"
+                                            },
+                                            {
+                                                "id":  39,
+                                                "slug":  "coc-say-chanh-muoi",
+                                                "name":  "C√?C S·∫§Y CHANH MU·ªêI",
+                                                "nameEn":  null,
+                                                "price":  18,
+                                                "salePrice":  15,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/401ee030-10c1-4cfe-a135-a3e4833422ec.jpg"
+                                            },
+                                            {
+                                                "id":  72,
+                                                "slug":  "khoai-lang-say-deo",
+                                                "name":  "KHOAI LANG S·∫§Y D·∫∫O",
+                                                "nameEn":  null,
+                                                "price":  13,
+                                                "salePrice":  10,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/64839b5b-18f7-4626-b144-372ea301c927.jpg"
+                                            },
+                                            {
+                                                "id":  73,
+                                                "slug":  "khoai-mon-say-mam-hanh",
+                                                "name":  "KHOAI M√?N S·∫§Y M·∫ÆM H√?NH",
+                                                "nameEn":  null,
+                                                "price":  16,
+                                                "salePrice":  13,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/c865f1a5-ec25-478e-b5b5-1f38e8073249.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  103,
+                           "name":  "B√°nh K·∫πo ƒê·∫∑c S·∫£n",
+                           "nameEn":  null,
+                           "slug":  "banh-keo",
+                           "products":  [
+                                            {
+                                                "id":  24,
+                                                "slug":  "banh-mochi",
+                                                "name":  "B√ÅNH MOCHI",
+                                                "nameEn":  null,
+                                                "price":  10,
+                                                "salePrice":  8,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/7e40f629-b95f-49c9-8fc2-53eecfa537df.jpg"
+                                            },
+                                            {
+                                                "id":  35,
+                                                "slug":  "banh-phong-tom",
+                                                "name":  "B√ÅNH PH·ª?NG T√?M",
+                                                "nameEn":  null,
+                                                "price":  12,
+                                                "salePrice":  9,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/b2de968f-bca1-4de1-a7bb-ee6cbee319b8.jpg"
+                                            },
+                                            {
+                                                "id":  46,
+                                                "slug":  "banh-rong-bien-kep-hat",
+                                                "name":  "B√ÅNH RONG BI·ª?N K·∫∏P H·∫†T",
+                                                "nameEn":  null,
+                                                "price":  15,
+                                                "salePrice":  12,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505530585436_d5297b72bece6264c1750ff9a252e63a.jpg"
+                                            },
+                                            {
+                                                "id":  52,
+                                                "slug":  "keo-dua-sap-cafe-muoi",
+                                                "name":  "K·∫∏O D·ª™A S√ÅP CAFE MU·ªêI",
+                                                "nameEn":  null,
+                                                "price":  20,
+                                                "salePrice":  16,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/bdaeb684-78bc-4d8d-b50b-dd22820b130a.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  104,
+                           "name":  "Tr√† \u0026 Th·ª©c U·ª?ng",
+                           "nameEn":  null,
+                           "slug":  "tra-thuc-uong",
+                           "products":  [
+                                            {
+                                                "id":  15,
+                                                "slug":  "tra-vi-oi-hong",
+                                                "name":  "TR√? V·ª? ·ª?I H·ª?NG",
+                                                "nameEn":  null,
+                                                "price":  14,
+                                                "salePrice":  11,
+                                                "originalPrice":  null,
+                                                "image":  "/uploads/2790e128-da16-4553-a795-4aef49807445.webp"
+                                            },
+                                            {
+                                                "id":  2,
+                                                "slug":  "bot-dau-nanh",
+                                                "name":  "B·ª?T ƒê·∫¨U N√?NH",
+                                                "nameEn":  null,
+                                                "price":  22,
+                                                "salePrice":  17,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/924ab902-4f27-4e71-892c-fa87fde4e48c.jpg"
+                                            },
+                                            {
+                                                "id":  8,
+                                                "slug":  "tra-dong-trung-ngu-vi",
+                                                "name":  "TR√? ƒê√?NG TR√?NG NG≈® V·ª?",
+                                                "nameEn":  null,
+                                                "price":  20,
+                                                "salePrice":  15,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529667629_102b523d11fddfb76c388445f4ec6c0b.jpg"
+                                            },
+                                            {
+                                                "id":  9,
+                                                "slug":  "tra-lipton-cam-thao",
+                                                "name":  "TR√? LIPTON CAM TH·∫¢O",
+                                                "nameEn":  null,
+                                                "price":  20,
+                                                "salePrice":  16,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/4135fbf5-37e4-4d8e-9aa4-6bbb7f081c35.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  105,
+                           "name":  "Gia V·ª? \u0026 N∆∞·ª?c Ch·∫•m",
+                           "nameEn":  null,
+                           "slug":  "gia-vi",
+                           "products":  [
+                                            {
+                                                "id":  44,
+                                                "slug":  "hanh-phi",
+                                                "name":  "H√?NH PHI",
+                                                "nameEn":  null,
+                                                "price":  15,
+                                                "salePrice":  12,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/fcbcbb40-eb36-4cc9-a1be-2c6cf5e4e621.jpg"
+                                            },
+                                            {
+                                                "id":  75,
+                                                "slug":  "mam-ca-linh",
+                                                "name":  "Mƒ?ÃÅM CAÃÅ LINH",
+                                                "nameEn":  null,
+                                                "price":  17,
+                                                "salePrice":  13,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/dd646d30-4fa2-478f-83c4-ae177a3ae862.jpg"
+                                            },
+                                            {
+                                                "id":  76,
+                                                "slug":  "mam-ca-loc",
+                                                "name":  "Mƒ?ÃÅM CAÃÅ L√?C",
+                                                "nameEn":  null,
+                                                "price":  18,
+                                                "salePrice":  14,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/87729796-5618-4701-8911-c08d359991f3.jpg"
+                                            },
+                                            {
+                                                "id":  77,
+                                                "slug":  "mam-ca-sac",
+                                                "name":  "Mƒ?ÃÅM CAÃÅ S·∫∂C",
+                                                "nameEn":  null,
+                                                "price":  17,
+                                                "salePrice":  13,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/442486a5-2881-405f-96f2-6df84944ba44.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  106,
+                           "name":  "H·∫°t Dinh D∆∞·ª°ng",
+                           "nameEn":  null,
+                           "slug":  "hat-dinh-duong",
+                           "products":  [
+                                            {
+                                                "id":  41,
+                                                "slug":  "dau-phong-say-toi-ot",
+                                                "name":  "ƒê·∫¨U PH·ª?NG S·∫§Y T·ª?I ·ª?T",
+                                                "nameEn":  null,
+                                                "price":  16,
+                                                "salePrice":  13,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/86389373-d890-47c0-ae93-b8d79a15c183.jpg"
+                                            },
+                                            {
+                                                "id":  45,
+                                                "slug":  "hat-bi",
+                                                "name":  "H·∫†T B√ç",
+                                                "nameEn":  null,
+                                                "price":  13,
+                                                "salePrice":  10,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/2774e7ee-5c36-48a4-81a6-58f1c7c67c0b.jpg"
+                                            },
+                                            {
+                                                "id":  47,
+                                                "slug":  "hat-dieu",
+                                                "name":  "H·∫†T ƒêI·ª?U",
+                                                "nameEn":  null,
+                                                "price":  22,
+                                                "salePrice":  18,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529867613_fd07356103c29af9cc30624d93821920.jpg"
+                                            },
+                                            {
+                                                "id":  48,
+                                                "slug":  "hat-dua",
+                                                "name":  "H·∫†T D∆ØA",
+                                                "nameEn":  null,
+                                                "price":  17,
+                                                "salePrice":  14,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/b99822a8-375c-41a4-8921-c788963bf623.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  107,
+                           "name":  "ƒê·ª? ƒ?n V·∫∑t \u0026 Th·ª±c Ph·∫©m",
+                           "nameEn":  null,
+                           "slug":  "do-an-vat",
+                           "products":  [
+                                            {
+                                                "id":  3,
+                                                "slug":  "tau-hu-ki",
+                                                "name":  "T√?U H·ª¶ KI",
+                                                "nameEn":  null,
+                                                "price":  20,
+                                                "salePrice":  16,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/aadbe111-0120-4abb-9a01-476bddd86437.jpg"
+                                            },
+                                            {
+                                                "id":  32,
+                                                "slug":  "canh-chua-an-lien",
+                                                "name":  "CANH CHUA ƒ?N LI·ª?N",
+                                                "nameEn":  null,
+                                                "price":  14,
+                                                "salePrice":  11,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/c2a632bd-b7a2-4e2a-a791-5d7e03779ed1.jpg"
+                                            },
+                                            {
+                                                "id":  33,
+                                                "slug":  "canh-rieu-tom-an-lien",
+                                                "name":  "CANH RI√?U T√?M ƒ?N LI·ª?N",
+                                                "nameEn":  null,
+                                                "price":  14,
+                                                "salePrice":  11,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/2056ac19-166a-46ad-963f-2f4f5a07d70e.jpg"
+                                            },
+                                            {
+                                                "id":  34,
+                                                "slug":  "canh-rong-bien-dau-hu",
+                                                "name":  "CANH RONG BI·ª?N ƒê·∫¨U H≈®",
+                                                "nameEn":  null,
+                                                "price":  15,
+                                                "salePrice":  12,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/ce19ff10-7d80-458a-a418-a54360595f28.jpg"
+                                            }
+                                        ]
+                       },
+                       {
+                           "id":  108,
+                           "name":  "S·ª©c Kh·ªèe \u0026 Ti·ª?n √çch",
+                           "nameEn":  null,
+                           "slug":  "suc-khoe-tien-ich",
+                           "products":  [
+                                            {
+                                                "id":  109,
+                                                "slug":  "saffron",
+                                                "name":  "Nh·ª•y hoa ngh·ª? t√¢y",
+                                                "nameEn":  "Saffron",
+                                                "price":  20,
+                                                "salePrice":  14,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529655148_22b4524d2b8b0415df292a7f4d62b09f.jpg"
+                                            },
+                                            {
+                                                "id":  5,
+                                                "slug":  "tinh-dau-dr",
+                                                "name":  "TINH D·∫¶U ƒêR",
+                                                "nameEn":  null,
+                                                "price":  22,
+                                                "salePrice":  17,
+                                                "originalPrice":  null,
+                                                "image":  "/sanpham/z7505529402959_f7f054c483b0ecdcbf50af8542207280.jpg"
+                                            },
+                                            {
+                                                "id":  6,
+                                                "slug":  "toi-den",
+                                                "name":  "T·ª?I ƒêEN",
+                                                "nameEn":  null,
+                                                "price":  16,
+                                                "salePrice":  13,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/5debb74a-a825-49b4-b755-067ea34ec4ef.jpg"
+                                            },
+                                            {
+                                                "id":  31,
+                                                "slug":  "can-dien-tu",
+                                                "name":  "C√?N ƒêI·ª?N T·ª¨",
+                                                "nameEn":  null,
+                                                "price":  22,
+                                                "salePrice":  18,
+                                                "originalPrice":  null,
+                                                "image":  "/api/uploads/f4db66ea-e43f-4f79-a62e-111ecb0f1e32.jpg"
+                                            }
+                                        ]
+                       }
+                   ]
+}

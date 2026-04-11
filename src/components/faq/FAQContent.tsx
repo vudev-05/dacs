@@ -57,7 +57,7 @@ const FAQ_DATA: Record<"vi" | "en", FAQItem[]> = {
             category: "Thanh toán",
             question: "LIKEFOOD hỗ trợ những phương thức thanh toán nào?",
             answer:
-                "Hệ thống hiện hỗ trợ COD, chuyển khoản ngân hàng, thẻ và một số cổng thanh toán trực tuyến. Những lựa chọn đang khả dụng sẽ xuất hiện ngay tại bước thanh toán.",
+                "Checkout hiện xử lý qua Stripe: thẻ quốc tế (Visa, Mastercard, American Express) và ví nhanh như Apple Pay/Google Pay nếu thiết bị của bạn hỗ trợ.",
         },
         {
             category: "Thanh toán",
@@ -113,7 +113,7 @@ const FAQ_DATA: Record<"vi" | "en", FAQItem[]> = {
             category: "Payments",
             question: "What payment methods are available?",
             answer:
-                "Available options may include cash on delivery, bank transfer, cards, and selected online payment methods. The checkout step will show the methods currently supported for your order.",
+                "Checkout is currently Stripe-based: international cards (Visa, Mastercard, American Express) and quick wallets such as Apple Pay/Google Pay when supported on your device.",
         },
         {
             category: "Payments",

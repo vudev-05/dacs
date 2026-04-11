@@ -188,9 +188,11 @@ function ProductCardList({ product, meta }: { product: ProductCardProduct; meta:
                 <div className="space-y-1.5">
                     <Link href={`/products?category=${encodeURIComponent(product.category)}`} onClick={e => e.stopPropagation()}
                         className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 uppercase tracking-[0.12em] px-2 py-1 rounded-full hover:bg-emerald-100 transition-colors">
-                        {!isVietnamese && product.categoryEn ? product.categoryEn : product.category}
+                        {!isVietnamese && product.categoryEn ? product.categoryEn : (t(`categories.${product.category}` as any) !== `categories.${product.category}` ? t(`categories.${product.category}` as any) : product.category)}
                     </Link>
-                    <h3 className="font-bold text-sm sm:text-base leading-snug text-slate-800 group-hover:text-emerald-700 transition-colors line-clamp-2">{!isVietnamese && product.nameEn ? product.nameEn : product.name}</h3>
+                    <h3 className="font-bold text-sm sm:text-base leading-snug text-slate-800 group-hover:text-emerald-700 transition-colors line-clamp-2">
+                        {!isVietnamese && product.nameEn ? product.nameEn : (t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : product.name)}
+                    </h3>
                     {(product.weight || product.weightEn) && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{!isVietnamese && product.weightEn ? product.weightEn : product.weight}</p>}
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5">
@@ -300,8 +302,8 @@ function ProductCardGrid({ product, meta }: { product: ProductCardProduct; meta:
                     {/* Info + Price Section */}
                     <CardFooter className="flex flex-col items-start p-2 sm:p-2.5 gap-1.5 bg-white">
                         <ProductCardInfo
-                            name={!isVietnamese && product.nameEn ? product.nameEn : product.name}
-                            category={!isVietnamese && product.categoryEn ? product.categoryEn : product.category}
+                            name={!isVietnamese && product.nameEn ? product.nameEn : (t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : product.name)}
+                            category={!isVietnamese && product.categoryEn ? product.categoryEn : (t(`categories.${product.category}` as any) !== `categories.${product.category}` ? t(`categories.${product.category}` as any) : product.category)}
                             weight={!isVietnamese && product.weightEn ? product.weightEn : product.weight}
                             ratingValue={meta.ratingValue}
                             ratingCount={meta.ratingCount}

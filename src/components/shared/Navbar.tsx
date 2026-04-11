@@ -9,22 +9,18 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import {
-    ShoppingCart, User, Search, Menu, X, ChevronDown,
-    Heart, Phone, Home, Flame,
-    Settings, FileText, ShoppingBag, Info,
-    HelpCircle, Gift, UserPlus } from "lucide-react";
-import { useState, useEffect, Suspense, useRef, useCallback } from "react";
+import { ShoppingCart, User, Search, Menu, X, ChevronDown, Heart, Phone, Home, Flame, Settings, FileText, ShoppingBag, Info, HelpCircle, Gift, UserPlus, MoreHorizontal } from "lucide-react";
+import { useState, useEffect, Suspense, useRef, useCallback, useMemo } from "react";
 import { useCartState } from "@/contexts/CartContext";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import MiniCart from "@/components/cart/MiniCart";
-import MegaMenu from "@/components/navbar/MegaMenu";
 import UserDropdown from "@/components/navbar/UserDropdown";
 import LanguageToggle from "@/components/navbar/LanguageToggle";
 import SearchSuggestions from "@/components/navbar/SearchSuggestions";
+import SidebarCategories from "@/components/navbar/SidebarCategories";
 import { useLanguage } from "@/lib/i18n/context";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { useNavbarConfig } from "@/hooks/useNavbarConfig";
@@ -36,64 +32,18 @@ import { analytics } from "@/lib/analytics/sdk";
 // ─────────────────────────────────────────────────────────────────────────────
 // Mobile inline search — expands in-header on tap, no drawer required
 // ─────────────────────────────────────────────────────────────────────────────
-function MobileSearchInput({
-    value, onChange, onSubmit, onClose, onKeyDown
-}: {
-    value: string;
-    onChange: (v: string) => void;
-    onSubmit: (e: React.FormEvent) => void;
-    onClose: () => void;
-    onKeyDown?: (e: React.KeyboardEvent) => void;
-}) {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const { t } = useLanguage();
-    useEffect(() => { inputRef.current?.focus(); }, []);
-    return (
-        <motion.form
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            onSubmit={onSubmit}
-            className="flex-1 flex items-center gap-2"
-        >
-            <div className="flex-1 flex items-center gap-2 bg-white border-2 border-primary/30 rounded-2xl px-3 py-2 shadow-sm">
-                <Search className="w-4 h-4 text-primary flex-shrink-0" />
-                <input
-                    ref={inputRef}
-                    type="text"
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    onKeyDown={onKeyDown}
-                    placeholder={t("common.searchPlaceholder")}
-                    className="flex-1 bg-transparent text-[13px] font-medium text-slate-800 placeholder:text-slate-400 outline-none"
-                />
-                {value && (
-                    <button type="button" onClick={() => onChange("")} aria-label="Clear search" className="text-slate-300 hover:text-slate-500">
-                        <X className="w-3.5 h-3.5" />
-                    </button>
-                )}
-            </div>
-            <button
-                type="button"
-                onClick={onClose}
-                aria-label={t("common.closeSearch")}
-                className="p-2 text-slate-500 hover:text-slate-800 transition-colors flex-shrink-0"
-            >
-                <X className="w-5 h-5" />
-            </button>
-        </motion.form>
-    );
-}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Navbar content (must be inside Suspense for useSearchParams)
 // ─────────────────────────────────────────────────────────────────────────────
 function NavbarContent() {
     const { t, dict } = useLanguage();
+    const reduceMotion = useReducedMotion();
 
     // ── Custom hooks (replaces 15+ inline states) ─────────────────────────
     const { isScrolled, isHidden } = useNavbarScroll();
-    const { supportPhone, navLinks } = useNavbarConfig();
+    const { supportPhone, navLinks, announcementEnabled, announcementText } = useNavbarConfig();
     const wishlistCount = useWishlistCount();
 
     // ── Local UI state only ───────────────────────────────────────────────
@@ -145,7 +95,12 @@ function NavbarContent() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const isAdminUser = session?.user?.role === "ADMIN" || session?.user?.role === "ADMIN";
+    const isAdminUser = session?.user?.role === "ADMIN";
+
+    // Close MegaMenu when navigating
+    useEffect(() => {
+        setIsMegaMenuOpen(false);
+    }, [pathname]);
 
     const featuredCategories = [
         { name: t("navbar.driedFish"), icon: "🐟", color: "bg-blue-50", href: "/products?category=Cá khô" },
@@ -156,19 +111,34 @@ function NavbarContent() {
 
     const mobilePrimaryLinks = [
         { label: t("common.about"), href: "/about", icon: <Info className="w-5 h-5" /> },
-        { label: t("common.flashSale"), href: "/flash-sale", icon: <Flame className="w-5 h-5 text-red-500" />, highlight: true },
-        { label: t("navbar.voucher"), href: "/vouchers", icon: <Gift className="w-5 h-5 text-primary" /> },
-        { label: t("navbar.posts"), href: "/posts", icon: <FileText className="w-5 h-5 text-emerald-500" /> },
-        { label: t("common.faq"), href: "/faq", icon: <HelpCircle className="w-5 h-5 text-sky-500" /> },
-        { label: t("common.contact"), href: "/contact", icon: <Phone className="w-5 h-5 text-primary" /> },
+        { label: t("common.flashSale"), href: "/flash-sale", icon: <Flame className="w-5 h-5" /> },
+        { label: t("navbar.voucher"), href: "/vouchers", icon: <Gift className="w-5 h-5" /> },
+        { label: t("navbar.posts"), href: "/posts", icon: <FileText className="w-5 h-5" /> },
+        { label: t("common.faq"), href: "/faq", icon: <HelpCircle className="w-5 h-5" /> },
+        { label: t("common.contact"), href: "/contact", icon: <Phone className="w-5 h-5" /> },
     ];
 
     const mobileAccountLinks = [
         { label: t("navbar.orderHistory"), href: "/profile/orders", icon: <ShoppingCart className="w-5 h-5" /> },
-        { label: t("navbar.referral"), href: "/profile/referrals", icon: <UserPlus className="w-5 h-5 text-emerald-500" /> },
-        { label: t("navbar.myVouchers"), href: "/profile/vouchers", icon: <Gift className="w-5 h-5 text-primary" /> },
-        { label: t("navbar.accountSettings"), href: "/profile", icon: <Settings className="w-5 h-5 text-slate-600" /> },
+        { label: t("navbar.referral"), href: "/profile/referrals", icon: <UserPlus className="w-5 h-5" /> },
+        { label: t("navbar.myVouchers"), href: "/profile/vouchers", icon: <Gift className="w-5 h-5" /> },
+        { label: t("navbar.accountSettings"), href: "/profile", icon: <Settings className="w-5 h-5" /> },
     ];
+
+    const announcementItems = useMemo(() => {
+        const parsed = announcementText
+            .split("|")
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+        if (parsed.length > 0) return parsed;
+
+        return [
+            "navbar.announcement1",
+            "navbar.announcement2",
+            "navbar.announcement3",
+        ];
+    }, [announcementText]);
 
     useEffect(() => { setIsMounted(true); }, []);
 
@@ -250,7 +220,7 @@ function NavbarContent() {
     };
 
     const renderMobileNavLink = (
-        item: { label: string; href: string; icon: React.ReactNode; highlight?: boolean },
+        item: { label: string; href: string; icon: React.ReactNode },
         idx: number,
         baseDelay: number
     ) => (
@@ -263,13 +233,13 @@ function NavbarContent() {
             <Link
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3.5 p-3 rounded-2xl transition-all border ${item.highlight ? "bg-red-50/50 border-red-100/50" : "bg-slate-50 border-transparent hover:border-slate-100"}`}
+                className="group flex items-center gap-3.5 p-3 rounded-2xl transition-all border bg-slate-50 border-transparent hover:border-emerald-200 hover:bg-emerald-50 hover:shadow-sm"
             >
-                <div className="w-9 h-9 rounded-2xl bg-white shadow-sm flex items-center justify-center transition-transform">
+                <div className="w-9 h-9 rounded-2xl bg-white shadow-sm flex items-center justify-center transition-transform text-emerald-600 group-hover:scale-110">
                     {item.icon}
                 </div>
-                <span className={`text-[13px] font-bold ${item.highlight ? "text-red-600" : "text-slate-700"}`}>{item.label}</span>
-                <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-slate-300 ml-auto" />
+                <span className="text-[13px] font-bold text-slate-700 group-hover:text-emerald-800 transition-colors">{item.label}</span>
+                <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-slate-300 group-hover:text-emerald-400 ml-auto transition-colors" />
             </Link>
         </motion.div>
     );
@@ -277,115 +247,71 @@ function NavbarContent() {
 
     return (
         <>
-            <motion.nav
-                className={`sticky top-0 z-[100] transition-all duration-200 ease-out will-change-transform ${isScrolled
-                    ? "bg-white/95 backdrop-blur-2xl shadow-[0_2px_24px_rgba(0,0,0,0.08)]"
-                    : "bg-white"
-                    }`}
-                initial={{ y: 0 }}
-                animate={{ y: isHidden ? -120 : 0 }}
-                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            <nav
+                className="sticky top-0 z-[100] bg-white backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.06)]"
             >
                 {/* Skip to Content Link for Accessibility */}
-                <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:p-4 focus:bg-white focus:text-slate-900 focus:font-bold focus:rounded-br-2xl focus:shadow-xl top-0 left-0 transition-transform">
+                <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:p-4 focus:bg-white/10 focus:text-slate-900 focus:font-bold focus:rounded-br-2xl focus:shadow-xl top-0 left-0 transition-transform">
                     {t("common.skipToContent")}
                 </a>
 
+                {announcementEnabled && (
+                    <div className="w-full border-b border-emerald-800/10 bg-[#DFF0E0] h-8" role="region" aria-label="Store announcements">
+                        <div className="w-full px-4 sm:px-6 lg:px-[6%] flex items-center justify-between h-full">
+                            <span className="sr-only">{announcementItems.join(" | ")}</span>
+                            <div className="flex-1 overflow-hidden relative mr-4 h-full flex items-center">
+                                <motion.div
+                                    className="flex w-max whitespace-nowrap"
+                                    aria-hidden="true"
+                                    animate={reduceMotion ? { x: 0 } : { x: ["0%", "-50%"] }}
+                                    transition={reduceMotion ? { duration: 0 } : { duration: 40, ease: "linear", repeat: Infinity }}
+                                >
+                                    {/* Repeat content to create smooth marquee loop. */}
+                                    {[...Array(4)].map((_, groupIdx) => (
+                                        <div key={groupIdx} className="flex items-center">
+                                            {announcementItems.map((msg, i) => (
+                                                <div key={i} className="flex items-center">
+                                                    <span className="mx-8 text-[11px] font-bold tracking-wide text-emerald-900/80 uppercase">
+                                                        {t(msg as any) === msg && !msg.includes('.') ? msg : t(msg as any)}
+                                                    </span>
+                                                    <span className="text-emerald-700/25 text-[10px] mx-2">•</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            </div>
+                            
+                            {/* Auth links mapped to Topbar */}
+                            <div className="flex flex-shrink-0 items-center justify-end gap-3 text-[10px] font-black text-emerald-900/70 tracking-wider">
+                                {!session && (
+                                        <Link href="/login" className="hover:text-emerald-900 transition-colors uppercase">
+                                            {t("common.login")}
+                                        </Link>
+                                 )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* ========== MAIN HEADER ========== */}
-                <div className={`w-full px-4 sm:px-6 lg:px-[6%] border-b border-slate-100/50 transition-all duration-150 ease-out ${isScrolled ? "py-2" : "py-3"}`}>
+                <div className={`w-full px-4 sm:px-6 lg:px-[6%] bg-white border-b border-slate-100/60 transition-all duration-150 ease-out py-3 relative z-[70]`}>
                     <div className="flex items-center justify-between gap-4 lg:gap-8">
-                        {/* Logo — hidden on mobile when search is active */}
-                        <Link href="/" className={`flex-shrink-0 ${mobileSearchActive ? 'hidden md:block' : ''}`}>
+                        {/* Logo */}
+                        <Link href="/" className="flex-shrink-0">
                             <motion.img
                                 src="/logo.png?v=2"
                                 alt="LIKEFOOD - Đặc sản Việt Nam tại Mỹ"
-                                className={`w-auto object-contain transition-all duration-300 ${isScrolled ? "h-6 xs:h-7 sm:h-8" : "h-7 xs:h-9 sm:h-10"}`}
+                                className={`w-auto object-contain transition-all duration-300 h-7 xs:h-9 sm:h-10`}
                                 whileHover={{ scale: 1.03 }}
                             />
                         </Link>
-
-                        {/* Mobile — inline real search input or search trigger */}
-                        <div className="flex-1 md:hidden ml-1">
-                            <AnimatePresence mode="wait">
-                                {mobileSearchActive ? (
-                                    <div className="relative">
-                                        <MobileSearchInput
-                                            key="search-input"
-                                            value={searchQuery}
-                                            onChange={setSearchQuery}
-                                            onSubmit={handleSearch}
-                                            onKeyDown={handleKeyDown}
-                                            onClose={() => { setMobileSearchActive(false); setSearchQuery(""); }}
-                                        />
-                                        
-                                        {/* Mobile Suggestions Dropdown */}
-                                        <AnimatePresence>
-                                            {searchQuery.length > 0 && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: -10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: -10 }}
-                                                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden z-[110]"
-                                                >
-                                                    <SearchSuggestions
-                                                        query={searchQuery}
-                                                        suggestions={suggestions}
-                                                        isLoading={isLoadingHints}
-                                                        selectedIndex={selectedIndex}
-                                                        trendingKeywords={TRENDING_KEYWORDS}
-                                                        translations={t}
-                                                        searchHistory={searchHistory}
-                                                        onClearHistory={clearSearchHistory}
-                                                        onSuggestionClick={handleSuggestionClick}
-                                                        onTrendingClick={handleTrendingClick}
-                                                        onViewAllClick={() => setShowSuggestions(false)}
-                                                    />
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                ) : (
-                                    <motion.button
-                                        key="search-trigger"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        onClick={() => setMobileSearchActive(true)}
-                                        aria-label={t("common.search")}
-                                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-100/80 border border-slate-200/50 rounded-2xl text-slate-400 shadow-inner"
-                                        whileTap={{ scale: 0.98 }}
-                                    >
-                                        <Search className="w-4 h-4 text-primary" />
-                                        <span className="text-[12px] font-bold truncate">{t("common.searchPlaceholder")}</span>
-                                    </motion.button>
-                                )}
-                            </AnimatePresence>
-                        </div>
-
-                        {/* Category Button - Desktop */}
-                        <div className="hidden lg:block">
-                            <motion.button
-                                onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
-                                aria-expanded={isMegaMenuOpen}
-                                aria-label={t("navbar.categoryBtn")}
-                                className={`flex items-center gap-2.5 px-5 py-2.5 text-[12px] font-black uppercase tracking-wider rounded-2xl transition-all border ${isMegaMenuOpen
-                                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                                    : "bg-slate-50 text-slate-700 border-slate-200/50 hover:border-primary/30 hover:text-primary hover:bg-primary/5"
-                                    }`}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <Menu className="w-4 h-4" />
-                                <span>{t("navbar.categoryBtn")}</span>
-                                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isMegaMenuOpen ? 'rotate-180' : ''}`} />
-                            </motion.button>
-                        </div>
-
                         {/* ========== SEARCH BAR ========== */}
-                        <div className="hidden md:flex flex-1 max-w-2xl relative">
+                        <div className="flex flex-1 min-w-0 relative">
                             <form onSubmit={handleSearch} className="relative w-full">
-                                <div className="relative flex items-center">
-                                    <div className="absolute left-4 flex items-center gap-2 text-slate-400">
-                                        <Search className="w-5 h-5" />
+                                <div className="relative flex items-center group">
+                                    <div className="absolute left-4 flex items-center text-slate-400 group-focus-within:text-primary transition-colors z-10">
+                                        <Search className="w-5 h-5 opacity-70" />
                                     </div>
                                     <input
                                         ref={desktopSearchRef}
@@ -398,17 +324,16 @@ function NavbarContent() {
                                             setSearchQuery(e.target.value);
                                             setShowSuggestions(true);
                                         }}
-                                        className="w-full pl-12 pr-28 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-full text-[13px] font-medium focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-slate-400"
+                                        className="w-full h-[48px] pl-[48px] pr-4 md:pr-[120px] bg-white/90 hover:bg-white border-2 border-transparent focus:border-white focus:bg-white backdrop-blur-md rounded-full text-[14px] font-medium focus:ring-[4px] focus:ring-black/5 outline-none transition-all placeholder:text-slate-400 shadow-[0_4px_15px_rgba(0,0,0,0.04)] group-focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
                                     />
-                                    <div className="absolute right-2 flex items-center gap-1">
+                                    <div className="absolute right-1.5 flex items-center h-[36px]">
                                         <motion.button
                                             type="submit"
-                                            className="px-5 py-2 bg-primary text-white rounded-full font-black text-[11px] uppercase tracking-wider hover:bg-primary/90 transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg"
+                                            className="hidden md:flex h-full px-4 md:px-6 bg-emerald-600 text-white rounded-full font-bold text-[11px] md:text-[12px] uppercase tracking-wide hover:bg-emerald-700 transition-colors shadow-sm items-center justify-center"
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                         >
-                                            <Search className="w-3.5 h-3.5" />
-                                            <span className="hidden xl:inline">{t("common.search")}</span>
+                                            {t("common.search")}
                                         </motion.button>
                                     </div>
                                 </div>
@@ -428,7 +353,7 @@ function NavbarContent() {
                                             initial={{ opacity: 0, y: 10, scale: 0.98 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                                            className="absolute top-full left-0 right-0 mt-3 bg-white/98 backdrop-blur-2xl border border-slate-100 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.15)] overflow-hidden z-[60]"
+                                            className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-[1.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden z-[60]"
                                         >
                                             <SearchSuggestions
                                                 query={searchQuery}
@@ -449,23 +374,27 @@ function NavbarContent() {
                             </form>
                         </div>
 
-                        {/* ========== ACTION ICONS (Refined for Mobile) ========== */}
-                        <div className={`flex items-center gap-1.5 xs:gap-2 ${mobileSearchActive ? 'hidden md:flex' : ''}`}>
+                        {/* Mobile — 3 dots Menu Trigger */}
+                        <div className="md:hidden ml-1.5 xs:ml-2 flex flex-shrink-0 items-center">
+                            <motion.button
+                                onClick={() => setIsOpen(true)}
+                                aria-label="Menu"
+                                className="p-2 xs:p-2.5 text-slate-800 hover:bg-slate-100 rounded-xl transition-colors bg-slate-50 border border-slate-200 shadow-sm"
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <MoreHorizontal className="w-5 h-5 text-emerald-700" />
+                            </motion.button>
+                        </div>
+
+                        {/* ========== ACTION ICONS (Removed on Mobile) ========== */}
+                        <div className={`hidden md:flex items-center gap-1.5 xs:gap-2`}>
                             {/* Language toggle — always visible, persistent after scroll */}
                             <div className="hidden sm:block">
                                 <LanguageToggle />
                             </div>
 
-                            {/* Auth links — persistent (desktop only) */}
-                            {!session && (
-                                <div className="hidden lg:flex items-center gap-2">
-                                    <Link href="/login" className="text-[11px] font-black text-slate-600 hover:text-primary transition-colors uppercase tracking-wider px-2 py-1">{t("common.login")}</Link>
-                                    <Link href="/register" className="text-[11px] font-black px-3 py-1.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all uppercase tracking-wider">{t("navbar.register")}</Link>
-                                </div>
-                            )}
-
                             {/* Wishlist - with count badge */}
-                            <Link href="/profile/wishlist" aria-label={t("navbar.wishlist")} className="hidden sm:flex">
+                            <Link href="/profile/wishlist" aria-label={t("navbar.wishlist")} className="flex">
                                 <motion.div
                                     whileHover={{
                                         y: -4,
@@ -473,7 +402,7 @@ function NavbarContent() {
                                         borderColor: "rgba(244, 63, 94, 0.2)"
                                     }}
                                     whileTap={{ scale: 0.9 }}
-                                    className="p-3 bg-slate-50/50 hover:bg-white border border-transparent rounded-2xl transition-all group relative"
+                                    className="p-3 bg-slate-50/50 hover:bg-white/70 border border-transparent rounded-2xl transition-all group relative"
                                 >
                                     <Heart className="w-5 h-5 text-slate-600 group-hover:text-rose-500 transition-colors" />
                                     {isMounted && wishlistCount > 0 && (
@@ -504,7 +433,7 @@ function NavbarContent() {
                                         borderColor: "rgba(16, 185, 129, 0.2)"
                                     }}
                                     whileTap={{ scale: 0.9 }}
-                                    className="p-3 bg-slate-50/50 hover:bg-white border border-transparent rounded-2xl transition-all group relative"
+                                    className="p-3 bg-slate-50/50 hover:bg-white/70 border border-transparent rounded-2xl transition-all group relative"
                                 >
                                     <ShoppingCart className="w-5 h-5 text-slate-600 group-hover:text-primary transition-colors" />
                                     {isMounted && totalItems > 0 && (
@@ -529,7 +458,7 @@ function NavbarContent() {
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                         aria-label={t("navbar.accountSettings")}
                                         aria-expanded={isUserMenuOpen}
-                                        className="relative w-10 h-10 bg-slate-50 hover:bg-white rounded-2xl flex items-center justify-center overflow-hidden border-2 border-transparent hover:border-primary/30 transition-all"
+                                        className="relative w-10 h-10 bg-slate-50 hover:bg-white rounded-2xl flex items-center justify-center overflow-hidden border-2 border-transparent hover:border-primary/30 transition-all shadow-sm"
                                         whileHover={{ y: -2 }}
                                     >
                                         {session.user.image ? (
@@ -557,9 +486,9 @@ function NavbarContent() {
 
                             {/* Mobile Menu Toggle (Glassmorphism style) */}
                             <motion.button
-                                className={`lg:hidden p-2.5 rounded-2xl transition-all shadow-lg ${isOpen
+                                className={`lg:hidden p-2.5 rounded-2xl transition-all shadow-md ${isOpen
                                     ? "bg-primary text-white shadow-primary/20"
-                                    : "bg-white/80 backdrop-blur-md text-slate-800 border border-slate-200/50 shadow-slate-900/5"}`}
+                                    : "bg-white/40 backdrop-blur-md text-slate-800 border border-slate-200/50"}`}
                                 onClick={() => setIsOpen(!isOpen)}
                                 aria-label={isOpen ? t("common.close") : t("common.categories")}
                                 aria-expanded={isOpen}
@@ -567,7 +496,7 @@ function NavbarContent() {
                                 whileTap={{ scale: 0.9 }}
                             >
                                 <AnimatePresence mode="wait">
-                                    {isOpen ? <X key="x" className="w-5 h-5" /> : <Menu key="m" className="w-5 h-5" />}
+                                    {isOpen ? <X key="x" className="w-5 h-5" /> : <Menu key="m" className="w-6 h-6" />}
                                 </AnimatePresence>
                             </motion.button>
                         </div>
@@ -575,84 +504,112 @@ function NavbarContent() {
                 </div>
 
                 {/* ========== QUICK NAV ROW ========== */}
-                <AnimatePresence>
-                    {!isScrolled && (
-                        <motion.div
-                            initial={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-                            className="border-b border-slate-100 overflow-hidden hidden lg:block bg-white"
-                        >
-                            <div className="w-full px-4 sm:px-6 lg:px-[6%]">
+                <div className="block bg-white z-[60] relative border-b border-slate-100">
+                    <div className="w-full px-4 sm:px-6 lg:px-[6%] bg-white flex justify-between items-center py-2 lg:py-0">
+                        {/* Category Button aligned to Sidebar */}
+                                <div className="block w-full lg:w-[240px] xl:w-[260px] flex-shrink-0 relative group">
+                                    <motion.button
+                                        onClick={() => {
+                                            if (window.innerWidth >= 1024 && pathname === "/") return;
+                                            setIsMegaMenuOpen(!isMegaMenuOpen);
+                                        }}
+                                        className={`w-full rounded-lg lg:rounded-none h-[40px] md:h-[46px] flex items-center justify-between px-3 md:px-4 bg-[#7D9A6E] text-white hover:bg-[#728F63] transition-colors font-bold uppercase tracking-wider text-[12px] md:text-[13px] ${pathname !== "/" ? "cursor-pointer" : "cursor-pointer lg:cursor-default"}`}
+                                    >
+                                        <div className="flex items-center gap-2 md:gap-2.5">
+                                            <Menu className="w-4 h-4 md:w-5 md:h-5 opacity-90"/>
+                                            <span className="truncate">{t("navbar.categoryBtn") || "Danh mục"}</span>
+                                        </div>
+                                        <ChevronDown className={`w-4 h-4 md:w-4 md:h-4 transition-transform duration-300 ${isMegaMenuOpen ? 'rotate-180' : ''} ${pathname === "/" ? "lg:hidden" : ""}`} />
+                                    </motion.button>
+                                    
+                                    {/* Sidebar Categories Dropdown */}
+                                    <AnimatePresence>
+                                        {(isMegaMenuOpen) && (
+                                            <>
+                                                {/* Invisible overlay for clicking outside */}
+                                                <div 
+                                                    className="fixed inset-0 z-[90] lg:hidden" 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setIsMegaMenuOpen(false);
+                                                    }} 
+                                                />
+                                                {pathname !== "/" && (
+                                                    <div 
+                                                        className="fixed inset-0 z-[90] hidden lg:block" 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsMegaMenuOpen(false);
+                                                        }} 
+                                                    />
+                                                )}
+                                                <motion.div
+                                                    initial={{ opacity: 0, scaleY: 0.95 }}
+                                                    animate={{ opacity: 1, scaleY: 1 }}
+                                                    exit={{ opacity: 0, scaleY: 0.95 }}
+                                                    transition={{ duration: 0.2, ease: "easeOut" }}
+                                                    style={{ originY: 0 }}
+                                                    className={`absolute top-full left-0 mt-1 lg:mt-0 w-full lg:w-[260px] z-[100] shadow-[0_20px_40px_-5px_rgba(0,0,0,0.15)] bg-white rounded-2xl lg:rounded-b-2xl border border-slate-100 lg:border-t-0 ${pathname === "/" ? "lg:hidden" : ""}`}
+                                                >
+                                                    <SidebarCategories />
+                                                </motion.div>
+                                            </>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                                <div className="flex-1 hidden lg:flex justify-end">
                                 {navLinks ? (
                                     /* Admin override — use custom links from DB */
-                                    <div className="flex items-center justify-center gap-0 py-1">
+                                    <div className="w-full flex items-center justify-between px-2 xl:px-4 py-1">
                                         {navLinks.map((item) => (
-                                            <Link key={item.href} href={item.href} className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${item.highlight ? "text-red-500 hover:text-red-600" : pathname === item.href ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                                {item.icon && <span>{item.icon}</span>}
-                                                <span className="relative">{item.label}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname === item.href ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                            <Link key={item.href} href={item.href} className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${item.highlight ? "text-red-600 hover:text-red-700" : pathname === item.href ? "text-slate-900" : "text-slate-800 hover:text-slate-900"}`}>
+                                                <span className="relative">{t(item.label as any) === item.label && !item.label.includes('.') ? item.label : t(item.label as any)}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-slate-700/30 rounded-full transition-all duration-300 ${pathname === item.href ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                             </Link>
                                         ))}
                                     </div>
                                 ) : (
-                                    /* Default nav — premium underline style with active state */
-                                    <div className="flex items-center justify-center gap-0 py-1">
+                                    <div className="w-full flex items-center justify-start md:justify-between px-0 md:px-2 xl:px-4 py-1 overflow-x-auto whitespace-nowrap scrollbar-hide gap-1 md:gap-0">
 
-                                        <Link href="/" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname === "/" ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("common.home")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname === "/" ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/" className={`relative block px-2 md:px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname === "/" ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("common.home")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname === "/" ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <Link href="/products" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/products") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <ShoppingBag className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("common.products")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/products") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/products" className={`relative block px-2 md:px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/products") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("common.products")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/products") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <Link href="/about" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/about") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("common.about")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/about") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/about" className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/about") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("common.about")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/about") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <div className="w-px h-4 bg-slate-200/80 mx-2 flex-shrink-0" />
-
-                                        <Link href="/flash-sale" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/flash-sale") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <Flame className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("common.flashSale")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/flash-sale") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/flash-sale" className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/flash-sale") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("common.flashSale")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/flash-sale") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <Link href="/vouchers" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/vouchers") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <Gift className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("navbar.voucher")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/vouchers") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/vouchers" className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/vouchers") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("navbar.voucher")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/vouchers") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <div className="w-px h-4 bg-slate-200/80 mx-2 flex-shrink-0" />
-
-                                        <Link href="/posts" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/posts") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <FileText className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("navbar.posts")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/posts") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/posts" className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/posts") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("navbar.posts")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/posts") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <Link href="/faq" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/faq") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <HelpCircle className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("common.faq")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/faq") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/faq" className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/faq") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("common.faq")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/faq") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
-                                        <Link href="/contact" className={`relative flex items-center gap-1.5 px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/contact") ? "text-primary" : "text-slate-500 hover:text-primary"}`}>
-                                            <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                                            <span className="relative">{t("common.contact")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-current rounded-full transition-all duration-300 ${pathname.startsWith("/contact") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
+                                        <Link href="/contact" className={`relative block px-2 py-2.5 text-[11px] lg:text-[12px] font-bold uppercase tracking-wider transition-colors group ${pathname.startsWith("/contact") ? "text-emerald-950" : "text-emerald-900/70 hover:text-emerald-950"}`}>
+                                            <span className="relative">{t("common.contact")}<span className={`absolute -bottom-0.5 left-0 h-[2px] bg-emerald-900/30 rounded-full transition-all duration-300 ${pathname.startsWith("/contact") ? "w-full" : "w-0 group-hover:w-full"}`} /></span>
                                         </Link>
 
                                     </div>
                                 )}
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                        </div>
+                    </div>
 
-                {/* MegaMenu — positioned relative to full nav bottom */}
-                <MegaMenu isOpen={isMegaMenuOpen} onClose={() => setIsMegaMenuOpen(false)} />
 
-            </motion.nav >
+            </nav>
 
             {/* ========== MOBILE MENU DRAWER (Moved outside for fixed positioning) ========== */}
             <AnimatePresence>
@@ -678,8 +635,7 @@ function NavbarContent() {
                                 exit={{ x: "100%" }}
                                 transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
                             >
-                                {/* Mobile Menu Header */}
-                                <div className="sticky top-0 bg-white/95 backdrop-blur-xl px-5 py-4 flex items-center justify-between border-b border-slate-100 z-10">
+                                <div className="sticky top-0 bg-white/95 backdrop-blur-xl px-5 py-4 flex items-center justify-between border-b border-emerald-800/10 z-10">
                                     <Link href="/" onClick={() => setIsOpen(false)}>
                                         <motion.img
                                             src="/logo.png?v=2"
@@ -700,52 +656,6 @@ function NavbarContent() {
                                 </div>
 
                                 <div className="p-4 space-y-6 pb-28">
-                                    {/* Mobile Search - Prominent in Drawer */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.1 }}
-                                    >
-                                        <form onSubmit={handleSearch} className="relative group">
-                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center text-primary">
-                                                <Search className="w-4 h-4" />
-                                            </div>
-                                            <input
-                                                type="text"
-                                                placeholder={t("common.searchProducts")}
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-[14px] font-bold outline-none focus:border-primary/30 focus:bg-white transition-all shadow-sm"
-                                            />
-                                        </form>
-                                    </motion.div>
-
-                                    {/* Popular Categories — Horizontal scroll chips */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between px-1">
-                                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t("navbar.featuredCategories")}</h3>
-                                            <Link href="/products" className="text-[10px] font-bold text-primary" onClick={() => setIsOpen(false)}>{t("common.viewAll")}</Link>
-                                        </div>
-                                        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
-                                            {featuredCategories.map((cat, idx) => (
-                                                <motion.div
-                                                    key={cat.name}
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: 0.2 + idx * 0.05 }}
-                                                >
-                                                    <Link
-                                                        href={cat.href}
-                                                        onClick={() => setIsOpen(false)}
-                                                        className={`flex items-center gap-2 px-3.5 py-2.5 ${cat.color} rounded-2xl border border-transparent hover:border-primary/20 transition-all shadow-sm whitespace-nowrap`}
-                                                    >
-                                                        <span className="text-base">{cat.icon}</span>
-                                                        <span className="text-[11px] font-bold text-slate-700">{cat.name}</span>
-                                                    </Link>
-                                                </motion.div>
-                                            ))}
-                                        </div>
-                                    </div>
 
                                     {/* Primary navigation synced with desktop */}
                                     <div className="space-y-3">
@@ -782,7 +692,7 @@ function NavbarContent() {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-[12px] font-black uppercase tracking-wider text-emerald-700">{t("navbar.adminPortal")}</p>
-                                                    <p className="text-[11px] font-semibold text-emerald-600/90">Dashboard</p>
+                                                    <p className="text-[11px] font-semibold text-emerald-600/90">{t("navbar.dashboard") || "Dashboard"}</p>
                                                 </div>
                                                 <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-emerald-500" />
                                             </Link>
@@ -791,7 +701,7 @@ function NavbarContent() {
 
                                     {/* Language toggle for mobile */}
                                     <div className="flex items-center justify-between py-3 px-1 border-t border-slate-100">
-                                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("navbar.language") || "Ngôn ngữ / Language"}</span>
+                                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">{t("navbar.language")}</span>
                                         <LanguageToggle />
                                     </div>
 
@@ -807,7 +717,7 @@ function NavbarContent() {
                                             <Phone className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Hotline 24/7</p>
+                                            <p className="text-[10px] font-black uppercase tracking-wider text-emerald-600">{t("footer.hotline") || "Hotline 24/7"}</p>
                                             <p className="text-[13px] font-bold text-emerald-800">{supportPhone}</p>
                                         </div>
                                     </motion.a>
@@ -821,12 +731,12 @@ function NavbarContent() {
                                             transition={{ delay: 0.6 }}
                                         >
                                             <Link href="/login" onClick={() => setIsOpen(false)}>
-                                                <Button className="w-full h-11 rounded-2xl bg-gradient-to-r from-primary to-emerald-600 text-white font-black text-[12px] uppercase tracking-wider shadow-lg shadow-primary/20">
+                                                <Button className="w-full h-11 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-black text-[12px] uppercase tracking-wider shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all border-none">
                                                     {t("navbar.loginNow")}
                                                 </Button>
                                             </Link>
                                             <Link href="/register" onClick={() => setIsOpen(false)}>
-                                                <Button variant="outline" className="w-full h-11 rounded-2xl border border-slate-200 text-slate-600 font-bold text-[12px] uppercase tracking-wider hover:bg-slate-50 transition-all">
+                                                <Button variant="outline" className="w-full h-11 rounded-2xl border-2 border-emerald-500 text-emerald-600 font-bold text-[12px] uppercase tracking-wider hover:bg-emerald-50 transition-all">
                                                     {t("navbar.createAccount")}
                                                 </Button>
                                             </Link>
@@ -841,7 +751,7 @@ function NavbarContent() {
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: 0.6 }}
                                         >
-                                            <div className="w-12 h-12 rounded-2xl bg-white shadow-sm overflow-hidden p-0.5 relative">
+                                            <div className="w-12 h-12 rounded-2xl bg-white/10 shadow-sm overflow-hidden p-0.5 relative">
                                                 <Image
                                                     src={session.user.image || "/images/default-avatar.png"}
                                                     className="object-cover rounded-[14px]"
@@ -875,16 +785,16 @@ function NavbarContent() {
 export default function Navbar() {
     return (
         <Suspense fallback={
-            <nav className="sticky top-0 z-[100] bg-white border-b border-slate-100 shadow-sm">
+            <nav className="sticky top-0 z-[100] bg-[#DFF0E0] shadow-sm">
                 <div className="w-full px-4 sm:px-6 lg:px-[8%]">
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-24 h-8 bg-slate-200/50 animate-pulse rounded-lg" />
-                            <div className="hidden md:block w-96 h-10 bg-slate-100 animate-pulse rounded-full" />
+                            <div className="w-24 h-8 bg-white/20 animate-pulse rounded-lg" />
+                            <div className="hidden md:block w-96 h-10 bg-white/15 animate-pulse rounded-full" />
                         </div>
                         <div className="flex items-center gap-3">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="w-10 h-10 bg-slate-100 animate-pulse rounded-2xl" />
+                                <div key={i} className="w-10 h-10 bg-white/15 animate-pulse rounded-2xl" />
                             ))}
                         </div>
                     </div>

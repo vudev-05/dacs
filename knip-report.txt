@@ -1,0 +1,347 @@
+﻿[93m[4mUnused files[24m[39m (65)
+public/sw.js                                              
+src/hooks/useAIChat.ts                                    
+src/hooks/useAIChatStream.ts                              
+src/lib/api-validation.ts                                 
+src/lib/api-wrapper.ts                                    
+src/lib/structured-logger.ts                              
+src/lib/verify-order-total.ts                             
+src/scripts/seed-knowledge-base.ts                        
+src/types/voucher.ts                                      
+src/__tests__/setup.ts                                    
+src/components/about/AboutContent.tsx                     
+src/components/admin/AdminTopbar.tsx                      
+src/components/admin/AIAssistantWidget.tsx                
+src/components/admin/ProductImport.tsx                    
+src/components/admin/ProductQuickEdit.tsx                 
+src/components/admin/ProductTable.tsx                     
+src/components/chat/ChatWidget.tsx                        
+src/components/navbar/MegaMenu.tsx                        
+src/components/home/FeaturedProductsSection.tsx           
+src/components/home/PersonalizedRecommendationsSection.tsx
+src/components/product/FlashSaleCountdown.tsx             
+src/components/product/ProductAdvisor.tsx                 
+src/components/product/ProductSpecifications.tsx          
+src/components/product/PublicVoucherList.tsx              
+src/components/product/RecentlyViewed.tsx                 
+src/components/product/ShippingCalculator.tsx             
+src/components/product/ShopInfoCard.tsx                   
+src/components/product/TrustBadgesRow.tsx                 
+src/components/product-qa/ProductQA.tsx                   
+src/components/product-quick-view/QuickViewModal.tsx      
+src/components/product-size-guide/SizeGuide.tsx           
+src/components/seo/InternalLinks.tsx                      
+src/components/seo/StructuredData.tsx                     
+src/components/seo/WebVitalsReporter.tsx                  
+src/components/shared/CategoryShowcase.tsx                
+src/components/shared/ChatbotAIUltimate.tsx               
+src/components/shared/ClientWrappers.tsx                  
+src/components/shared/ComboRecommendation.tsx             
+src/components/shared/CustomerReviews.tsx                 
+src/components/shared/FeaturedStickyShowcase.tsx          
+src/components/shared/FlashSaleBanner.tsx                 
+src/components/shared/HeroCarousel.tsx                    
+src/components/shared/HomeSearchBar.tsx                   
+src/components/shared/RecentPosts.tsx                     
+src/components/shared/StatsSection.tsx                    
+src/components/shared/TrustBadges.tsx                     
+src/components/shared/VietnamStory.tsx                    
+src/components/shared/WhyChooseUs.tsx                     
+src/components/ui/a11y.tsx                                
+src/components/ui/ErrorBoundary.tsx                       
+src/components/ui/SkipToContent.tsx                       
+src/components/ui/ThemeToggle.tsx                         
+src/lib/ai/ai-data-reader-enhanced.ts                     
+src/lib/ai/product-analysis.ts                            
+src/lib/ai/user-segmentation.ts                           
+src/lib/i18n/product-names.ts                             
+src/lib/referral/cashout-approval.service.ts              
+src/lib/referral/velocity.service.ts                      
+src/lib/validations/flashsale.ts                          
+src/app/api/products/helpers.ts                           
+src/components/shared/featured/FeaturedHeader.tsx         
+src/components/shared/featured/FeaturedProductFrame.tsx   
+src/components/shared/featured/FeaturedProductPreview.tsx 
+src/components/shared/featured/FeaturedProductSlide.tsx   
+src/components/shared/featured/types.ts                   
+[93m[4mUnused dependencies[24m[39m (15)
+@hookform/resolvers        package.json:39:6
+@next-auth/prisma-adapter  package.json:40:6
+@prisma/client             package.json:41:6
+@stripe/react-stripe-js    package.json:44:6
+@stripe/stripe-js          package.json:45:6
+cmdk                       package.json:53:6
+date-fns                   package.json:54:6
+embla-carousel-autoplay    package.json:56:6
+embla-carousel-react       package.json:57:6
+next-themes                package.json:63:6
+radix-ui                   package.json:68:6
+react-day-picker           package.json:70:6
+react-hook-form            package.json:72:6
+vaul                       package.json:78:6
+zustand                    package.json:80:6
+[93m[4mUnused devDependencies[24m[39m (7)
+@testing-library/jest-dom    package.json:86:6 
+@testing-library/react       package.json:87:6 
+@testing-library/user-event  package.json:88:6 
+@types/bcryptjs              package.json:89:6 
+@types/dompurify             package.json:91:6 
+tw-animate-css               package.json:102:6
+web-vitals                   package.json:105:6
+[93m[4mUnlisted dependencies[24m[39m (1)
+postcss  postcss.config.mjs
+[93m[4mUnused exports[24m[39m (157)
+useTheme                      function  src/lib/theme/ThemeContext.tsx:62:17              
+buttonVariants                          src/components/ui/button.tsx:72:18                
+getAbandonedCart              function  src/components/cart/AbandonedCartTracker.tsx:77:17
+clearAbandonedCart            function  src/components/cart/AbandonedCartTracker.tsx:90:17
+PAYMENT_STATUSES                        src/lib/order-state-machine.ts:27:14              
+ORDER_STATUS                            src/lib/order-state-machine.ts:110:10             
+productSlugSchema                       src/lib/validations/product.ts:34:14              
+productVariantIdSchema                  src/lib/validations/product.ts:39:14              
+updateProductSchema                     src/lib/validations/product.ts:70:14              
+productImageSchema                      src/lib/validations/product.ts:75:14              
+productVariantSchema                    src/lib/validations/product.ts:82:14              
+shippingAddressSchema                   src/lib/validations/order.ts:17:14                
+orderItemSchema                         src/lib/validations/order.ts:62:14                
+paymentMethodEnum                       src/lib/validations/order.ts:77:14                
+createOrderSchema                       src/lib/validations/order.ts:86:14                
+updateOrderStatusSchema                 src/lib/validations/order.ts:198:14               
+cancelOrderSchema                       src/lib/validations/order.ts:282:14               
+orderFilterSchema                       src/lib/validations/order.ts:292:14               
+updateReviewSchema                      src/lib/validations/review.ts:42:14               
+deleteReviewSchema                      src/lib/validations/review.ts:59:14               
+reviewFilterSchema                      src/lib/validations/review.ts:64:14               
+replyToReviewSchema                     src/lib/validations/review.ts:82:14               
+markReviewHelpfulSchema                 src/lib/validations/review.ts:92:14               
+reportReviewSchema                      src/lib/validations/review.ts:97:14               
+couponQuerySchema                       src/lib/validations/coupon.ts:16:14               
+updateCouponSchema                      src/lib/validations/coupon.ts:73:14               
+validateCouponSchema                    src/lib/validations/coupon.ts:76:14               
+setCSRFCookie                 function  src/lib/csrf.ts:34:23                             
+verifyCSRF                    function  src/lib/csrf.ts:51:23                             
+alreadyExists                 function  src/lib/api-error.ts:129:17                       
+paginatedResponse             function  src/lib/pagination.ts:68:17                       
+paginatedQuery                function  src/lib/pagination.ts:79:23                       
+removeCartItemSchema                    src/lib/validations/cart.ts:47:14                 
+clearCartSchema                         src/lib/validations/cart.ts:52:14                 
+applyVoucherSchema                      src/lib/validations/cart.ts:57:14                 
+batchAddToCartSchema                    src/lib/validations/cart.ts:67:14                 
+CardAction                              src/components/ui/card.tsx:96:3                   
+CardDescription                         src/components/ui/card.tsx:97:3                   
+USD_TO_VND_RATE                         src/lib/currency.ts:24:14                         
+setDefaultCurrency            function  src/lib/currency.ts:26:17                         
+getDefaultCurrency            function  src/lib/currency.ts:30:17                         
+formatPriceNumber             function  src/lib/currency.ts:43:17                         
+getCurrencySymbol             function  src/lib/currency.ts:50:17                         
+parsePrice                    function  src/lib/currency.ts:63:17                         
+DialogTrigger                 function  src/components/ui/dialog.tsx:42:17                
+DialogDescription             function  src/components/ui/dialog.tsx:162:17               
+AdminButton                   function  src/components/admin/AdminPageContainer.tsx:99:17 
+StatusBadge                   function  src/components/admin/AdminPageContainer.tsx:147:17
+AdminInput                    function  src/components/admin/AdminPageContainer.tsx:174:17
+AdminSelect                   function  src/components/admin/AdminPageContainer.tsx:203:17
+EmptyState                    function  src/components/admin/AdminPageContainer.tsx:236:17
+LoadingSpinner                function  src/components/admin/AdminPageContainer.tsx:265:17
+AnalyticsSDK                            src/lib/analytics/sdk.ts:285:10                   
+trackEvent                    function  src/lib/tracking.ts:40:17                         
+usePrefetchOnHover            function  src/lib/prefetch.ts:20:17                         
+prefetchRoutes                function  src/lib/prefetch.ts:35:17                         
+ProfileHeader                           src/components/profile/index.ts:8:10              
+enhancedChat                  function  src/lib/ai/enhanced-chatbot.ts:723:23             
+default                       function  src/lib/ai/enhanced-chatbot.ts:933:16             
+getTurnstileSecret            function  src/lib/captcha.ts:35:23                          
+getCaptchaConfig              function  src/lib/captcha.ts:46:23                          
+formatOrderNotification       function  src/lib/telegram.ts:167:17                        
+notifySecurityAlert           function  src/lib/telegram.ts:301:23                        
+isProduction                            src/env.ts:139:14                                 
+isDevelopment                           src/env.ts:140:14                                 
+isTest                                  src/env.ts:141:14                                 
+requireEnv                    function  src/env.ts:147:17                                 
+getEnv                        function  src/env.ts:159:17                                 
+createNotification            function  src/lib/notifications.ts:21:23                    
+createWelcomeNotification     function  src/lib/notifications.ts:112:23                   
+markNotificationAsRead        function  src/lib/notifications.ts:122:23                   
+markAllNotificationsAsRead    function  src/lib/notifications.ts:135:23                   
+getUnreadCount                function  src/lib/notifications.ts:148:23                   
+SITE_CURRENCY                           src/lib/commerce.ts:8:14                          
+POINTS_TO_DOLLAR_RATIO                  src/lib/commerce.ts:39:14                         
+decrypt                       function  src/lib/encryption.ts:80:17                       
+isEncrypted                   function  src/lib/encryption.ts:132:17                      
+ensureEncrypted               function  src/lib/encryption.ts:141:17                      
+maskValue                     function  src/lib/encryption.ts:152:17                      
+incrementSoldCount            function  src/lib/rating.ts:41:23                           
+getEscalationResponse         function  src/lib/ai/safety-guard.ts:185:17                 
+JsonLd                        function  src/components/seo/JsonLd.tsx:18:17               
+OrganizationJsonLd            function  src/components/seo/JsonLd.tsx:30:17               
+FAQJsonLd                     function  src/components/seo/JsonLd.tsx:146:17              
+WebSiteJsonLd                 function  src/components/seo/JsonLd.tsx:170:17              
+ArticleJsonLd                 function  src/components/seo/JsonLd.tsx:192:17              
+ReferralSource                          src/lib/referral/types.ts:12:14                   
+MilestoneRewardType                     src/lib/referral/types.ts:39:14                   
+MilestoneRewardStatus                   src/lib/referral/types.ts:49:14                   
+ReferralTier                            src/lib/referral/types.ts:102:14                  
+customCodeSchema                        src/lib/referral/types.ts:187:14                  
+convertBalanceSchema                    src/lib/referral/types.ts:220:14                  
+manualAdjustSchema                      src/lib/referral/types.ts:271:14                  
+generateProductDescription    function  src/lib/ai/content-generator.ts:140:23            
+getAIContentAnalysis          function  src/lib/ai/admin-service.ts:479:23                
+logFeedback                   function  src/lib/ai/ai-logger.ts:62:23                     
+trackPageView                 function  src/lib/analytics/behavior.ts:93:23               
+trackProductView              function  src/lib/analytics/behavior.ts:110:23              
+trackAddToCart                function  src/lib/analytics/behavior.ts:134:23              
+trackSearch                   function  src/lib/analytics/behavior.ts:184:23              
+clearDataCache                function  src/lib/ai/ai-data-reader.ts:33:23                
+getUserPurchaseProfile        function  src/lib/ai/ai-data-reader.ts:118:23               
+getProductInsights            function  src/lib/ai/ai-data-reader.ts:261:23               
+getStoreSnapshot              function  src/lib/ai/ai-data-reader.ts:315:23               
+getFullProductCatalog         function  src/lib/ai/ai-data-reader.ts:379:23               
+getBrandsInfo                 function  src/lib/ai/ai-data-reader.ts:412:23               
+getUserRecentOrders           function  src/lib/ai/ai-data-reader.ts:436:23               
+getBlogHighlights             function  src/lib/ai/ai-data-reader.ts:478:23               
+getStoreConfig                function  src/lib/ai/ai-data-reader.ts:539:23               
+getUserPointsBalance          function  src/lib/ai/ai-data-reader.ts:581:23               
+getAPIKey                     function  src/lib/ai/ai-provider.ts:82:23                   
+clearAICache                  function  src/lib/ai/ai-provider.ts:271:23                  
+getAICacheStats               function  src/lib/ai/ai-provider.ts:276:23                  
+getOpenAIApiKey               function  src/lib/ai/ai-provider.ts:332:23                  
+getAnswer                     function  src/lib/ai/knowledge-base.ts:380:23               
+stripe                                  src/lib/stripe.ts:23:14                           
+createLiveChat                function  src/lib/chat/live-chat-service.ts:45:23           
+sendLiveChatMessage           function  src/lib/chat/live-chat-service.ts:84:23           
+getLiveChats                  function  src/lib/chat/live-chat-service.ts:134:23          
+getUserActiveChat             function  src/lib/chat/live-chat-service.ts:242:23          
+getAdminUnreadCount           function  src/lib/chat/live-chat-service.ts:254:23          
+getSystemSetting              function  src/lib/system-settings.ts:30:23                  
+getSystemSettingBooleanOnOff  function  src/lib/system-settings.ts:54:23                  
+requireRole                   function  src/lib/api-auth.ts:40:23                         
+requireSuperAdmin             function  src/lib/api-auth.ts:70:23                         
+isAdmin                       function  src/lib/api-auth.ts:77:23                         
+getCurrentUserId              function  src/lib/api-auth.ts:88:23                         
+isCustomCodeAvailable         function  src/lib/referral/code.service.ts:118:23           
+isProgramEnabled              function  src/lib/referral/config.service.ts:55:23          
+optionalEmailSchema                     src/lib/validations/common.ts:55:14               
+optionalPhoneSchema                     src/lib/validations/common.ts:58:14               
+positiveIntSchema                       src/lib/validations/common.ts:67:14               
+paginationSchema                        src/lib/validations/common.ts:78:14               
+dateRangeSchema                         src/lib/validations/common.ts:84:14               
+ProductCardSkeleton           function  src/components/ui/product-skeleton.tsx:14:17      
+ProductDetailSkeleton         function  src/components/ui/product-skeleton.tsx:49:17      
+CartItemSkeleton              function  src/components/ui/product-skeleton.tsx:86:17      
+CartPageSkeleton              function  src/components/ui/product-skeleton.tsx:107:17     
+ProfileHeader                 function  src/components/profile/ProfileHeader.tsx:37:17    
+saveContext                   function  src/lib/ai/context-manager.ts:106:23              
+updatePreferences             function  src/lib/ai/context-manager.ts:176:23              
+clearContext                  function  src/lib/ai/context-manager.ts:199:23              
+getRecentlyViewedProducts     function  src/lib/ai/context-manager.ts:212:23              
+trackProductView              function  src/lib/ai/context-manager.ts:223:23              
+getProduct                    function  src/lib/ai/product-service.ts:138:23              
+getProductsByCategory         function  src/lib/ai/product-service.ts:165:23              
+getRelatedProducts            function  src/lib/ai/product-service.ts:188:23              
+getBrands                     function  src/lib/ai/product-service.ts:357:23              
+getOrderStatus                function  src/lib/ai/product-service.ts:379:23              
+OrderReviewButton             function  src/components/review/WriteReviewButton.tsx:173:17
+CACHE_TTL                               src/lib/cache.ts:57:14                            
+invalidateCache               function  src/lib/cache.ts:121:23                           
+invalidateCacheKey            function  src/lib/cache.ts:142:23                           
+checkAddressFraud             function  src/lib/referral/fraud.service.ts:122:23          
+processHeldCommissions        function  src/lib/referral/commission.service.ts:129:23     
+creditAvailableBalance        function  src/lib/referral/wallet.service.ts:14:23          
+ReviewForm                    function  src/components/review/ReviewForm.tsx:33:17        
+[93m[4mUnused exported types[24m[39m (93)
+AddableProduct            type       src/contexts/CartContext.tsx:43:13                           
+PaymentStatus             type       src/lib/order-state-machine.ts:30:13                         
+ProductQueryInput         type       src/lib/validations/product.ts:93:13                         
+ProductSlugInput          type       src/lib/validations/product.ts:94:13                         
+CreateProductInput        type       src/lib/validations/product.ts:95:13                         
+UpdateProductInput        type       src/lib/validations/product.ts:96:13                         
+ProductVariantInput       type       src/lib/validations/product.ts:97:13                         
+ShippingAddressInput      type       src/lib/validations/order.ts:329:13                          
+OrderItemInput            type       src/lib/validations/order.ts:330:13                          
+CreateOrderInput          type       src/lib/validations/order.ts:331:13                          
+CreateOrderRequestInput   type       src/lib/validations/order.ts:332:13                          
+UpdateOrderStatusInput    type       src/lib/validations/order.ts:333:13                          
+CancelOrderInput          type       src/lib/validations/order.ts:334:13                          
+OrderFilterInput          type       src/lib/validations/order.ts:335:13                          
+PaymentMethod             type       src/lib/validations/order.ts:336:13                          
+CreateReviewInput         type       src/lib/validations/review.ts:114:13                         
+UpdateReviewInput         type       src/lib/validations/review.ts:115:13                         
+DeleteReviewInput         type       src/lib/validations/review.ts:116:13                         
+ReviewFilterInput         type       src/lib/validations/review.ts:117:13                         
+ReplyToReviewInput        type       src/lib/validations/review.ts:118:13                         
+MarkReviewHelpfulInput    type       src/lib/validations/review.ts:119:13                         
+ReportReviewInput         type       src/lib/validations/review.ts:120:13                         
+CouponQueryInput          type       src/lib/validations/coupon.ts:81:13                          
+CreateCouponInput         type       src/lib/validations/coupon.ts:82:13                          
+UpdateCouponInput         type       src/lib/validations/coupon.ts:83:13                          
+ValidateCouponInput       type       src/lib/validations/coupon.ts:84:13                          
+LockoutCheck              interface  src/lib/account-lockout.ts:14:18                             
+ApiError                  interface  src/lib/api-error.ts:21:18                                   
+PaginationMeta            interface  src/lib/pagination.ts:17:18                                  
+PaginatedResponse         interface  src/lib/pagination.ts:26:18                                  
+UserRole                  type       src/lib/admin-auth.ts:18:13                                  
+ValidationError           type       src/lib/validations/utils.ts:37:13                           
+AddToCartInput            type       src/lib/validations/cart.ts:85:13                            
+UpdateCartItemInput       type       src/lib/validations/cart.ts:86:13                            
+RemoveCartItemInput       type       src/lib/validations/cart.ts:87:13                            
+ClearCartInput            type       src/lib/validations/cart.ts:88:13                            
+ApplyVoucherInput         type       src/lib/validations/cart.ts:89:13                            
+BatchAddToCartInput       type       src/lib/validations/cart.ts:90:13                            
+Currency                  type       src/lib/currency.ts:13:13                                    
+CurrencyConfig            interface  src/lib/currency.ts:15:18                                    
+InputProps                interface  src/components/ui/input.tsx:9:18                             
+LabelProps                type       src/components/ui/label.tsx:9:13                             
+TextareaProps             interface  src/components/ui/textarea.tsx:10:18                         
+ProductCardProduct        interface  src/components/product/ProductCard.tsx:31:18                 
+ProductCardProps          interface  src/types/product.ts:59:18                                   
+ProductVariant            interface  src/types/product.ts:63:18                                   
+EventType                 type       src/lib/analytics/sdk.ts:286:15                              
+EventData                 type       src/lib/analytics/sdk.ts:286:26                              
+ContactInput              type       src/lib/validations/contact.ts:47:13                         
+NewsletterInput           type       src/lib/validations/contact.ts:63:13                         
+CaptchaConfig             type       src/lib/captcha.ts:11:13                                     
+CaptchaVerifyResult       type       src/lib/captcha.ts:18:13                                     
+OrderNotificationData     interface  src/lib/telegram.ts:24:18                                    
+SafetyResult              interface  src/lib/ai/safety-guard.ts:12:18                             
+ContactInfo               interface  src/lib/contact-info.ts:9:18                                 
+ProductDetailClientProps  interface  src/app/(shop)/products/[slug]/ProductDetailClient.tsx:107:18
+CashoutItem               interface  src/lib/referral/types.ts:356:18                             
+GeneratedProductContent   interface  src/lib/ai/content-generator.ts:28:18                        
+LeadScore                 interface  src/lib/ai/behavioral-intelligence.ts:16:18                  
+FunnelAnalysis            interface  src/lib/ai/behavioral-intelligence.ts:27:18                  
+AbandonedSession          interface  src/lib/ai/behavioral-intelligence.ts:38:18                  
+RetentionCohort           interface  src/lib/ai/behavioral-intelligence.ts:51:18                  
+SearchIntent              interface  src/lib/ai/behavioral-intelligence.ts:340:18                 
+UserSegmentData           interface  src/lib/ai/ai-behavior-analyzer.ts:14:18                     
+ConversionFunnel          interface  src/lib/ai/ai-behavior-analyzer.ts:21:18                     
+BehaviorInsight           interface  src/lib/ai/ai-behavior-analyzer.ts:30:18                     
+BehaviorEvent             interface  src/lib/analytics/behavior.ts:40:18                          
+ProductSummary            interface  src/lib/ai/ai-data-reader.ts:37:18                           
+UserPurchaseProfile       interface  src/lib/ai/ai-data-reader.ts:53:18                           
+StoreSnapshot             interface  src/lib/ai/ai-data-reader.ts:63:18                           
+ProductInsight            interface  src/lib/ai/ai-data-reader.ts:74:18                           
+AdvisorRequest            interface  src/lib/ai/ai-types.ts:144:18                                
+ContentType               type       src/lib/ai/ai-types.ts:166:13                                
+ContentRequest            interface  src/lib/ai/ai-types.ts:175:18                                
+ContentResult             interface  src/lib/ai/ai-types.ts:191:18                                
+SendEmailOptions          interface  src/lib/email/send.ts:14:18                                  
+ChatStatus                type       src/lib/chat/live-chat-service.ts:14:13                      
+SenderType                type       src/lib/chat/live-chat-service.ts:15:13                      
+LiveChatSummary           interface  src/lib/chat/live-chat-service.ts:17:18                      
+LiveChatMessageData       interface  src/lib/chat/live-chat-service.ts:32:18                      
+RecommendationType        type       src/lib/ai/recommendation-engine.ts:11:13                    
+RecommendationInput       interface  src/lib/ai/recommendation-engine.ts:21:18                    
+UserPreferences           interface  src/lib/ai/recommendation-engine.ts:32:18                    
+ProductRecommendation     interface  src/lib/ai/recommendation-engine.ts:39:18                    
+RecommendationResult      interface  src/lib/ai/recommendation-engine.ts:58:18                    
+GetPublicSettingsOptions  type       src/lib/public-settings.ts:20:13                             
+ChatMessage               interface  src/lib/ai/context-manager.ts:12:18                          
+ConversationContext       interface  src/lib/ai/context-manager.ts:19:18                          
+ProductInfo               interface  src/lib/ai/product-service.ts:14:18                          
+FlashSaleInfo             interface  src/lib/ai/product-service.ts:43:18                          
+ShippingInfo              interface  src/lib/ai/product-service.ts:58:18                          
+BadgeProps                interface  src/components/ui/badge.tsx:9:18                             
+CacheOptions              interface  src/lib/cache.ts:49:18                                       
+[93m[4mDuplicate exports[24m[39m (1)
+enhancedChat|default  src/lib/ai/enhanced-chatbot.ts
+[33m[4mConfiguration hints[24m (1)[39m

@@ -64,7 +64,6 @@ export default function SearchSuggestions({
                 <div className="mb-1">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-slate-400" />
                             <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">{t('shopPage.recentSearches')}</span>
                         </div>
                         <button
@@ -83,7 +82,7 @@ export default function SearchSuggestions({
                                 onClick={() => onTrendingClick(h)}
                                 className="px-3 py-2 rounded-2xl text-[12px] font-semibold bg-slate-100 text-slate-600 hover:bg-primary/10 hover:text-primary transition-all"
                             >
-                                🕐 {h}
+                                {h}
                             </button>
                         ))}
                     </div>

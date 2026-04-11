@@ -11,7 +11,6 @@ import { useLanguage } from "@/lib/i18n/context";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";
-import Image from "next/image";
 
 const LANGUAGES = [
     { code: "vi" as const, flag: "/images/flags/vn.svg", name: "Việt Nam", short: "VI" },

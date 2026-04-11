@@ -8,444 +8,412 @@
  */
 
 import Link from "next/link";
-import Image from "next/image";
 import {
-    Facebook,
-    Mail,
     Phone,
     MapPin,
+    Mail,
     ShieldCheck,
     Truck,
-    RefreshCw,
-    CreditCard,
     ChevronDown,
-    Send,
-    CheckCircle2,
-    AlertCircle,
-    Star,
+    Facebook,
     Instagram,
+    Youtube,
+    Music2,
 } from "lucide-react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/context";
 
-// ─── Link group (accordion on mobile) ─────────────────────────────────────────
-
-function LinkGroup({ group }: { group: { title: string; links: { label: string; href: string }[] } }) {
-    const [open, setOpen] = useState(false);
-
-    return (
-        <div>
-            {/* Desktop title */}
-            <p className="hidden md:block text-[11px] font-extrabold uppercase tracking-[0.12em] text-slate-500 mb-4">
-                {group.title}
-            </p>
-
-            {/* Mobile toggle */}
-            <button
-                className="md:hidden w-full flex items-center justify-between py-3 border-b border-slate-100 text-left"
-                onClick={() => setOpen((v) => !v)}
-                aria-expanded={open}
-            >
-                <span className="text-[13px] font-semibold text-slate-800">{group.title}</span>
-                <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}>
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
-                </motion.span>
-            </button>
-
-            {/* Links */}
-            <AnimatePresence initial={false}>
-                <motion.ul
-                    key={open ? "o" : "c"}
-                    className="overflow-hidden space-y-2.5"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={
-                        typeof window !== "undefined" && window.innerWidth >= 768
-                            ? { height: "auto", opacity: 1 }
-                            : open ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }
-                    }
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                >
-                    <div className="md:hidden h-2.5" />
-                    {group.links.map((link) => (
-                        <li key={link.label}>
-                            <Link
-                                href={link.href}
-                                className="text-[13px] font-semibold text-slate-700 hover:text-primary transition-colors duration-200"
-                            >
-                                {link.label}
-                            </Link>
-                        </li>
-                    ))}
-                    <div className="md:hidden h-2" />
-                </motion.ul>
-            </AnimatePresence>
-        </div>
-    );
-}
-
-// ─── Newsletter ───────────────────────────────────────────────────────────────
-
-function Newsletter() {
-    const { t } = useLanguage();
-    const [email, setEmail] = useState("");
-    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const trimmed = email.trim();
-        if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return;
-        setStatus("loading");
-        try {
-            const res = await fetch("/api/newsletter/subscribe", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: trimmed }),
-            });
-            setStatus(res.ok ? "success" : "error");
-        } catch {
-            setStatus("error");
-        }
-    };
-
-    return (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/8 via-emerald-50 to-teal-50 border border-primary/15 px-7 py-6 md:py-7">
-            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-primary/8 blur-2xl pointer-events-none" />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                        <Star className="w-3.5 h-3.5 text-primary fill-primary" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary">{t("footer.exclusiveOffers")}</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-800 leading-snug">
-                        {t("footer.newsletterTitle")}
-                    </h3>
-                    <p className="text-[12px] text-slate-500 mt-1 max-w-sm leading-relaxed">
-                        {t("footer.newsletterDesc")}
-                    </p>
-                </div>
-
-                {/* Form */}
-                <div className="w-full md:w-auto md:min-w-[360px]">
-                    {status === "success" ? (
-                        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                            <p className="text-[13px] font-medium text-emerald-700">{t("footer.subscribeSuccess")}</p>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="flex gap-2">
-                            <div className="flex-1 relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder={t("footer.emailPlaceholder")}
-                                    className={`w-full pl-9 pr-3 py-2.5 rounded-xl bg-white border text-[13px] text-slate-800 placeholder:text-slate-400 outline-none transition-all ${
-                                        status === "error"
-                                            ? "border-red-300 focus:ring-1 focus:ring-red-200"
-                                            : "border-slate-200 focus:border-primary/50 focus:ring-1 focus:ring-primary/15"
-                                    }`}
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                disabled={status === "loading"}
-                                className="flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-[13px] font-semibold rounded-xl transition-all shadow-sm shadow-primary/15 flex-shrink-0 disabled:opacity-60 active:scale-95"
-                            >
-                                {status === "loading"
-                                    ? <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    : <Send className="w-3.5 h-3.5" />
-                                }
-                                <span>{t("footer.subscribe")}</span>
-                            </button>
-                        </form>
-                    )}
-                    {status === "error" && (
-                        <div className="flex items-center gap-1 mt-1.5">
-                            <AlertCircle className="w-3 h-3 text-red-400" />
-                            <p className="text-[11px] text-red-500">{t("footer.subscribeError")}</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ─── Payment Methods ──────────────────────────────────────────────────────────
+type FooterMenuCategory = {
+    name: string;
+    slug: string;
+};
 
 const PAYMENT_METHODS = [
-    { label: "Stripe",     color: "text-[#635BFF] bg-indigo-50 border-indigo-100"  },
-    { label: "Visa",       color: "text-blue-700 bg-blue-50 border-blue-100"  },
-    { label: "Mastercard", color: "text-red-600 bg-red-50 border-red-100"  },
-    { label: "Amex",       color: "text-blue-600 bg-blue-50 border-blue-100" },
+    {
+        label: "Visa",
+        icon: (
+            <div className="flex items-center justify-center pt-0.5">
+                <span className="text-[#1434CB] font-black italic text-[18px] sm:text-[20px] tracking-tighter leading-none" style={{ fontFamily: "Arial, sans-serif", transform: "scaleX(1.05)" }}>
+                    VISA
+                </span>
+            </div>
+        ),
+    },
+    {
+        label: "Mastercard",
+        icon: (
+            <svg viewBox="0 0 38 24" className="h-5 sm:h-6 w-auto">
+              <circle cx="12" cy="12" r="12" fill="#EA001B"/>
+              <circle cx="26" cy="12" r="12" fill="#FFA200"/>
+              <path d="M19 21.05C16.5 19.5 15 16 15 12C15 8 16.5 4.5 19 2.95C21.5 4.5 23 8 23 12C23 16 21.5 19.5 19 21.05Z" fill="#FF5E00"/>
+            </svg>
+        ),
+    },
+    {
+        label: "American Express",
+        icon: (
+            <div className="bg-[#2671B9] rounded-[4px] px-2 flex items-center justify-center h-[22px] sm:h-6">
+                <span className="text-white font-[900] text-[10px] sm:text-[11px] tracking-[0.06em] leading-none" style={{ fontFamily: "Arial, sans-serif" }}>
+                    AMEX
+                </span>
+            </div>
+        ),
+    },
+    {
+        label: "Apple Pay",
+        icon: (
+             <div className="flex items-center gap-1.5 pt-0.5">
+                <svg viewBox="0 0 384 512" className="h-[14px] sm:h-[16px] w-auto fill-slate-800">
+                  <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                </svg>
+                <span className="text-slate-800 font-[700] tracking-tight text-[12px] sm:text-[14px] leading-none">Pay</span>
+            </div>
+        ),
+    },
 ];
 
-const SHIPPING_PARTNERS = [
-    { label: "USPS",       color: "text-blue-700 bg-blue-50 border-blue-100" },
-    { label: "FedEx",      color: "text-purple-600 bg-purple-50 border-purple-100" },
-    { label: "UPS",        color: "text-amber-700 bg-amber-50 border-amber-100" },
-    { label: "US Shipping", color: "text-emerald-600 bg-emerald-50 border-emerald-100" },
-];
 
-// ─── Main Footer ──────────────────────────────────────────────────────────────
 
 export default function Footer() {
     const ref = useRef<HTMLElement>(null);
     const isInView = useInView(ref, { once: true, margin: "-60px" });
     const { t } = useLanguage();
-    const [supportPhone, setSupportPhone] = useState("+1 402-315-8105");
-    const [supportEmail, setSupportEmail] = useState("tranquocvu3011@gmail.com");
-    const [supportAddress, setSupportAddress] = useState("Omaha, NE 68136, United States");
+
+    const [supportPhone, setSupportPhone] = useState(process.env.NEXT_PUBLIC_SITE_SUPPORT_PHONE || "+1 402-315-8105");
+    const [supportEmail, setSupportEmail] = useState(process.env.NEXT_PUBLIC_SITE_SUPPORT_EMAIL || "tranquocvu3011@gmail.com");
+    const [supportAddress, setSupportAddress] = useState(process.env.NEXT_PUBLIC_SITE_ADDRESS || "Omaha, NE 68136, United States");
     const [socialUrls, setSocialUrls] = useState({
-        facebook: "https://www.facebook.com/profile.php?id=100076170558548",
-        instagram: "https://instagram.com/likefood",
-        tiktok: "",
-        youtube: "",
+        facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/profile.php?id=100076170558548",
+        instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://instagram.com/likefood",
+        tiktok: process.env.NEXT_PUBLIC_TIKTOK_URL || "",
+        youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || "",
     });
+    const [websiteCategories, setWebsiteCategories] = useState<FooterMenuCategory[]>([]);
 
     useEffect(() => {
         const load = async () => {
             try {
                 const { getPublicSettings } = await import("@/lib/public-settings");
-                const data = await getPublicSettings();
+                const [data, categoriesRes] = await Promise.all([
+                    getPublicSettings(),
+                    fetch("/api/categories/menu").catch(() => null),
+                ]);
+
                 if (data.SITE_SUPPORT_PHONE) setSupportPhone(data.SITE_SUPPORT_PHONE);
                 if (data.SITE_SUPPORT_EMAIL) setSupportEmail(data.SITE_SUPPORT_EMAIL);
                 if (data.SITE_ADDRESS) setSupportAddress(data.SITE_ADDRESS);
-                setSocialUrls(prev => ({
+                setSocialUrls((prev) => ({
                     facebook: data.FACEBOOK_URL || prev.facebook,
                     instagram: data.INSTAGRAM_URL || prev.instagram,
                     tiktok: data.TIKTOK_URL || prev.tiktok,
                     youtube: data.YOUTUBE_URL || prev.youtube,
                 }));
-            } catch { /* keep defaults */ }
+
+                if (categoriesRes?.ok) {
+                    const payload = (await categoriesRes.json()) as {
+                        categories?: Array<{ name?: string; slug?: string }>;
+                    };
+                    const nextCategories = Array.isArray(payload.categories)
+                        ? payload.categories
+                            .filter((c) => c?.name && c?.slug)
+                            .map((c) => ({ name: String(c.name), slug: String(c.slug) }))
+                        : [];
+                    setWebsiteCategories(nextCategories);
+                }
+            } catch {
+                // Keep defaults
+            }
         };
         void load();
     }, []);
 
-    // ── Trust badges using i18n ──
-    const TRUST_ITEMS = [
-        { icon: ShieldCheck, title: t("trustBadges.authentic"),  desc: t("trustBadges.authenticDesc"), color: "text-emerald-600", bg: "bg-emerald-50",  border: "border-emerald-100" },
-        { icon: Truck,       title: t("trustBadges.freeShip"),   desc: t("trustBadges.freeShipDesc"),  color: "text-sky-600",     bg: "bg-sky-50",      border: "border-sky-100"     },
-        { icon: RefreshCw,   title: t("trustBadges.return"),     desc: t("trustBadges.returnDesc"),    color: "text-amber-600",   bg: "bg-amber-50",    border: "border-amber-100"   },
-        { icon: CreditCard,  title: t("trustBadges.secure"),     desc: t("trustBadges.secureDesc"),    color: "text-violet-600",  bg: "bg-violet-50",   border: "border-violet-100"  },
+    const dynamicCategoryLinks = websiteCategories.slice(0, 8).map((cat) => ({
+        label: t(`categories.${cat.name}` as any) !== `categories.${cat.name}` ? t(`categories.${cat.name}` as any) : cat.name,
+        href: `/products?category=${encodeURIComponent(cat.slug)}`,
+    }));
+
+
+    /* ── Link data ── */
+    const linksList = [
+        { label: t("footer.aboutUs"), href: "/about" },
+        { label: t("footer.brandStory"), href: "/about#story" },
+        { label: t("footer.posts"), href: "/posts" },
+        { label: t("footer.shippingPolicy"), href: "/policies/shipping" },
+        { label: t("footer.returnPolicy"), href: "/policies/return" },
+        { label: t("footer.faq"), href: "/faq" },
     ];
 
-    // ── Link groups using i18n — fixed dead links ──
-    const LINK_GROUPS = [
-        {
-            title: t("footer.products"),
-            links: [
-                { label: t("footer.allProducts"),       href: "/products" },
-                { label: t("footer.featuredProducts"),   href: "/products?featured=true" },
-                { label: t("footer.gifts"),              href: "/products?category=gifts" },
-                { label: t("footer.traditionalSpices"),  href: "/products?category=gia-vi" },
-                { label: t("footer.driedSeafood"),       href: "/products?category=ca-kho" },
-                { label: t("footer.flashSale"),          href: "/flash-sale" },
-            ],
-        },
-        {
-            title: t("footer.company"),
-            links: [
-                { label: t("footer.aboutUs"),            href: "/about" },
-                { label: t("footer.brandStory"),         href: "/about#story" },
-                { label: "LIKEFOOD là gì?",              href: "/likefood-la-gi" },
-                { label: t("footer.posts"),              href: "/posts" },
-                { label: t("footer.faq"),                href: "/faq" },
-                { label: t("footer.contactUs"),          href: "/contact" },
-            ],
-        },
-        {
-            title: t("footer.support"),
-            links: [
-                { label: t("footer.orderTracking"),      href: "/profile/orders" },
-                { label: t("footer.shippingPolicy"),     href: "/policies/shipping" },
-                { label: t("footer.returnPolicy"),       href: "/policies/return" },
-                { label: t("footer.faqLink"),            href: "/faq" },
-            ],
-        },
-        {
-            title: t("footer.policies"),
-            links: [
-                { label: t("footer.privacyPolicy"),      href: "/policies/privacy" },
-                { label: t("footer.termsOfService"),      href: "/policies/terms" },
-                { label: t("footer.returnPolicy"),        href: "/policies/return" },
-                { label: t("footer.shippingPolicy"),      href: "/policies/shipping" },
-            ],
-        },
-    ];
+    const categoriesList =
+        dynamicCategoryLinks.length > 0
+            ? dynamicCategoryLinks
+            : [
+                { label: t("footer.allProducts"), href: "/products" },
+                { label: t("footer.featuredProducts"), href: "/products?featured=true" },
+                { label: t("footer.driedSeafood"), href: "/products?category=dried-seafood" },
+                { label: t("footer.traditionalSpices"), href: "/products?category=spices" },
+                { label: t("footer.gifts"), href: "/products?category=gifts" },
+                { label: t("footer.flashSale"), href: "/flash-sale" },
+            ];
+
+    /* ── Mobile accordion state ── */
+    const [openCol, setOpenCol] = useState<string | null>(null);
+
+    const MobileAccordion = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+        <div className="lg:hidden">
+            <button
+                className="w-full flex items-center justify-between py-3 border-b border-emerald-200/50 text-left"
+                onClick={() => setOpenCol(openCol === id ? null : id)}
+                aria-expanded={openCol === id}
+            >
+                <span className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-emerald-900/80">{title}</span>
+                <motion.span animate={{ rotate: openCol === id ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                    <ChevronDown className="w-4 h-4 text-emerald-700/40" />
+                </motion.span>
+            </button>
+            <AnimatePresence initial={false}>
+                {openCol === id && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                    >
+                        <div className="py-3">{children}</div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 
     return (
-        <footer ref={ref} className="bg-white text-slate-800 border-t border-slate-100">
-
-            {/* ── Newsletter ── */}
-            <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] pt-10 pb-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5 }}
-                >
-                    <Newsletter />
-                </motion.div>
-            </div>
-
-            {/* ── Trust Strip ── */}
-            <div className="border-y border-slate-100 bg-slate-50/60">
-                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-5">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        {TRUST_ITEMS.map((item, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                                transition={{ duration: 0.35, delay: 0.08 + i * 0.06 }}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${item.bg} ${item.border} hover:shadow-sm transition-all cursor-default group`}
-                            >
-                                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <item.icon className={`w-4 h-4 ${item.color}`} />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="text-[12px] font-semibold text-slate-800 leading-tight">{item.title}</p>
-                                    <p className="text-[11px] text-slate-500 leading-tight mt-0.5">{item.desc}</p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* ── Main Links ── */}
-            <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-10">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-
-                    {/* Brand column */}
+        <footer ref={ref} className="text-slate-800">
+            {/* ═══════════ MAIN 4-COLUMN SECTION ═══════════ */}
+            <div className="bg-[#DFF0E0]">
+                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] pt-10 pb-1 lg:py-12">
                     <motion.div
-                        className="md:col-span-4 lg:col-span-3 space-y-5"
-                        initial={{ opacity: 0, x: -16 }}
-                        animate={isInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.45, delay: 0.12 }}
+                        className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-10"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.5, delay: 0.1 }}
                     >
-                        {/* Logo */}
-                        <Link href="/" aria-label="LIKEFOOD">
-                            <Image
-                                src="/logo.png"
-                                alt="LIKEFOOD"
-                                width={150}
-                                height={40}
-                                className="max-h-10 w-auto object-contain"
-                                style={{ width: "auto", height: "auto" }}
-                                priority
-                            />
-                        </Link>
+                        {/* ── COL 1: Brand + Description + Social ── */}
+                        <div className="space-y-4">
+                            <Link href="/" aria-label="LIKEFOOD">
+                                <motion.img
+                                    src="/logo.png?v=2"
+                                    alt="LIKEFOOD"
+                                    className="h-10 w-auto object-contain"
+                                    whileHover={{ scale: 1.03 }}
+                                />
+                            </Link>
 
-                        <p className="text-[13px] text-slate-600 leading-relaxed max-w-xs font-medium">
-                            {t("footer.description")}
-                        </p>
+                            <p className="text-[13px] text-emerald-900/55 leading-relaxed font-medium">
+                                {t("footer.description")}
+                            </p>
 
-                        {/* Contact info */}
-                        <div className="space-y-2.5">
-                            <a href={`tel:${supportPhone.replace(/[^0-9+]/g, "")}`}
-                                className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-primary transition-colors group">
-                                <div className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                                    <Phone className="w-3 h-3 text-slate-400 group-hover:text-primary transition-colors" />
-                                </div>
-                                {supportPhone}
-                            </a>
-                            <a href={`mailto:${supportEmail}`}
-                                className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-primary transition-colors group">
-                                <div className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                                    <Mail className="w-3 h-3 text-slate-400 group-hover:text-primary transition-colors" />
-                                </div>
-                                {supportEmail}
-                            </a>
-                            <div className="flex items-center gap-2 text-[13px] text-slate-500">
-                                <div className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center">
-                                    <MapPin className="w-3 h-3 text-slate-400" />
-                                </div>
-                                {supportAddress}
+                            {/* Social Icons */}
+                            <div className="flex gap-3 pt-2">
+                                {Object.entries(socialUrls).map(([key, url]) => {
+                                    if (!url) return null;
+                                    let Icon: React.ElementType | null = null;
+                                    if (key === 'facebook') Icon = Facebook;
+                                    else if (key === 'instagram') Icon = Instagram;
+                                    else if (key === 'youtube') Icon = Youtube;
+                                    else if (key === 'tiktok') Icon = Music2;
+                                    
+                                    if (!Icon) return null;
+                                    
+                                    return (
+                                        <a
+                                            key={key}
+                                            href={url}
+                                            aria-label={key}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-10 h-10 rounded-full bg-white/70 border border-emerald-200/50 flex items-center justify-center text-emerald-700 hover:bg-emerald-600 hover:border-emerald-600 hover:text-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                                        >
+                                            <Icon className="w-5 h-5 stroke-[1.5]" />
+                                        </a>
+                                    );
+                                })}
+                                <a
+                                    href={`mailto:${supportEmail}`}
+                                    aria-label="Email"
+                                    className="w-10 h-10 rounded-full bg-white/70 border border-emerald-200/50 flex items-center justify-center text-emerald-700 hover:bg-emerald-600 hover:border-emerald-600 hover:text-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                                >
+                                    <Mail className="w-5 h-5 stroke-[1.5]" />
+                                </a>
                             </div>
                         </div>
 
-                        {/* Social */}
-                        <div className="flex gap-2 pt-1">
-                            {[
-                                ...(socialUrls.facebook ? [{ href: socialUrls.facebook, icon: Facebook, label: "Facebook", hover: "hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600" }] : []),
-                                { href: `mailto:${supportEmail}`,       icon: Mail,      label: "Email",    hover: "hover:bg-primary/5 hover:border-primary/30 hover:text-primary" },
-                                ...(socialUrls.instagram ? [{ href: socialUrls.instagram, icon: Instagram, label: "Instagram", hover: "hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600" }] : []),
-                            ].map((s) => (
-                                <a key={s.label} href={s.href} aria-label={s.label}
-                                    target={s.href.startsWith("http") ? "_blank" : undefined}
-                                    rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                                    className={`w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 transition-all duration-200 ${s.hover}`}>
-                                    <s.icon className="w-3.5 h-3.5" />
-                                </a>
-                            ))}
+                        {/* ── COL 2: Links (Desktop) ── */}
+                        <div className="hidden lg:block">
+                            <h4 className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-emerald-900/80 mb-4">
+                                {t("footer.company")}
+                            </h4>
+                            <ul className="space-y-2.5">
+                                {linksList.map((link) => (
+                                    <li key={link.label}>
+                                        <Link href={link.href} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors duration-200">
+                                            {link.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                    </motion.div>
 
-                    {/* Link columns */}
-                    <motion.div
-                        className="md:col-span-8 lg:col-span-9 grid grid-cols-1 md:grid-cols-4 gap-5 md:gap-8"
-                        initial={{ opacity: 0, x: 16 }}
-                        animate={isInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.45, delay: 0.18 }}
-                    >
-                        {LINK_GROUPS.map((group) => (
-                            <LinkGroup key={group.title} group={group} />
-                        ))}
+                        {/* ── COL 3: Categories (Desktop) ── */}
+                        <div className="hidden lg:block">
+                            <h4 className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-emerald-900/80 mb-4">
+                                {t("common.categories")}
+                            </h4>
+                            <ul className="space-y-2.5">
+                                {categoriesList.map((link) => (
+                                    <li key={link.label}>
+                                        <Link href={link.href} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors duration-200">
+                                            {link.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* ── COL 4: Contact + Payment (Desktop) ── */}
+                        <div className="hidden lg:block space-y-5">
+                            <div>
+                                <h4 className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-emerald-900/80 mb-4">
+                                    {t("footer.contactUs")}
+                                </h4>
+                                <ul className="space-y-3">
+                                    <li className="flex items-start gap-2.5">
+                                        <MapPin className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        <a href="https://maps.app.goo.gl/rhG6HVGDXcAwKb7E9" target="_blank" rel="noopener noreferrer" className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors">
+                                            {supportAddress}
+                                        </a>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <Phone className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                        <a href={`tel:${supportPhone.replace(/[^0-9+]/g, "")}`} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors">
+                                            {supportPhone}
+                                        </a>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <Mail className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                        <a href={`mailto:${supportEmail}`} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors truncate">
+                                            {supportEmail}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Payment Methods — Real logos */}
+                            <div>
+                                <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-emerald-900/50 mb-2.5">
+                                    {t("footer.payment")}
+                                </p>
+                                <div className="grid grid-cols-2 gap-2.5 w-max">
+                                    {PAYMENT_METHODS.map((p) => (
+                                        <div key={p.label} title={p.label} className="w-[110px] h-[48px] bg-white rounded-lg flex items-center justify-center border border-emerald-100 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden">
+                                            <div className="scale-110 origin-center flex justify-center">
+                                                {p.icon}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── MOBILE: Accordion for Col 2, 3, 4 ── */}
+                        <div className="lg:hidden space-y-0 sm:col-span-1">
+                            <MobileAccordion id="links" title={t("footer.company")}>
+                                <ul className="space-y-2.5">
+                                    {linksList.map((link) => (
+                                        <li key={link.label}>
+                                            <Link href={link.href} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors">
+                                                {link.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </MobileAccordion>
+
+                            <MobileAccordion id="categories" title={t("common.categories")}>
+                                <ul className="space-y-2.5">
+                                    {categoriesList.map((link) => (
+                                        <li key={link.label}>
+                                            <Link href={link.href} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors">
+                                                {link.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </MobileAccordion>
+
+                            <MobileAccordion id="contact" title={t("footer.contactUs")}>
+                                <ul className="space-y-3 mb-4">
+                                    <li className="flex items-start gap-2.5">
+                                        <MapPin className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        <a href="https://maps.app.goo.gl/rhG6HVGDXcAwKb7E9" target="_blank" rel="noopener noreferrer" className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 transition-colors">
+                                            {supportAddress}
+                                        </a>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <Phone className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                        <a href={`tel:${supportPhone.replace(/[^0-9+]/g, "")}`} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900">{supportPhone}</a>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <Mail className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                        <a href={`mailto:${supportEmail}`} className="text-[13px] font-medium text-emerald-900/55 hover:text-emerald-900 truncate">{supportEmail}</a>
+                                    </li>
+                                </ul>
+                                <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-emerald-900/50 mb-2">
+                                    {t("footer.payment")}
+                                </p>
+                                <div className="grid grid-cols-4 gap-1.5 w-full">
+                                    {PAYMENT_METHODS.map((p) => (
+                                        <div key={p.label} title={p.label} className="w-full h-[36px] bg-white rounded-md flex items-center justify-center border border-emerald-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-transform hover:-translate-y-0.5 cursor-pointer overflow-hidden">
+                                            <div className="scale-[0.75] origin-center flex justify-center">
+                                                {p.icon}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </MobileAccordion>
+                        </div>
                     </motion.div>
                 </div>
             </div>
 
-            {/* ── Payment & Shipping ── */}
-            <div className="border-t border-slate-100 bg-slate-50/50">
-                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-5">
-                    <div className="flex flex-col sm:flex-row gap-5 sm:gap-8 items-start sm:items-center">
-                        <div className="flex items-center gap-3 flex-wrap">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{t("footer.payment")}</span>
-                            <div className="hidden sm:block w-px h-4 bg-slate-200" />
-                            {PAYMENT_METHODS.map((p) => (
-                                <span key={p.label} className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold ${p.color}`}>{p.label}</span>
-                            ))}
-                        </div>
-                        <div className="hidden sm:block w-px h-5 bg-slate-200 self-center" />
-                        <div className="flex items-center gap-3 flex-wrap">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{t("footer.shipping")}</span>
-                            <div className="hidden sm:block w-px h-4 bg-slate-200" />
-                            {SHIPPING_PARTNERS.map((s) => (
-                                <span key={s.label} className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold ${s.color}`}>{s.label}</span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── Footer Bottom ── */}
-            <div className="border-t border-slate-100">
-                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-4">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <p className="text-[12px] font-bold text-slate-500">
-                            © 2026 <span className="font-extrabold text-slate-700">LIKEFOOD</span>. All rights reserved.
+            {/* ═══════════ COPYRIGHT BAR ═══════════ */}
+            <div className="bg-[#DFF0E0] border-t border-emerald-200/60">
+                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-3">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <p className="text-[12px] font-medium text-emerald-800/50">
+                            © 2026 <span className="font-bold text-emerald-900/70">LIKEFOOD</span> by <span className="font-semibold">Trần Quốc Vũ</span>
                         </p>
-                        <div className="flex items-center gap-3 flex-wrap justify-center text-[11px] text-slate-400">
-                            <div className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-500" /><span>{t("footer.qualityStandard")}</span></div>
-                            <div className="w-px h-3 bg-slate-200" />
-                            <div className="flex items-center gap-1"><Truck className="w-3 h-3 text-sky-500" /><span>{t("footer.shipNationwide")}</span></div>
-                            <div className="w-px h-3 bg-slate-200" />
-                            <div className="flex items-center gap-1"><Phone className="w-3 h-3 text-primary" /><span>{t("footer.quickSupport")}</span></div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Link href="/policies/privacy" className="text-[12px] text-slate-400 hover:text-slate-600 transition-colors">{t("footer.privacy")}</Link>
-                            <Link href="/policies/terms" className="text-[12px] text-slate-400 hover:text-slate-600 transition-colors">{t("footer.terms")}</Link>
+                        <div className="flex items-center gap-3 flex-wrap justify-center text-[11px] text-emerald-800/50 font-medium">
+                            <div className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-600/60" /><span>{t("footer.qualityStandard")}</span></div>
+                            <div className="w-px h-3 bg-emerald-300/30" />
+                            <div className="flex items-center gap-1"><Truck className="w-3 h-3 text-emerald-600/60" /><span>{t("footer.shipNationwide")}</span></div>
+                            <div className="w-px h-3 bg-emerald-300/30" />
+                            <div className="flex items-center gap-1"><Phone className="w-3 h-3 text-emerald-600/60" /><span>{t("footer.quickSupport")}</span></div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            {/* ═══════════ GOOGLE MAPS — FULL WIDTH ═══════════ */}
+            <div className="w-full">
+                <iframe
+                    title="LIKEFOOD location map"
+                    src="https://maps.google.com/maps?cid=17525169677230232503&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    className="w-full h-[220px] sm:h-[280px] md:h-[320px]"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                />
+            </div>
         </footer>
     );
 }

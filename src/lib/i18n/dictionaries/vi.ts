@@ -7,7 +7,7 @@
 
 export const vi = {
     common: {
-        search: "Tìm kiếm...",
+        search: "Tìm kiếm",
         searchPlaceholder: "Tìm món ngon...",
         searchProducts: "Tìm cá khô, đặc sản...",
         cart: "Giỏ hàng",
@@ -105,6 +105,41 @@ export const vi = {
         driedFruits: "Trái cây sấy",
         teaSweets: "Trà & Bánh mứt",
         vietnameseSpices: "Gia vị Việt",
+        dashboard: "Bảng điều khiển",
+        announcement1: "MIỄN PHÍ VẬN CHUYỂN ĐƠN MỸ TỪ $200",
+        announcement2: "100% ĐẶC SẢN VIỆT CHÍNH GỐC",
+        announcement3: "GIAO HÀNG HỎA TỐC 24H",
+    },
+    // Topbar Database Announcements Fallbacks
+    "Chào mừng bạn đến với LIKEFOOD": "CHÀO MỪNG BẠN ĐẾN VỚI LIKEFOOD",
+    "Miễn phí vận chuyển cho đơn hàng từ $500": "MIỄN PHÍ VẬN CHUYỂN CHO ĐƠN HÀNG TỪ $500",
+    "Nhập mã LIKEFOOD20 để giảm 20%": "NHẬP MÃ LIKEFOOD20 ĐỂ GIẢM 20%",
+    categories: {
+        "Cá Khô & Hải Sản": "Cá Khô & Hải Sản",
+        "Trái Cây Sấy & Mứt": "Trái Cây Sấy & Mứt",
+        "Bánh Kẹo Đặc Sản": "Bánh Kẹo Đặc Sản",
+        "Trà & Thức Uống": "Trà & Thức Uống",
+        "Gia Vị & Nước Chấm": "Gia Vị & Nước Chấm",
+        "Hạt Dinh Dưỡng": "Hạt Dinh Dưỡng",
+        "Đồ Ăn Vặt & Thực Phẩm": "Đồ Ăn Vặt & Thực Phẩm",
+        "Sức Khỏe & Tiện Ích": "Sức Khỏe & Tiện Ích",
+    },
+    products: {
+        "ca-loc-kho-dong-thap": "Cá Lóc Khô Đồng Tháp",
+        "kho-ca-sac-boi-ca-mau": "Khô Cá Sặc Bổi Cà Mau",
+        "kho-ca-tra-phong": "Khô Cá Tra Phồng",
+        "tom-kho-ca-mau-loai-1": "Tôm Khô Cà Mau Loại 1",
+        "muc-kho-cau-phu-quoc": "Mực Khô Câu Phú Quốc",
+        "tom-rim-me-sai-gon": "Tôm Rim Me Sài Gòn",
+        "xoai-say-deo-cam-ranh": "Xoài Sấy Dẻo Cam Ranh",
+        "chuoi-say-gion-tien-giang": "Chuối Sấy Giòn Tiền Giang",
+        "mit-say-gion-dong-nai": "Mít Sấy Giòn Đồng Nai",
+        "mut-dua-non-ben-tre": "Mứt Dừa Non Bến Tre",
+        "tra-sen-tay-ho": "Trà Sen Tây Hồ",
+        "banh-trang-me-tay-ninh": "Bánh Tráng Me Tây Ninh",
+        "nuoc-mam-phu-quoc-40-do-dam": "Nước Mắm Phú Quốc 40 Độ Đạm",
+        "muoi-tom-tay-ninh": "Muối Tôm Tây Ninh",
+        "sa-te-chay-da-nang": "Sa Tế Chay Đà Nẵng"
     },
     shop: {
         addToCart: "Thêm vào giỏ",
@@ -515,6 +550,12 @@ export const vi = {
         quickSupport: "Hỗ trợ nhanh chóng",
         privacy: "Bảo mật",
         terms: "Điều khoản",
+        // Hardcoded text
+        callNow: "Gọi ngay",
+        quickContact: "Liên hệ nhanh",
+        storeLocation: "Vị trí cửa hàng",
+        openGoogleMaps: "Mở Google Maps",
+        whatIsLikefood: "LIKEFOOD là gì?",
     },
     trustBadges: {
         authentic: "100% Chính Hãng",

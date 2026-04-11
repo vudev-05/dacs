@@ -10,7 +10,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, ShoppingBag, Heart, User } from "lucide-react";
+import { Home, Search, ShoppingBag, Heart, User, LayoutGrid } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -29,7 +29,7 @@ export default function MobileBottomNav() {
 
     const navItems = [
         { icon: Home, label: t("mobileNav.home"), href: "/" },
-        { icon: Search, label: t("mobileNav.products"), href: "/products" },
+        { icon: LayoutGrid, label: t("mobileNav.products"), href: "/products" },
         { icon: ShoppingBag, label: t("mobileNav.cart"), href: "/cart", hasBadge: true },
         { icon: Heart, label: t("mobileNav.wishlist"), href: "/profile/wishlist", hasWishlistBadge: true },
         { icon: User, label: t("mobileNav.account"), href: "/profile" },

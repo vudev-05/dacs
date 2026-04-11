@@ -363,6 +363,9 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
         );
     }
 
+    const localizedCategory = t(`categories.${product.category}` as any) !== `categories.${product.category}` ? t(`categories.${product.category}` as any) : product.category;
+    const localizedName = product.slug && t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : product.name;
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/10">
             <div className="pt-4 pb-10">
@@ -389,9 +392,9 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                         <ChevronRight className="w-3 h-3" />
                         <Link href="/products" prefetch={true} className="hover:text-emerald-600 transition-colors">{t("common.products")}</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link href={`/products?category=${encodeURIComponent(product.category)}`} className="hover:text-emerald-600 transition-colors">{product.category}</Link>
+                        <Link href={`/products?category=${encodeURIComponent(product.category)}`} className="hover:text-emerald-600 transition-colors">{localizedCategory}</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <span className="text-slate-600 font-medium truncate max-w-[160px]">{product.name}</span>
+                        <span className="text-slate-600 font-medium truncate max-w-[160px]">{localizedName}</span>
                     </nav>
 
                     {/* ══════════ MAIN: Image + Info ══════════ */}
@@ -467,7 +470,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                                     href={`/products?category=${encodeURIComponent(product.category)}`}
                                     className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full hover:bg-emerald-100 transition-colors"
                                 >
-                                    {product.category}
+                                    {localizedCategory}
                                 </Link>
                                 {product.isNew && (
                                     <Badge variant="new" className="text-[10px] py-0.5 px-2">
@@ -484,7 +487,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                             </div>
 
                             {/* Title */}
-                            <h1 className="text-2xl lg:text-3xl font-black text-slate-900 leading-tight">{product.name}</h1>
+                            <h1 className="text-2xl lg:text-3xl font-black text-slate-900 leading-tight">{localizedName}</h1>
 
                             {/* Rating + Sold — single compact line */}
                             <div className="flex items-center gap-4 text-sm">
@@ -735,7 +738,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                 </div>
             </div>
             <StickyBuyBar
-                productName={product.name}
+                productName={localizedName}
                 price={getCurrentPrice()}
                 originalPrice={hasDiscount() ? getOriginalPrice() : undefined}
                 inStock={getCurrentInventory() > 0}

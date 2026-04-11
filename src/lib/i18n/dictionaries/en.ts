@@ -7,7 +7,7 @@
 
 export const en = {
     common: {
-        search: "Search...",
+        search: "Search",
         searchPlaceholder: "Search for food...",
         searchProducts: "Search dried fish, specialties...",
         cart: "Cart",
@@ -105,6 +105,41 @@ export const en = {
         driedFruits: "Dried Fruits",
         teaSweets: "Tea & Sweets",
         vietnameseSpices: "Vietnamese Spices",
+        dashboard: "Dashboard",
+        announcement1: "FREE USA SHIPPING FROM $200",
+        announcement2: "100% AUTHENTIC VIETNAMESE QUALITY",
+        announcement3: "24H EXPRESS DELIVERY",
+    },
+    // Topbar Database Announcements Fallbacks
+    "Chào mừng bạn đến với LIKEFOOD": "WELCOME TO LIKEFOOD",
+    "Miễn phí vận chuyển cho đơn hàng từ $500": "FREE SHIPPING ON ORDERS OVER $500",
+    "Nhập mã LIKEFOOD20 để giảm 20%": "ENTER CODE LIKEFOOD20 FOR 20% OFF",
+    categories: {
+        "Cá Khô & Hải Sản": "Dried Fish & Seafood",
+        "Trái Cây Sấy & Mứt": "Dried Fruits & Jam",
+        "Bánh Kẹo Đặc Sản": "Specialty Candy & Cakes",
+        "Trà & Thức Uống": "Tea & Beverages",
+        "Gia Vị & Nước Chấm": "Spices & Sauces",
+        "Hạt Dinh Dưỡng": "Nutrition Seeds",
+        "Đồ Ăn Vặt & Thực Phẩm": "Snacks & Groceries",
+        "Sức Khỏe & Tiện Ích": "Health & Utilities",
+    },
+    products: {
+        "ca-loc-kho-dong-thap": "Dong Thap Dried Snakehead Fish",
+        "kho-ca-sac-boi-ca-mau": "Ca Mau Dried Snakeskin Gourami",
+        "kho-ca-tra-phong": "Puffed Dried Pangasius",
+        "tom-kho-ca-mau-loai-1": "Ca Mau Premium Dried Shrimp",
+        "muc-kho-cau-phu-quoc": "Phu Quoc Sun-Dried Squid",
+        "tom-rim-me-sai-gon": "Saigon Tamarind Glazed Shrimp",
+        "xoai-say-deo-cam-ranh": "Cam Ranh Chewy Dried Mango",
+        "chuoi-say-gion-tien-giang": "Tien Giang Crispy Dried Banana",
+        "mit-say-gion-dong-nai": "Dong Nai Crispy Dried Jackfruit",
+        "mut-dua-non-ben-tre": "Ben Tre Young Coconut Jam",
+        "tra-sen-tay-ho": "Tay Ho Lotus Tea",
+        "banh-trang-me-tay-ninh": "Tay Ninh Tamarind Rice Paper",
+        "nuoc-mam-phu-quoc-40-do-dam": "Phu Quoc 40°N Fish Sauce",
+        "muoi-tom-tay-ninh": "Tay Ninh Shrimp Salt",
+        "sa-te-chay-da-nang": "Da Nang Vegetarian Satay"
     },
     shop: {
         addToCart: "Add to Cart",
@@ -515,6 +550,12 @@ export const en = {
         quickSupport: "Quick Support",
         privacy: "Privacy",
         terms: "Terms",
+        // Hardcoded text
+        callNow: "Call Now",
+        quickContact: "Quick Contact",
+        storeLocation: "Store Location",
+        openGoogleMaps: "Open Google Maps",
+        whatIsLikefood: "What is LIKEFOOD?",
     },
     trustBadges: {
         authentic: "100% Authentic",

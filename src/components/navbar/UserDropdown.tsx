@@ -103,29 +103,29 @@ export default function UserDropdown({ isOpen, onClose, user }: UserDropdownProp
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute top-[calc(100%+12px)] right-0 xl:-right-12 w-[340px] bg-white/95 backdrop-blur-3xl border border-slate-100 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] z-[999] overflow-hidden"
+                        className="absolute top-[calc(100%+8px)] right-0 xl:-right-6 w-[260px] bg-white/95 backdrop-blur-3xl border border-slate-100 rounded-[2rem] shadow-[0_15px_60px_rgba(0,0,0,0.15)] z-[999] overflow-hidden"
                     >
                         {/* User Header */}
-                        <div className="p-5 bg-gradient-to-r from-emerald-50 to-cyan-50 border-b border-slate-100">
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-white border-2 border-white shadow-lg overflow-hidden flex items-center justify-center relative">
+                        <div className="p-3 bg-gradient-to-r from-emerald-50 to-cyan-50 border-b border-slate-100">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-white border-2 border-white shadow-md overflow-hidden flex items-center justify-center relative">
                                     {user.image && !avatarError ? (
                                         <Image
                                             src={user.image}
                                             alt="Avatar"
                                             fill
                                             className="object-cover"
-                                            sizes="56px"
+                                            sizes="40px"
                                             unoptimized
                                             onError={() => setAvatarError(true)}
                                         />
                                     ) : (
-                                        <Image src="/images/default-avatar.png" alt="Avatar" fill className="object-cover" sizes="56px" unoptimized />
+                                        <Image src="/images/default-avatar.png" alt="Avatar" fill className="object-cover" sizes="40px" unoptimized />
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                        <h4 className="text-[14px] font-black text-slate-900 truncate">{user.name || t("navbar.customer")}</h4>
+                                    <div className="flex items-center gap-1.5">
+                                        <h4 className="text-[12px] font-black text-slate-900 truncate">{user.name || t("navbar.customer")}</h4>
                                         {isAdminUser && (
                                             <span className="px-2 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-black rounded-full flex items-center gap-1">
                                                 <Crown className="w-2.5 h-2.5" />
@@ -133,29 +133,29 @@ export default function UserDropdown({ isOpen, onClose, user }: UserDropdownProp
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-[11px] font-medium text-slate-500 truncate">{user.email}</p>
+                                    <p className="text-[10px] font-medium text-slate-500 truncate">{user.email}</p>
                                 </div>
                             </div>
 
                             {/* Quick Stats - Real data */}
-                            <div className="flex items-center gap-3 mt-4">
+                            <div className="flex items-center gap-2 mt-3">
                                 {isLoadingStats ? (
-                                    <div className="flex-1 flex items-center justify-center py-3">
-                                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                                    <div className="flex-1 flex items-center justify-center py-2">
+                                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="flex-1 p-2.5 bg-white rounded-2xl text-center border border-slate-100/50">
-                                            <div className="text-[14px] font-black text-primary">{stats?.orders ?? 0}</div>
-                                            <div className="text-[9px] font-bold text-slate-400 uppercase">{t("navbar.statsOrders")}</div>
+                                        <div className="flex-1 p-1.5 bg-white rounded-xl text-center border border-slate-100/50">
+                                            <div className="text-[12px] font-black text-primary">{stats?.orders ?? 0}</div>
+                                            <div className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter sm:tracking-normal">{t("navbar.statsOrders")}</div>
                                         </div>
-                                        <div className="flex-1 p-2.5 bg-white rounded-2xl text-center border border-slate-100/50">
-                                            <div className="text-[14px] font-black text-primary">{stats?.wishlist ?? 0}</div>
-                                            <div className="text-[9px] font-bold text-slate-400 uppercase">{t("navbar.statsWishlist")}</div>
+                                        <div className="flex-1 p-1.5 bg-white rounded-xl text-center border border-slate-100/50">
+                                            <div className="text-[12px] font-black text-primary">{stats?.wishlist ?? 0}</div>
+                                            <div className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter sm:tracking-normal">{t("navbar.statsWishlist")}</div>
                                         </div>
-                                        <div className="flex-1 p-2.5 bg-white rounded-2xl text-center border border-slate-100/50">
-                                            <div className="text-[14px] font-black text-primary">{stats?.vouchers ?? 0}</div>
-                                            <div className="text-[9px] font-bold text-slate-400 uppercase">{t("navbar.statsVouchers")}</div>
+                                        <div className="flex-1 p-1.5 bg-white rounded-xl text-center border border-slate-100/50">
+                                            <div className="text-[12px] font-black text-primary">{stats?.vouchers ?? 0}</div>
+                                            <div className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter sm:tracking-normal">{t("navbar.statsVouchers")}</div>
                                         </div>
                                     </>
                                 )}
@@ -163,40 +163,40 @@ export default function UserDropdown({ isOpen, onClose, user }: UserDropdownProp
                         </div>
 
                         {/* Menu Items */}
-                        <div className="p-3">
+                        <div className="p-2">
                             {isAdminUser && (
                                 <Link
                                     href="/admin/dashboard"
                                     prefetch={false}
                                     onClick={onClose}
-                                    className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 transition-all mb-2 group"
+                                    className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-all mb-1.5 group"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-sm">
-                                            <Crown className="w-4 h-4 text-white" />
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center shadow-sm">
+                                            <Crown className="w-3.5 h-3.5 text-white" />
                                         </div>
-                                        <span className="text-[12px] font-black text-emerald-700 uppercase tracking-wider">{t("navbar.adminPortal")}</span>
+                                        <span className="text-[11px] font-black text-emerald-700 uppercase tracking-wider">{t("navbar.adminPortal")}</span>
                                     </div>
-                                    <ChevronRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+                                    <ChevronRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-1 transition-transform" />
                                 </Link>
                             )}
 
                             {menuItems.map((item, idx) => {
                                 const Content = (
                                     <>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-2xl bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-                                                <item.icon className="w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                <item.icon className="w-3.5 h-3.5 text-slate-500 group-hover:text-primary transition-colors" />
                                             </div>
-                                            <span className="text-[12px] font-bold text-slate-700 group-hover:text-slate-900">{item.label}</span>
+                                            <span className="text-[11px] font-bold text-slate-700 group-hover:text-slate-900">{item.label}</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1.5">
                                             {item.badge && (
-                                                <span className={`px-2 py-0.5 ${item.label.includes('Điểm danh') ? 'bg-amber-100 text-amber-600' : 'bg-primary/10 text-primary'} text-[9px] font-black rounded-full`}>
+                                                <span className={`px-1.5 py-0.5 ${item.label.includes('Điểm danh') ? 'bg-amber-100 text-amber-600' : 'bg-primary/10 text-primary'} text-[8px] font-black rounded-full`}>
                                                     {item.badge}
                                                 </span>
                                             )}
-                                            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
+                                            <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
                                         </div>
                                     </>
                                 );
@@ -209,7 +209,7 @@ export default function UserDropdown({ isOpen, onClose, user }: UserDropdownProp
                                                 e.preventDefault();
                                                 item.onClick?.();
                                             }}
-                                            className="w-full flex items-center justify-between p-3.5 rounded-2xl hover:bg-slate-50 transition-all group text-left"
+                                            className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-all group text-left"
                                         >
                                             {Content}
                                         </button>
@@ -221,7 +221,7 @@ export default function UserDropdown({ isOpen, onClose, user }: UserDropdownProp
                                         key={item.href}
                                         href={item.href!}
                                         onClick={onClose}
-                                        className="flex items-center justify-between p-3.5 rounded-2xl hover:bg-slate-50 transition-all group"
+                                        className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-all group"
                                     >
                                         {Content}
                                     </Link>
@@ -230,16 +230,16 @@ export default function UserDropdown({ isOpen, onClose, user }: UserDropdownProp
                         </div>
 
                         {/* Logout */}
-                        <div className="p-3 pt-0">
+                        <div className="p-2 pt-0">
                             <button
                                 onClick={() => {
                                     onClose();
                                     signOut();
                                 }}
-                                className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 transition-all"
+                                className="w-full flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 transition-all"
                             >
-                                <LogOut className="w-4 h-4" />
-                                <span className="text-[11px] font-black uppercase tracking-wider">{t("navbar.logout")}</span>
+                                <LogOut className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-black uppercase tracking-wider">{t("navbar.logout")}</span>
                             </button>
                         </div>
                     </motion.div>
