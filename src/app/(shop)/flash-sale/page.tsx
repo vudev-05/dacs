@@ -92,10 +92,19 @@ export default function FlashSalePage() {
     useEffect(() => {
         let timer: NodeJS.Timeout;
 
-        const calculateTimeLeft = (endTime: number) => {
-            const now = Date.now();
-            const diff = endTime - now;
-            if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0 };
+        const getNextMilestone = () => {
+            const now = new Date();
+            const hours = now.getHours();
+            const nextMilestoneHour = Math.floor(hours / 6) * 6 + 6;
+            const milestone = new Date(now);
+            milestone.setHours(nextMilestoneHour, 0, 0, 0);
+            return milestone.getTime();
+        };
+
+        const calculateTimeLeft = () => {
+            const target = getNextMilestone();
+            const diff = target - Date.now();
+            if (diff <= 0) return { hours: 6, minutes: 0, seconds: 0 };
             return {
                 hours: Math.floor(diff / (1000 * 60 * 60)),
                 minutes: Math.floor((diff / 1000 / 60) % 60),
@@ -103,35 +112,11 @@ export default function FlashSalePage() {
             };
         };
 
-        if (countdown) {
-            const endTime = new Date(countdown).getTime();
-            setTimeLeft(calculateTimeLeft(endTime));
-            timer = setInterval(() => setTimeLeft(calculateTimeLeft(endTime)), 1000);
-        } else {
-            const DURATION = 24 * 60 * 60 * 1000;
-            const storedEndTime = typeof window !== 'undefined' ? localStorage.getItem("flash_sale_end_time") : null;
-            let endTime: number;
-
-            if (!storedEndTime) {
-                endTime = Date.now() + DURATION;
-                if (typeof window !== 'undefined') localStorage.setItem("flash_sale_end_time", endTime.toString());
-            } else {
-                endTime = parseInt(storedEndTime, 10);
-                if (endTime <= Date.now()) {
-                    endTime = Date.now() + DURATION;
-                    if (typeof window !== 'undefined') localStorage.setItem("flash_sale_end_time", endTime.toString());
-                }
-            }
-
-            setTimeLeft(calculateTimeLeft(endTime));
-            timer = setInterval(() => {
-                const currentEndTime = parseInt(localStorage.getItem("flash_sale_end_time") || "0", 10);
-                setTimeLeft(calculateTimeLeft(currentEndTime));
-            }, 1000);
-        }
+        setTimeLeft(calculateTimeLeft());
+        timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
 
         return () => clearInterval(timer);
-    }, [countdown]);
+    }, []);
 
     const handleAddToCart = (product: FlashProduct) => {
         if (product.inventory <= 0) {
