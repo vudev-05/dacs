@@ -113,9 +113,6 @@ export default function HomeNewsSection() {
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-slate-100">
                     <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                            <FileText className="w-4 h-4" />
-                        </div>
                         <h2 className="text-sm sm:text-lg font-black text-slate-800 uppercase tracking-tight">
                             {language === 'vi' ? 'Tin Tức & Bài Viết' : 'News & Posts'}
                         </h2>

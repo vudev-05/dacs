@@ -1,110 +1,90 @@
-/**
- * LIKEFOOD - Vietnamese Specialty Marketplace
- * Copyright (c) 2026 LIKEFOOD Team
- * Licensed under the MIT License
- * https://github.com/tranquocvu-3011/likefood
- */
+"use client";
 
-import prisma from "@/lib/prisma";
-import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { Sparkles, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/context";
+import ProductCard from "@/components/product/ProductCard";
+import type { ProductCardProduct } from "@/components/product/ProductCard";
 
-const FeaturedStickyShowcase = dynamic(
-    () => import("@/components/shared/FeaturedStickyShowcase"),
-    { ssr: true }
-);
+export default function FeaturedProductsSection() {
+    const { t, isVietnamese } = useLanguage();
+    const [products, setProducts] = useState<ProductCardProduct[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-export default async function FeaturedProductsSection() {
-    let rawProducts: Array<{
-        id: number;
-        slug: string | null;
-        name: string;
-        price: number;
-        originalPrice: number | null;
-        salePrice: number | null;
-        isOnSale: boolean | null;
-        image: string | null;
-        category: string;
-        productImages?: Array<{ imageUrl: string }>;
-    }> = [];
-
-    try {
-        rawProducts = await prisma.product.findMany({
-            where: { featured: true, inventory: { gt: 0 } },
-            select: {
-                id: true,
-                slug: true,
-                name: true,
-                price: true,
-                originalPrice: true,
-                salePrice: true,
-                isOnSale: true,
-                image: true,
-                category: true,
-                productImages: {
-                    orderBy: { order: "asc" },
-                    take: 1,
-                    select: { imageUrl: true }
-                },
-            },
-            orderBy: [{ isOnSale: "desc" }, { originalPrice: "desc" }, { createdAt: "desc" }, { id: "asc" }],
-            take: 8,
-        });
-
-        if (rawProducts.length === 0) {
-            rawProducts = await prisma.product.findMany({
-                where: { inventory: { gt: 0 } },
-                select: {
-                    id: true,
-                    slug: true,
-                    name: true,
-                    price: true,
-                    originalPrice: true,
-                    salePrice: true,
-                    isOnSale: true,
-                    image: true,
-                    category: true,
-                    productImages: {
-                        orderBy: { order: "asc" },
-                        take: 1,
-                        select: { imageUrl: true }
-                    },
-                },
-                orderBy: [{ isOnSale: "desc" }, { originalPrice: "desc" }, { createdAt: "desc" }, { id: "asc" }],
-                take: 8,
-            });
-        }
-    } catch (error) {
-        console.error("FeaturedProductsSection fetch error:", error);
-        // Return empty array instead of null to allow parent to handle gracefully
-        return <FeaturedStickyShowcase products={[]} />;
-    }
-
-    if (rawProducts.length === 0) {
-        // Return empty showcase instead of silent null
-        return <FeaturedStickyShowcase products={[]} />;
-    }
-
-    const products = rawProducts.map((p) => {
-        const hasSalePrice = !!(p.salePrice && p.salePrice > 0 && p.salePrice < p.price);
-        const useSale = !!p.isOnSale && hasSalePrice;
-        const currentPrice = useSale ? (p.salePrice as number) : p.price;
-        const basePrice = p.originalPrice && p.originalPrice > currentPrice
-            ? p.originalPrice
-            : useSale
-                ? p.price
-                : undefined;
-
-        return {
-            id: p.id,
-            slug: String(p.slug || p.id),
-            name: p.name,
-            price: currentPrice,
-            basePrice,
-            image: p.image || p.productImages?.[0]?.imageUrl || undefined,
-            category: p.category,
-            colorLabel: p.category,
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                // Fetch best-selling or featured products
+                const res = await fetch('/api/products?limit=10&featured=true', { cache: 'no-store' });
+                const data = await res.json();
+                
+                if (data.products && data.products.length > 0) {
+                    setProducts(data.products);
+                } else {
+                    // Fallback to newly added if no featured products
+                    const fallbackRes = await fetch('/api/products?limit=10&sort=newest', { cache: 'no-store' });
+                    const fallbackData = await fallbackRes.json();
+                    if (fallbackData.products) {
+                        setProducts(fallbackData.products);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch featured products", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
-    });
+        fetchProducts();
+    }, []);
 
-    return <FeaturedStickyShowcase products={products} />;
+    if (isLoading) {
+        return (
+            <section className="w-full px-4 sm:px-6 lg:px-[6%] mx-auto mt-8 mb-8">
+                <div className="h-8 w-48 bg-slate-200 rounded animate-pulse mb-5"></div>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                        <div key={i} className="aspect-[3/4] bg-slate-50 rounded-xl border border-slate-100 animate-pulse"></div>
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
+    if (products.length === 0) return null;
+
+    const translate = (key: string, viText: string, enText: string) => {
+        const value = t(`shop.${key}`);
+        return value === `shop.${key}` || value.includes(".") ? (isVietnamese ? viText : enText) : value;
+    };
+
+    return (
+        <section className="w-full px-4 sm:px-6 lg:px-[6%] mx-auto mt-8 mb-8 overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5 px-1">
+                <div className="flex items-center gap-2.5">
+                    <h2 className="text-xl md:text-2xl font-black uppercase tracking-wide text-slate-800">
+                        {translate("featuredProducts", "SẢN PHẨM NỔI BẬT", "FEATURED PRODUCTS")}
+                    </h2>
+                </div>
+                
+                <Link 
+                    href="/products?featured=true" 
+                    className="group flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-teal-50 border border-slate-100 hover:border-teal-100 rounded-lg transition-all duration-300"
+                >
+                    <span className="text-sm font-bold text-slate-600 group-hover:text-teal-600 transition-colors">
+                        {translate("viewAll", "Xem tất cả", "View all")}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-teal-500 transition-colors group-hover:translate-x-0.5" />
+                </Link>
+            </div>
+
+            {/* Grid 5 cột (LG), 2 cột (Mobile) thẻ nhỏ gọn gap-3 */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                {products.map((product) => (
+                    <ProductCard key={product.id} product={product} viewMode="grid" /> // viewMode="grid" renders it properly
+                ))}
+            </div>
+        </section>
+    );
 }
