@@ -34,15 +34,24 @@ interface FlashSaleProduct {
 
 /* ── Countdown Hook ─────────────────────────── */
 
-function useCountdown(endTime: string | null) {
+function useCountdown() {
     const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0, expired: true });
 
     useEffect(() => {
-        if (!endTime) return;
+        const getNextMilestone = () => {
+            const now = new Date();
+            const hours = now.getHours();
+            const nextMilestoneHour = Math.floor(hours / 6) * 6 + 6;
+            const milestone = new Date(now);
+            milestone.setHours(nextMilestoneHour, 0, 0, 0);
+            return milestone.getTime();
+        };
 
         const calcTimeLeft = () => {
-            const diff = new Date(endTime).getTime() - Date.now();
-            if (diff <= 0) return { h: 0, m: 0, s: 0, expired: true };
+            const target = getNextMilestone();
+            const diff = target - Date.now();
+
+            if (diff <= 0) return { h: 6, m: 0, s: 0, expired: false };
             return {
                 h: Math.floor(diff / (1000 * 60 * 60)),
                 m: Math.floor((diff / (1000 * 60)) % 60),
@@ -54,7 +63,7 @@ function useCountdown(endTime: string | null) {
         setTimeLeft(calcTimeLeft());
         const timer = setInterval(() => setTimeLeft(calcTimeLeft()), 1000);
         return () => clearInterval(timer);
-    }, [endTime]);
+    }, []);
 
     return timeLeft;
 }
@@ -174,30 +183,30 @@ function FlashSaleCard({ product, t }: { product: FlashSaleProduct; t: (k: strin
 
             {/* Info */}
             <div className="p-2 flex flex-col flex-1">
-                <h3 className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug mb-1 group-hover:text-red-600 transition-colors min-h-[32px]">
+                <h3 className="text-[11px] sm:text-xs font-bold text-slate-800 line-clamp-2 leading-tight mb-0.5 group-hover:text-red-600 transition-colors">
                     {product.name}
                 </h3>
 
                 {/* Price */}
-                <div className="mt-auto">
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-lg font-black bg-gradient-to-r from-red-500 to-rose-500 bg-clip-text text-transparent">
-                            {formatPrice(effectivePrice)}
+                <div className="flex items-baseline gap-1.5 flex-wrap">
+                    <span className="text-base sm:text-lg font-black bg-gradient-to-r from-red-500 to-rose-500 bg-clip-text text-transparent">
+                        {formatPrice(effectivePrice)}
+                    </span>
+                    {product.discount > 0 && (
+                        <span className="text-[10px] font-medium text-slate-400 line-through">
+                            {formatPrice(product.originalPrice)}
                         </span>
-                        {product.discount > 0 && (
-                            <span className="text-[11px] font-medium text-slate-400 line-through">
-                                {formatPrice(product.originalPrice)}
-                            </span>
-                        )}
-                    </div>
+                    )}
+                </div>
 
+                <div className="mt-auto pt-2">
                     {/* Sold progress */}
                     <SoldBar soldCount={product.soldCount} inventory={product.inventory} t={t} />
 
                     {/* Quick add */}
                     <button
                         onClick={handleAddToCart}
-                        className="w-full mt-2 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider
+                        className="w-full mt-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider
                                    bg-gradient-to-r from-red-500 to-rose-500 text-white
                                    hover:from-red-600 hover:to-rose-600
                                    active:scale-[0.97] transition-all duration-200
