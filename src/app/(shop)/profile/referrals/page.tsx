@@ -297,7 +297,7 @@ export default function ReferralPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 pb-16">
+    <div className="min-h-screen bg-white pb-16">
       {/* ═══ VIP Hero Banner ═══ */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 25%, #0891b2 50%, #0e7490 75%, #065f46 100%)" }}>
         {/* Animated mesh overlay */}
@@ -447,7 +447,7 @@ export default function ReferralPage() {
             <motion.div key="overview" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }} className="space-y-6">
               {/* Next Milestone Preview */}
               {dashboard.nextMilestone && (
-                <div className="relative overflow-hidden bg-gradient-to-br from-white to-amber-50/40 rounded-3xl p-6 shadow-lg shadow-amber-100/30 border border-amber-100/60">
+                <div className="relative overflow-hidden bg-white text-slate-800 border-b border-slate-100">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-amber-100/40 to-transparent rounded-bl-full" />
                   <h3 className="relative text-sm font-black uppercase tracking-wider text-amber-700/80 mb-4 flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-md">

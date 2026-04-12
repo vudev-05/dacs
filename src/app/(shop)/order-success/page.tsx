@@ -289,7 +289,7 @@ export default function OrderSuccessPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50/30">
+            <div className="min-h-screen flex items-center justify-center bg-white">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -309,7 +309,7 @@ export default function OrderSuccessPage() {
             {/* Confetti celebration */}
             {showConfetti && <ConfettiCanvas />}
 
-            <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-slate-50 relative overflow-hidden">
+            <div className="min-h-screen bg-white relative overflow-hidden">
                 {/* Decorative background elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-emerald-100/40 to-teal-100/20 rounded-full blur-3xl -z-10" />
                 <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tl from-blue-100/30 to-transparent rounded-full blur-3xl -z-10" />

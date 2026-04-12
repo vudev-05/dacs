@@ -523,7 +523,7 @@ function ProductCatalogContent() {
 
     return (
         <>
-        <div className="bg-slate-50 min-h-screen">
+        <div className="bg-white min-h-screen">
             {/* Layout thu gọn: max-width nhỏ lại ~ một nửa so với full width */}
             <div className="max-w-[82rem] mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header section - Cleaned up to avoid double search bar */}

@@ -123,6 +123,10 @@ export const en = {
         "Hạt Dinh Dưỡng": "Nutrition Seeds",
         "Đồ Ăn Vặt & Thực Phẩm": "Snacks & Groceries",
         "Sức Khỏe & Tiện Ích": "Health & Utilities",
+        "Cá khô": "Dried Fish",
+        "Tôm & Mực khô": "Dried Shrimp & Squid",
+        "Trái cây sấy": "Dried Fruits",
+        "Gia vị Việt": "Vietnamese Spices",
     },
     products: {
         "ca-loc-kho-dong-thap": "Dong Thap Dried Snakehead Fish",

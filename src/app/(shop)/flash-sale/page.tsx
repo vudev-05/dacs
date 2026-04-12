@@ -97,7 +97,7 @@ export default function FlashSalePage() {
             const diff = endTime - now;
             if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0 };
             return {
-                hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+                hours: Math.floor(diff / (1000 * 60 * 60)),
                 minutes: Math.floor((diff / 1000 / 60) % 60),
                 seconds: Math.floor((diff / 1000) % 60),
             };
@@ -168,13 +168,8 @@ export default function FlashSalePage() {
             {/* ═══════════════════════════════════════════════════════
                 HERO SECTION — Soft Pastel Pink
             ═══════════════════════════════════════════════════════ */}
-            <section className="relative overflow-hidden bg-gradient-to-b from-rose-50 via-pink-50/70 to-white">
-                {/* Soft pastel background */}
-                <div className="absolute inset-0 bg-gradient-to-b from-rose-50 via-pink-50/70 to-white" />
-
-                {/* Subtle decorative shapes — very soft, no sparkle */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-rose-100/60 to-transparent rounded-full blur-3xl -translate-y-1/3 translate-x-1/4" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-pink-100/50 to-transparent rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
+            <section className="relative overflow-hidden bg-white">
+                {/* Soft pastel background removed for pure white */}
 
                 {/* Content */}
                 <div className="relative page-container-wide pt-2 lg:pt-3 pb-4 lg:pb-5">

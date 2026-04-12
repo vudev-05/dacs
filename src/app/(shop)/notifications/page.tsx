@@ -211,7 +211,7 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/50">
+        <div className="min-h-screen bg-white">
             {/* Hero Section */}
             <div className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10" />

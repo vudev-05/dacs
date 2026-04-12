@@ -236,7 +236,7 @@ export default function VouchersClient({ variant = "market" }: VouchersClientPro
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 pb-20 pt-8">
+        <div className="min-h-screen bg-white pb-20 pt-8">
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
                 {/* Header */}

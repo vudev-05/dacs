@@ -372,7 +372,7 @@ export default function ProfilePage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50/30 pb-20 lg:pb-16">
+        <div className="min-h-screen bg-white pb-20 lg:pb-16">
             {/* Hero Banner */}
             <div className="bg-gradient-to-r from-primary/90 via-primary to-teal-500 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />

@@ -68,32 +68,25 @@ export default function PostsPage() {
     }, [posts, searchQuery, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20 font-sans">
+        <div className="min-h-screen bg-white pb-20 font-sans">
             {/* Fresh Food Hero Section */}
-            <div className="relative bg-gradient-to-br from-emerald-600 to-teal-700 pt-3 pb-6 sm:pt-4 sm:pb-8 px-4 overflow-hidden">
-                {/* Background Decor */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-0 right-1/4 w-[40%] h-[60%] bg-white/10 blur-[100px] rounded-full translate-y-[-20%] mix-blend-overlay" />
-                    <div className="absolute bottom-[-10%] left-1/4 w-[30%] h-[50%] bg-emerald-300/20 blur-[80px] rounded-full mix-blend-overlay" />
-                    <div className="absolute inset-0 bg-[url('/pattern-light.svg')] opacity-5 mix-blend-overlay"></div>
-                </div>
-
+            <div className="relative bg-white pt-3 pb-6 sm:pt-4 sm:pb-8 px-4 overflow-hidden border-b border-slate-100">
                 <div className="w-full relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center space-y-6"
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold uppercase tracking-widest backdrop-blur-md shadow-sm">
-                            <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full text-emerald-600 text-xs font-semibold uppercase tracking-widest backdrop-blur-md shadow-sm">
+                            <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
                             <span>{language === "vi" ? "Khám phá tri thức ẩm thực" : "Explore culinary knowledge"}</span>
                         </div>
 
-                        <h1 className="text-2xl sm:text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight drop-shadow-sm">
-                            {language === "vi" ? "Bài Viết &" : "Articles &"} <span className="text-emerald-100">{language === "vi" ? "Cẩm Nang" : "Guides"}</span>
+                        <h1 className="text-2xl sm:text-4xl md:text-6xl font-extrabold text-slate-800 tracking-tight leading-tight">
+                            {language === "vi" ? "Bài Viết &" : "Articles &"} <span className="text-emerald-600">{language === "vi" ? "Cẩm Nang" : "Guides"}</span>
                         </h1>
 
-                        <p className="text-emerald-50 font-medium max-w-2xl mx-auto text-sm md:text-base leading-relaxed drop-shadow-sm">
+                        <p className="text-slate-500 font-medium max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
                             {t("shop.postsSubtitle")}
                         </p>
 
@@ -111,13 +104,6 @@ export default function PostsPage() {
                             </div>
                         </div>
                     </motion.div>
-                </div>
-
-                {/* Wave Decor */}
-                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
-                    <svg className="relative block w-full h-[40px] md:h-[60px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C58.47,105,142.1,111.45,221,100.82A521,521,0,0,0,321.39,56.44Z" className="fill-slate-50"></path>
-                    </svg>
                 </div>
             </div>
 
@@ -241,25 +227,22 @@ export default function PostsPage() {
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mt-24 p-8 md:p-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl relative overflow-hidden text-center shadow-xl shadow-emerald-600/20"
+                        className="mt-24 p-8 md:p-16 bg-white border border-slate-100 rounded-3xl relative overflow-hidden text-center shadow-sm"
                     >
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-40 h-40 bg-emerald-900/10 blur-[60px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
-
                         <div className="relative z-10 space-y-6">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">
                                 {language === "vi" ? "Đừng bỏ lỡ bài viết nào!" : "Don't miss any articles!"}
                             </h2>
-                            <p className="text-emerald-50 font-medium max-w-lg mx-auto text-sm md:text-base">
+                            <p className="text-slate-500 font-medium max-w-lg mx-auto text-sm md:text-base">
                                 {language === "vi" ? "Đăng ký nhận bản tin để cập nhật những cẩm nang ẩm thực và ưu đãi đặc biệt dành riêng cho bạn." : "Subscribe to our newsletter for exclusive food guides and special offers."}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mt-4">
                                 <input
                                     type="email"
                                     placeholder={language === "vi" ? "Địa chỉ Email của bạn" : "Your email address"}
-                                    className="flex-1 px-6 py-4 rounded-2xl bg-white/10 border border-white/30 text-white placeholder:text-white/70 focus:bg-white focus:text-slate-900 outline-none transition-all font-medium shadow-inner"
+                                    className="flex-1 px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-emerald-500 outline-none transition-all font-medium"
                                 />
-                                <button className="px-8 py-4 bg-emerald-900 text-white rounded-2xl font-bold text-sm hover:bg-white hover:text-emerald-700 transition-all shadow-lg whitespace-nowrap">
+                                <button className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm whitespace-nowrap">
                                     {language === "vi" ? "Đăng ký" : "Subscribe"}
                                 </button>
                             </div>

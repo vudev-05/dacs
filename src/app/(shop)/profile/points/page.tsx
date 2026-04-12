@@ -125,9 +125,9 @@ export default function PointsHistoryPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20">
+        <div className="min-h-screen bg-white pb-20">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-amber-500 via-amber-400 to-orange-400">
+            <div className="relative overflow-hidden bg-white text-slate-800 border-b border-slate-100">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 40%, white 1px, transparent 1px), radial-gradient(circle at 70% 60%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
                 <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-300/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
                 <div className="absolute bottom-0 left-0 w-72 h-72 bg-orange-300/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/3" />

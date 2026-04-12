@@ -118,7 +118,7 @@ export default function CheckoutReturnPage() {
     // Payment successful
     if (sessionStatus.status === "complete") {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-50/30">
+            <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="text-center max-w-lg px-6 py-16">
                     {/* Success animation circle */}
                     <div className="relative mx-auto mb-8">

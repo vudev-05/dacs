@@ -261,7 +261,7 @@ export default function OrderDetailPage() {
 
   if (sessionStatus === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-white">
         <div className="flex justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -271,7 +271,7 @@ export default function OrderDetailPage() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="min-h-screen bg-white pb-20">
         <div className="page-container-wide">
           <Card className="rounded-[2.5rem] border border-rose-200 bg-white shadow-sm">
             <CardContent className="p-10 text-center">
@@ -296,7 +296,7 @@ export default function OrderDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eff6ff_100%)] pb-20">
+      <div className="min-h-screen bg-white pb-20">
         <div className="page-container-wide space-y-8">
           <Link href="/profile/orders" className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-slate-500 transition hover:text-primary">
             <ArrowLeft className="h-4 w-4" />

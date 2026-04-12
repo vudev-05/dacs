@@ -123,6 +123,10 @@ export const vi = {
         "Hạt Dinh Dưỡng": "Hạt Dinh Dưỡng",
         "Đồ Ăn Vặt & Thực Phẩm": "Đồ Ăn Vặt & Thực Phẩm",
         "Sức Khỏe & Tiện Ích": "Sức Khỏe & Tiện Ích",
+        "Cá khô": "Cá khô",
+        "Tôm & Mực khô": "Tôm & Mực khô",
+        "Trái cây sấy": "Trái cây sấy",
+        "Gia vị Việt": "Gia vị Việt",
     },
     products: {
         "ca-loc-kho-dong-thap": "Cá Lóc Khô Đồng Tháp",

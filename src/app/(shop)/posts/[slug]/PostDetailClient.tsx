@@ -200,7 +200,7 @@ export default function PostDetailClient({ slug }: { slug: string }) {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f1ea]">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -249,7 +249,7 @@ export default function PostDetailClient({ slug }: { slug: string }) {
     const hasGallery = galleryImages.length > 0;
 
     return (
-        <div className="min-h-screen bg-[#f4f1ea] pb-24 selection:bg-emerald-200 selection:text-emerald-900 w-full overflow-x-hidden">
+        <div className="min-h-screen bg-white pb-24 selection:bg-emerald-200 selection:text-emerald-900 w-full overflow-x-hidden">
             {/* Reading Progress Bar */}
             <motion.div
                 className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 z-[100] origin-left"

@@ -1,6 +1,7 @@
 import SidebarCategories from "@/components/navbar/SidebarCategories";
 import BannerCarousel from "@/components/home/BannerCarousel";
 import PromoBanners from "@/components/home/PromoBanners";
+import FlashSaleSection from "@/components/home/FlashSaleSection";
 
 export const metadata = {
    title: "LIKEFOOD - Đặc sản Việt",
@@ -31,6 +32,9 @@ export default function Home() {
                </div>
             </div>
          </section>
+
+         {/* Flash Sale Section */}
+         <FlashSaleSection />
       </main>
    );
 }

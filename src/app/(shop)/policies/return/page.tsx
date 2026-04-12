@@ -177,7 +177,7 @@ export default async function ReturnPolicyPage() {
     const contact = await getContactInfo();
 
     return (
-        <div className="min-h-screen bg-[#fdfdff] pb-20">
+        <div className="min-h-screen bg-white pb-20">
             <div className="page-container-wide">
                 <div className="overflow-hidden rounded-3xl bg-white shadow-xl">
                     {/* Hero Section */}

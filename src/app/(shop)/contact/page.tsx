@@ -173,14 +173,10 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-cyan-50/50 via-white to-blue-50/50">
+        <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10" />
-                <div className="absolute top-10 left-10 w-72 h-72 bg-cyan-300/20 rounded-full blur-[120px]" />
-                <div className="absolute bottom-0 right-10 w-96 h-96 bg-blue-300/20 rounded-full blur-[150px]" />
-
-                <div className="relative page-container-wide py-6 lg:py-8">
+            <section className="relative overflow-hidden bg-white">
+                <div className="relative page-container-wide py-6 lg:py-8 border-b border-slate-100">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}

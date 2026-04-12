@@ -42,7 +42,7 @@ export default function CheckoutPage() {
     // ── Empty cart guard ──
     if (checkout.isCartEmpty) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50/30 px-4">
+            <div className="min-h-screen flex items-center justify-center bg-white px-4">
                 <div className="text-center p-10 bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/50 max-w-sm w-full">
                     <div className="w-16 h-16 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <ShoppingBag className="w-7 h-7 text-slate-400" />
@@ -69,7 +69,7 @@ export default function CheckoutPage() {
     // ── Success step — Show Stripe pay button ──
     if (checkout.step === 3) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 flex items-start justify-center pt-4 lg:pt-6 px-4">
+            <div className="min-h-screen bg-white flex items-start justify-center pt-4 lg:pt-6 px-4">
                 <div className="w-full max-w-2xl">
                     <OrderSuccess
                         language={language}
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
 
     // ── Main checkout flow ──
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/20 flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col">
 
             {/* ── Checkout header ── */}
             <header className="flex-shrink-0 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-4 sm:px-6 py-3 sticky top-0 z-50">

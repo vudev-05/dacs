@@ -163,7 +163,7 @@ export default async function AboutPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-teal-50/40 via-white to-cyan-50/30">
+        <div className="min-h-screen bg-white">
             {/* SEO: Breadcrumb + AboutPage JSON-LD */}
             <script
                 type="application/ld+json"

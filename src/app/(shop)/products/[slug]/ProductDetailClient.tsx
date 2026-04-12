@@ -346,7 +346,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
 
     if (error || !product) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50/20 px-6">
+            <div className="min-h-screen flex items-center justify-center bg-white px-6">
                 <ErrorState
                     title="Oops!"
                     message={
@@ -367,7 +367,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
     const localizedName = product.slug && t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : product.name;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/10">
+        <div className="min-h-screen bg-white">
             <div className="pt-4 pb-10">
                 <div className="page-container-wide">
                     {/* SEO */}

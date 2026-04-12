@@ -87,7 +87,7 @@ export default function InvoicePage() {
 
     if (sessionStatus === "loading" || isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+            <div className="min-h-screen flex items-center justify-center bg-white">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         );
@@ -98,7 +98,7 @@ export default function InvoicePage() {
     const isPaid = order.paymentStatus === "PAID" || order.status === "DELIVERED" || order.status === "SHIPPED";
 
     return (
-        <div className="min-h-screen bg-slate-100 py-10 print:bg-white print:py-0">
+        <div className="min-h-screen bg-white py-10 print:bg-white print:py-0">
             <div className="max-w-3xl mx-auto px-4">
 
                 {/* Screen-only toolbar */}
