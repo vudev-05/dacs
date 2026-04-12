@@ -127,6 +127,7 @@ export const en = {
         "Tôm & Mực khô": "Dried Shrimp & Squid",
         "Trái cây sấy": "Dried Fruits",
         "Gia vị Việt": "Vietnamese Spices",
+        "Trà & Bánh mứt": "Tea & Sweets",
     },
     products: {
         "ca-loc-kho-dong-thap": "Dong Thap Dried Snakehead Fish",

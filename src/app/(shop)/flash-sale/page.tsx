@@ -22,6 +22,7 @@ interface FlashProduct {
     id: number;
     slug: string;
     name: string;
+    nameEn?: string | null;
     originalPrice: number;
     salePrice: number;
     discount: number;
@@ -127,7 +128,7 @@ export default function FlashSalePage() {
         addItem({
             productId: product.id,
             slug: product.slug || undefined,
-            name: product.name,
+            name: language === "en" && product.nameEn ? product.nameEn : product.name,
             price: product.salePrice,
             originalPrice: hasDiscount ? product.originalPrice : undefined,
             salePrice: hasDiscount ? product.salePrice : undefined,
@@ -157,17 +158,7 @@ export default function FlashSalePage() {
                 {/* Soft pastel background removed for pure white */}
 
                 {/* Content */}
-                <div className="relative page-container-wide pt-2 lg:pt-3 pb-4 lg:pb-5">
-                    <div className="mb-3 flex items-center gap-2 text-sm">
-                        <Link href="/" className="text-slate-400 hover:text-rose-400 transition-colors">
-                            {flashT("goHome", "Trang chủ", "Home")}
-                        </Link>
-                        <span className="text-slate-300">/</span>
-                        <span className="text-rose-400 font-semibold flex items-center gap-1">
-                            <Zap className="w-3.5 h-3.5" />
-                            Flash Sale
-                        </span>
-                    </div>
+                <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-[6%] pt-2 lg:pt-3 pb-4 lg:pb-5">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -247,7 +238,7 @@ export default function FlashSalePage() {
             {/* ═══════════════════════════════════════════════════════
                 FEATURE BADGES
             ═══════════════════════════════════════════════════════ */}
-            <section className="page-container-wide py-6">
+            <section className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                         { icon: Zap, text: isVietnamese ? "Giảm đến 50%" : "Up to 50% off", bg: "bg-rose-50", iconColor: "text-rose-400" },
@@ -274,7 +265,7 @@ export default function FlashSalePage() {
             {/* ═══════════════════════════════════════════════════════
                 PRODUCTS SECTION
             ═══════════════════════════════════════════════════════ */}
-            <section className="page-container-wide pb-16">
+            <section className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] pb-16">
                 {/* Toolbar */}
                 <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-3.5 border border-slate-100">
                     <div className="flex items-center gap-3">
@@ -377,7 +368,7 @@ export default function FlashSalePage() {
                 {/* Products Grid */}
                 {!loading && products.length > 0 && (
                     <div className={viewMode === "grid"
-                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+                        ? "grid grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3"
                         : "space-y-4"
                     }>
                         {sortedProducts.map((product, index) => {
@@ -402,7 +393,7 @@ export default function FlashSalePage() {
                                             {product.image ? (
                                                 <Image
                                                     src={product.image}
-                                                    alt={product.name}
+                                                    alt={language === "en" && product.nameEn ? product.nameEn : product.name}
                                                     fill
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -455,7 +446,7 @@ export default function FlashSalePage() {
 
                                             <Link href={`/products/${product.slug}`}>
                                                 <h3 className="font-semibold text-sm text-slate-700 group-hover:text-rose-400 transition-colors line-clamp-2 mb-2.5 leading-snug">
-                                                    {product.name}
+                                                    {language === "en" && product.nameEn ? product.nameEn : product.name}
                                                 </h3>
                                             </Link>
 

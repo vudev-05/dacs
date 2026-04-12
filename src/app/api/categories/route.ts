@@ -12,7 +12,7 @@ import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
     const identifier = getRateLimitIdentifier(req);
-    const rl = await applyRateLimit(identifier, apiRateLimit, { windowMs: 60 * 1000, maxRequests: 30 });
+    const rl = await applyRateLimit(identifier, apiRateLimit, { windowMs: 60 * 1000, maxRequests: 3000 });
     if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
 
     try {

@@ -8,6 +8,6 @@
 import { redirect } from "next/navigation";
 
 export default async function OrderDetailRedirect({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    redirect(`/profile/orders/${id}`);
+ const { id } = await params;
+ redirect(`/profile/orders/${id}`);
 }

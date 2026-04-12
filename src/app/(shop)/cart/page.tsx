@@ -129,7 +129,7 @@ export default function CartPage() {
             { label: t('shopPage.tagGift'), href: "/products?tag=gift" },
         ];
         return (
-            <div className="page-container-wide py-8">
+            <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-8">
                 <EmptyState
                     icon={ShoppingBag}
                     title={t("cart.emptyCart")}
@@ -168,14 +168,7 @@ export default function CartPage() {
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
 
-                <div className="relative page-container-wide py-4 lg:py-8">
-                    {/* Breadcrumb */}
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60 mb-3 sm:mb-6">
-                        <Link href="/" className="hover:text-white transition-colors">{isVietnamese ? "Trang chủ" : "Home"}</Link>
-                        <span>/</span>
-                        <span className="text-white font-bold">{t("common.cart")}</span>
-                    </div>
-
+                <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-4 lg:py-8">
                     <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
@@ -216,7 +209,7 @@ export default function CartPage() {
                 </div>
             </div>
 
-            <div className="page-container-wide mt-8">
+            <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] mt-8">
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                 <div className="lg:col-span-8">
                     {showSavedTab ? (
@@ -266,7 +259,7 @@ export default function CartPage() {
 
             {/* Related Products Suggestions */}
             {items.length > 0 && (
-                <div className="page-container-wide mt-10">
+                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] mt-10">
                     <h2 className="text-xl font-black uppercase tracking-tighter mb-5">{t('cart.youMayAlsoLike')}</h2>
                     <RelatedProductsSection categories={relatedCategories} />
                 </div>

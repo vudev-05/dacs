@@ -15,27 +15,27 @@ import { AbandonedCartTracker } from "@/components/cart/AbandonedCartTracker";
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 
 export default function ShopLayout({
-    children,
+ children,
 }: {
-    children: React.ReactNode;
+ children: React.ReactNode;
 }) {
-    return (
-        <AnalyticsProvider>
-            <div className="compact-ui flex flex-col min-h-screen">
-                <header>
-                    <Navbar />
-                </header>
-                <main id="main-content" className="flex-1 pb-16 lg:pb-0">
-                    <IdleSessionWrapper>
-                        {children}
-                    </IdleSessionWrapper>
-                </main>
-                <Footer />
-                <ChatbotAI />
-                <ContactLauncher />
-                <MobileBottomNav />
-                <AbandonedCartTracker />
-            </div>
-        </AnalyticsProvider>
-    );
+ return (
+ <AnalyticsProvider>
+ <div className="compact-ui flex flex-col min-h-screen">
+ <header>
+ <Navbar />
+ </header>
+ <main id="main-content" className="flex-1 pb-16 lg:pb-0">
+ <IdleSessionWrapper>
+ {children}
+ </IdleSessionWrapper>
+ </main>
+ <Footer />
+ <ChatbotAI />
+ <ContactLauncher />
+ <MobileBottomNav />
+ <AbandonedCartTracker />
+ </div>
+ </AnalyticsProvider>
+ );
 }

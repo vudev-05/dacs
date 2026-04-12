@@ -287,7 +287,7 @@ function ProductCardGrid({ product, meta }: { product: ProductCardProduct; meta:
             className="h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-xl"
         >
             <Card className="group bg-transparent shadow-none p-0 h-full cursor-pointer">
-                <div className={`relative overflow-hidden rounded-xl bg-white border-0 shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.11)] transition-all duration-400 flex flex-col h-full ${product.inventory <= 0 ? "grayscale-[0.3] opacity-90" : ""}`}>
+                <div className={`relative overflow-hidden rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-400 flex flex-col h-full ${product.inventory <= 0 ? "grayscale-[0.3] opacity-90" : ""}`}>
                     {/* Image Section */}
                     <ProductCardImage
                         productId={product.id}
@@ -297,11 +297,15 @@ function ProductCardGrid({ product, meta }: { product: ProductCardProduct; meta:
                         onQuickView={handleQuickView}
                         onNavigate={handleCardClick}
                         lastAddedId={lastAddedId ? String(lastAddedId) : null}
+                        discountPercent={meta.hasDiscount ? meta.discountPercent : undefined}
+                        isFlashSale={meta.isCurrentlyFlashSale}
+                        badgeText={product.badgeText}
                     />
 
                     {/* Info + Price Section */}
-                    <CardFooter className="flex flex-col items-start p-2 sm:p-2.5 gap-1.5 bg-white">
+                    <CardFooter className="flex flex-col items-start p-2 sm:p-2.5 gap-0.5 bg-white flex-1 justify-between">
                         <ProductCardInfo
+                            productId={product.id}
                             name={!isVietnamese && product.nameEn ? product.nameEn : (t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : product.name)}
                             category={!isVietnamese && product.categoryEn ? product.categoryEn : (t(`categories.${product.category}` as any) !== `categories.${product.category}` ? t(`categories.${product.category}` as any) : product.category)}
                             weight={!isVietnamese && product.weightEn ? product.weightEn : product.weight}

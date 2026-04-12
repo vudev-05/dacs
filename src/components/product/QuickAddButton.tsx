@@ -25,9 +25,10 @@ interface QuickAddButtonProps {
         image?: string | null;
         inventory: number;
     };
+    fullWidth?: boolean;
 }
 
-export default function QuickAddButton({ product }: QuickAddButtonProps) {
+export default function QuickAddButton({ product, fullWidth = false }: QuickAddButtonProps) {
     const { addItem } = useCartActions();
     const [isAdded, setIsAdded] = useState(false);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,21 +64,20 @@ export default function QuickAddButton({ product }: QuickAddButtonProps) {
     };
 
     return (
-        <motion.button
+        <button
             onClick={handleQuickAdd}
             disabled={product.inventory <= 0}
             aria-label={isAdded ? t('shop.addedToCartAria') : t('shop.addToCartAria')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             className={`
-                relative flex items-center justify-center p-2 rounded-xl
-                transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden group/add
-                w-9 h-9
+                relative flex items-center justify-center transition-all duration-300 font-bold overflow-hidden
+                ${fullWidth ? 'w-full py-2 rounded-xl text-[12px] uppercase tracking-wide gap-2' : 'w-9 h-9 rounded-xl p-2'}
                 ${product.inventory <= 0
-                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    ? "bg-slate-50 text-slate-400 border border-slate-100 cursor-not-allowed"
                     : isAdded
-                        ? "bg-emerald-500 text-white shadow-emerald-500/25"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white"
+                        ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                        : fullWidth
+                            ? "bg-[#DFF0E0] hover:bg-[#d0ebd1] text-emerald-800 border border-[#DFF0E0]/50 hover:border-[#cbe8ce]"
+                            : "bg-slate-100 text-slate-600 hover:bg-[#DFF0E0] hover:text-emerald-800"
                 }
             `}
         >
@@ -88,9 +88,10 @@ export default function QuickAddButton({ product }: QuickAddButtonProps) {
                         initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
                         animate={{ opacity: 1, scale: 1, rotate: 0 }}
                         exit={{ opacity: 0, scale: 0.5, rotate: 45 }}
-                        className="flex items-center justify-center"
+                        className="flex items-center justify-center gap-1.5"
                     >
-                        <Check className="w-3.5 h-3.5" />
+                        <Check className={fullWidth ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
+                        {fullWidth && <span>{t('shop.added')}</span>}
                     </motion.span>
                 ) : (
                     <motion.span
@@ -98,12 +99,13 @@ export default function QuickAddButton({ product }: QuickAddButtonProps) {
                         initial={{ opacity: 0, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.5 }}
-                        className="flex items-center justify-center"
+                        className="flex items-center justify-center gap-1.5"
                     >
-                        <ShoppingCart className="w-3.5 h-3.5 group-hover/add:scale-110 transition-transform duration-300" />
+                        <ShoppingCart className={`${fullWidth ? 'w-4 h-4' : 'w-3.5 h-3.5'} transition-transform duration-300`} />
+                        {fullWidth && <span>{t('shop.addToCart')}</span>}
                     </motion.span>
                 )}
             </AnimatePresence>
-        </motion.button>
+        </button>
     );
 }

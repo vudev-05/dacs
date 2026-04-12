@@ -285,15 +285,9 @@ function NavbarContent() {
                             {/* Auth links mapped to Topbar */}
                             <div className="flex flex-shrink-0 items-center justify-end gap-3 text-[10px] font-black text-emerald-900/70 tracking-wider">
                                 {!session && (
-                                    <>
-                                        <Link href="/login" className="hover:text-emerald-900 transition-colors uppercase">
-                                            {t("common.login")}
-                                        </Link>
-                                        <span className="text-emerald-900/30">|</span>
-                                        <Link href="/register" className="hover:text-emerald-900 transition-colors uppercase">
-                                            {t("common.register")}
-                                        </Link>
-                                    </>
+                                    <Link href="/login" className="hover:text-emerald-900 transition-colors uppercase">
+                                        {t("common.login")}
+                                    </Link>
                                 )}
                             </div>
                         </div>

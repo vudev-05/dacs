@@ -695,8 +695,8 @@ export async function buildAIContext(
     }
   }
 
-  // AI instructions (compact)
-  parts.push(`\n📋 TƯ VẤN: Dùng data THẬT, **bold** tên SP/giá. Gợi ý combo, mã giảm giá, freeship. Cross-sell SP liên quan.`);
+  // AI instructions (compact & strict)
+  parts.push(`\n📋 TƯ VẤN: Trả lời CỰC KỲ NGẮN GỌN, vừa phải. Dùng đúng data THẬT bên trên. **Bold** tên SP/giá. NẾU DỮ LIỆU BÊN TRÊN TRỐNG HOẶC KHÔNG CÓ CÂU TRẢ LỜI, BẮT BUỘC trả lời 'Mình chưa có thông tin chính xác về vấn đề này' và giới thiệu rất ngắn gọn LIKEFOOD bán đặc sản Việt Nam. KHÔNG LAN MAN.`);
 
   return parts.join("\n");
 }

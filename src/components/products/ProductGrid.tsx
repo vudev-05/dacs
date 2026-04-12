@@ -130,8 +130,8 @@ function ProductGridInner({
     return (
         <>
             <div className={`transition-all duration-300 ${viewMode === "grid"
-                ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3"
-                : "flex flex-col gap-2.5"
+                ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+                : "flex flex-col gap-4"
                 }`}>
                 {products.map((product, index) => (
                     <div

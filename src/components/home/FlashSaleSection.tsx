@@ -320,7 +320,7 @@ export default function FlashSaleSection() {
         });
     };
 
-    const time = useCountdown(countdown);
+    const time = useCountdown();
 
     // Don't render if no products or loading
     if (isLoading) {

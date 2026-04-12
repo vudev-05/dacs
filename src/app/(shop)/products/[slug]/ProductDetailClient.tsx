@@ -71,11 +71,14 @@ interface Product {
     id: number;
     slug?: string | null;
     name: string;
+    nameEn?: string | null;
     description: string;
+    descriptionEn?: string | null;
     price: number;
     image?: string | null;
     category: string;
     weight?: string | null;
+    weightEn?: string | null;
     inventory: number;
     avgRating: number;
     reviewCount: number;
@@ -130,9 +133,10 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
 
     // Auto-format description
     const descriptionSections = useMemo(() => {
-        if (!product?.description) return [];
-        const text = product.description;
-        const sectionRegex = /(?:^|\s)([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}✅☑️🔥⭐️🎁💪🍃🌿🧂🌶️📦🎯🏷️💰🔒🚚👨‍🍳🧑‍🍳👩‍🍳🍴🥢🥄🍽️])\s*([A-ZÀ-Ỹ\s&]+):\s*/gu;
+        const descText = language === "en" && product?.descriptionEn ? product.descriptionEn : product?.description;
+        if (!descText) return [];
+        const text = descText;
+        const sectionRegex = /(?:^|\s)([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}✅☑️🔥⭐️🎁💪🍃🌿🧂🌶️📦🎯🏷️💰🔒🚚👨‍🍳🧑‍🍳👩‍🍳🍴🥢🥄🍽️])\s*([A-ZÀ-Ỹa-zA-Z\s&]+):\s*/gu;
         const parts: { title: string; content: string; emoji: string }[] = [];
         const matches: { index: number; emoji: string; title: string; length: number }[] = [];
         let match;
@@ -163,7 +167,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
         }
 
         return parts;
-    }, [product?.description]);
+    }, [product?.description, product?.descriptionEn, language]);
 
     // ──── Analytics: track product view + time spent ────
     const viewStartRef = useRef<number>(0);
@@ -364,12 +368,14 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
     }
 
     const localizedCategory = t(`categories.${product.category}` as any) !== `categories.${product.category}` ? t(`categories.${product.category}` as any) : product.category;
-    const localizedName = product.slug && t(`products.${product.slug}` as any) !== `products.${product.slug}` ? t(`products.${product.slug}` as any) : product.name;
+    const localizedName = language === "en" && product.nameEn ? product.nameEn : product.name;
+    const localizedDescription = language === "en" && product.descriptionEn ? product.descriptionEn : product.description;
+    const localizedWeight = language === "en" && product.weightEn ? product.weightEn : product.weight;
 
     return (
         <div className="min-h-screen bg-white">
             <div className="pt-4 pb-10">
-                <div className="page-container-wide">
+                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%]">
                     {/* SEO */}
                     <ProductStructuredData
                         product={{
@@ -387,15 +393,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                     />
 
                     {/* Breadcrumbs — compact */}
-                    <nav className="mb-4 flex items-center gap-1.5 text-xs text-slate-400">
-                        <Link href="/" prefetch={true} className="hover:text-emerald-600 transition-colors">{t("common.home")}</Link>
-                        <ChevronRight className="w-3 h-3" />
-                        <Link href="/products" prefetch={true} className="hover:text-emerald-600 transition-colors">{t("common.products")}</Link>
-                        <ChevronRight className="w-3 h-3" />
-                        <Link href={`/products?category=${encodeURIComponent(product.category)}`} className="hover:text-emerald-600 transition-colors">{localizedCategory}</Link>
-                        <ChevronRight className="w-3 h-3" />
-                        <span className="text-slate-600 font-medium truncate max-w-[160px]">{localizedName}</span>
-                    </nav>
+                    
 
                     {/* ══════════ MAIN: Image + Info ══════════ */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
@@ -481,7 +479,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                                 {product.weight && (
                                     <span className="text-[11px] font-medium text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full">
                                         <Package className="w-3 h-3 inline mr-1 text-slate-400" />
-                                        {product.weight}
+                                        {localizedWeight}
                                     </span>
                                 )}
                             </div>

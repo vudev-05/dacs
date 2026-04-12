@@ -127,6 +127,7 @@ export const vi = {
         "Tôm & Mực khô": "Tôm & Mực khô",
         "Trái cây sấy": "Trái cây sấy",
         "Gia vị Việt": "Gia vị Việt",
+        "Trà & Bánh mứt": "Trà & Bánh mứt",
     },
     products: {
         "ca-loc-kho-dong-thap": "Cá Lóc Khô Đồng Tháp",

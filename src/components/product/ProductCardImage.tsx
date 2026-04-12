@@ -23,6 +23,9 @@ interface ProductCardImageProps {
     onQuickView: (e: React.MouseEvent) => void;
     onNavigate: () => void;
     lastAddedId: string | null;
+    discountPercent?: number;
+    isFlashSale?: boolean;
+    badgeText?: string | null;
 }
 
 function ProductCardImageComponent({
@@ -37,10 +40,11 @@ function ProductCardImageComponent({
     const [imgError, setImgError] = useState(false);
 
     return (
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50/20">
-            <div className="p-0 relative aspect-[4/3] overflow-hidden group/img">
-                {/* Wishlist Button */}
-                <div className="absolute top-2 right-2 z-20">
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/20">
+            <div className="p-0 relative aspect-[4/3] sm:aspect-square overflow-hidden group/img">
+
+                {/* Wishlist Button (Top Right) */}
+                <div className="absolute top-2 right-2 z-20 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
                     <WishlistButton productId={productId} />
                 </div>
 
@@ -64,14 +68,14 @@ function ProductCardImageComponent({
                         </div>
                     )}
 
-                    {/* Image with CSS-only hover: zoom + brightness — works on desktop, no stuck state on mobile */}
-                    <div className="relative w-full h-full transition-transform duration-500 ease-out group-hover/img:scale-[1.08]">
+                    {/* Image with CSS-only hover */}
+                    <div className="relative w-full h-full transition-transform duration-700 ease-out group-hover/img:scale-105">
                         {image && !imgError ? (
                             <Image
                                 src={image}
                                 alt={name}
                                 fill
-                                className={`object-cover transition-all duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"} group-hover/img:brightness-[1.05]`}
+                                className={`object-cover transition-all duration-700 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
                                 onLoad={() => setImageLoaded(true)}
                                 onError={() => { setImgError(true); setImageLoaded(true); }}
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -82,14 +86,6 @@ function ProductCardImageComponent({
                                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">No image</span>
                             </div>
                         )}
-                    </div>
-
-                    {/* Subtle bottom gradient on hover — pure CSS, no stuck state */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
-
-                    {/* Shine sweep on hover — pure CSS animation */}
-                    <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
-                        <div className="absolute -inset-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 translate-x-[-200%] group-hover/img:translate-x-[200%] transition-transform duration-700 ease-in-out" />
                     </div>
                 </div>
 

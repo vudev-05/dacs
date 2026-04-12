@@ -70,7 +70,7 @@ export async function GET() {
         // Merge: source-1 products (keep their salePrice/saleEndAt)
         const seenIds = new Set<number>();
         const merged: Array<{
-            id: number; slug: string; name: string; originalPrice: number;
+            id: number; slug: string; name: string; nameEn: string | null; originalPrice: number;
             salePrice: number | null; discount: number; image: string | null;
             category: string; inventory: number; soldCount: number;
             badgeText: string | null; saleEndAt: Date | null; isHot: boolean;
@@ -84,7 +84,7 @@ export async function GET() {
                 ? Math.round(((p.price - salePrice) / p.price) * 100)
                 : 0;
             merged.push({
-                id: p.id, slug: p.slug || String(p.id), name: p.name,
+                id: p.id, slug: p.slug || String(p.id), name: p.name, nameEn: p.nameEn,
                 originalPrice: p.price, salePrice, discount,
                 image: p.image || p.productImages?.[0]?.imageUrl || null, category: p.category,
                 inventory: p.inventory,
@@ -105,7 +105,7 @@ export async function GET() {
                     ? Math.round(((p.price - fp.flashSalePrice) / p.price) * 100)
                     : 0;
                 merged.push({
-                    id: p.id, slug: p.slug || String(p.id), name: p.name,
+                    id: p.id, slug: p.slug || String(p.id), name: p.name, nameEn: p.nameEn,
                     originalPrice: p.price, salePrice: fp.flashSalePrice, discount,
                     image: p.image || p.productImages?.[0]?.imageUrl || null, category: p.category,
                     inventory: p.inventory, soldCount: fp.soldCount,

@@ -255,7 +255,35 @@ export default function ChatbotAI() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([isVietnamese ? INITIAL_MESSAGE_VI : INITIAL_MESSAGE_EN]);
+  const [aiMessages, setAiMessages] = useState<Message[]>([isVietnamese ? INITIAL_MESSAGE_VI : INITIAL_MESSAGE_EN]);
+  const [liveMessages, setLiveMessages] = useState<Message[]>([]);
+  const [isAiStateLoaded, setIsAiStateLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("likefood_ai_chat");
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (Date.now() - data.lastUpdated < 10 * 60 * 1000) {
+          setAiMessages(data.messages.map((m: any) => ({
+            ...m,
+            timestamp: new Date(m.timestamp)
+          })));
+        } else {
+          localStorage.removeItem("likefood_ai_chat");
+        }
+      }
+    } catch {}
+    setIsAiStateLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isAiStateLoaded) return;
+    localStorage.setItem("likefood_ai_chat", JSON.stringify({
+      lastUpdated: Date.now(),
+      messages: aiMessages
+    }));
+  }, [aiMessages, isAiStateLoaded]);
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -264,9 +292,11 @@ export default function ChatbotAI() {
   const [notifMessage, setNotifMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const userScrolledUp = useRef(false);
 
   // ─── Live Chat State ───────────────────────────────────────
   const [chatMode, setChatMode] = useState<ChatMode>("ai");
+  const messages = chatMode === "live" ? liveMessages : aiMessages;
   const [liveChatId, setLiveChatId] = useState<number | null>(null);
   const [liveChatStatus, setLiveChatStatus] = useState<LiveChatStatus>(null);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -289,7 +319,7 @@ export default function ChatbotAI() {
     if (pollRef.current) clearInterval(pollRef.current);
     setInput("");
     setShowQuickReplies(true);
-    setMessages([isVietnamese ? INITIAL_MESSAGE_VI : INITIAL_MESSAGE_EN]);
+    setAiMessages([isVietnamese ? INITIAL_MESSAGE_VI : INITIAL_MESSAGE_EN]);
   }, [isVietnamese]);
 
   const showClosedNoticeThenExit = useCallback(() => {
@@ -310,7 +340,7 @@ export default function ChatbotAI() {
       ? "Phiên chat đã được đóng bởi nhân viên. Cảm ơn bạn đã liên hệ LIKEFOOD! Đang chuyển hướng🙏"
       : "The chat session has been closed by support. Thank you for contacting LIKEFOOD! Redirecting🙏";
 
-    setMessages((prev) => {
+    setLiveMessages((prev) => {
       const exists = prev.some((m) => m.content.includes("Đang chuyển hướng🙏") || m.content.includes("Redirecting🙏"));
       if (exists) return prev;
       return [
@@ -394,7 +424,7 @@ export default function ChatbotAI() {
         }
 
         if (data.messages?.length > 0) {
-          setMessages(prev => {
+          setLiveMessages(prev => {
             const existingIds = new Set(prev.map(m => m.id));
             const newMsgs: Message[] = data.messages
               .filter((m: { id: number; senderType: string }) => {
@@ -459,7 +489,7 @@ export default function ChatbotAI() {
   }, [setChatOpen, language]);
 
   const resetConversation = () => {
-    setMessages([isVietnamese ? INITIAL_MESSAGE_VI : INITIAL_MESSAGE_EN]);
+    setAiMessages([isVietnamese ? INITIAL_MESSAGE_VI : INITIAL_MESSAGE_EN]);
     setInput("");
     setShowQuickReplies(true);
     setChatMode("ai");
@@ -509,7 +539,7 @@ export default function ChatbotAI() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         if (res.status === 401) {
-          setMessages(prev => [...prev, {
+          setLiveMessages(prev => [...prev, {
             id: Date.now(),
             role: "model",
             content: isVietnamese
@@ -529,7 +559,7 @@ export default function ChatbotAI() {
       setLiveChatStatus("OPEN");
       lastPollTimeRef.current = null;
     } catch (error) {
-      setMessages(prev => [...prev, {
+      setLiveMessages(prev => [...prev, {
         id: Date.now(),
         role: "model",
         content: isVietnamese
@@ -566,7 +596,7 @@ export default function ChatbotAI() {
       senderType: "USER",
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    if (chatMode === "live") { setLiveMessages((prev) => [...prev, userMessage]); } else { setAiMessages((prev) => [...prev, userMessage]); }
     setInput("");
     setIsLoading(true);
 
@@ -593,7 +623,7 @@ export default function ChatbotAI() {
         // Update local message ID with server DB ID to prevent polling duplicates
         const data = await res.json();
         if (data.message?.id) {
-          setMessages(prev =>
+          setLiveMessages(prev =>
             prev.map(m =>
               m.id === userMessage.id ? { ...m, id: data.message.id } : m
             )
@@ -606,7 +636,7 @@ export default function ChatbotAI() {
         // ─── AI Chat Mode: SSE Streaming ──────────────
         const currentMsgId = Number(Date.now()) + 1;
         // Add an empty model message that will be filled by streaming
-        setMessages((prev) => [...prev, {
+        setAiMessages((prev) => [...prev, {
           id: currentMsgId,
           role: "model" as const,
           content: "",
@@ -655,7 +685,7 @@ export default function ChatbotAI() {
                   const content = evt?.data?.content || evt?.content || "";
                   if (content) {
                     fullContent = content;
-                    setMessages((prev) =>
+                    setAiMessages((prev) =>
                       prev.map((m) =>
                         m.id === currentMsgId ? { ...m, content: fullContent } : m
                       )
@@ -672,7 +702,7 @@ export default function ChatbotAI() {
 
           // Ensure we have content, otherwise show error
           if (!fullContent) {
-            setMessages((prev) =>
+            setAiMessages((prev) =>
               prev.map((m) =>
                 m.id === currentMsgId
                   ? { ...m, content: isVietnamese ? "Mình đang cập nhật dữ liệu. Bạn thử hỏi lại nhé! 😊" : "I'm updating data. Please try again! 😊" }
@@ -684,7 +714,7 @@ export default function ChatbotAI() {
           // Fallback: no streaming support — try json
           const data = await response.json().catch(() => ({}));
           const replyContent = data.content ?? data.response ?? (isVietnamese ? "Mình đang cập nhật. Bạn thử hỏi lại nhé! 😊" : "Updating. Please try again! 😊");
-          setMessages((prev) =>
+          setAiMessages((prev) =>
             prev.map((m) =>
               m.id === currentMsgId ? { ...m, content: replyContent } : m
             )
@@ -692,7 +722,7 @@ export default function ChatbotAI() {
         }
       }
     } catch (error) {
-      setMessages((prev) => [
+      setAiMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 2,

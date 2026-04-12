@@ -212,8 +212,8 @@ export default function CustomerReviews() {
     if (reviews.length === 0) {
         return (
             <section className="bg-gradient-to-b from-white to-slate-50 py-6 md:py-10">
-                <div className="w-full mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-4">💬 {isVi ? "Khách hàng" : "What customers"} <span className="text-primary">{isVi ? "nói gì?" : "say?"}</span></h2>
+                <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%]">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4">{isVi ? "Khách hàng" : "What customers"} <span className="text-primary">{isVi ? "nói gì?" : "say?"}</span></h2>
                     <p className="text-slate-600 italic">{isVi ? "Chưa có đánh giá nào. Hãy là người đầu tiên!" : "No reviews yet. Be the first one!"}</p>
                 </div>
             </section>
@@ -224,11 +224,11 @@ export default function CustomerReviews() {
 
     return (
         <section className="bg-gradient-to-b from-white to-slate-50 py-6 md:py-10">
-            <div className="w-full mx-auto px-6 sm:px-10 lg:px-[8%]">
+            <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%]">
                 {/* Section Header */}
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
-                        💬 {isVi ? "Khách hàng" : "What customers"} <span className="text-primary">{isVi ? "nói gì?" : "say?"}</span>
+                <div className="text-center mb-6">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+                        {isVi ? "Khách hàng" : "What customers"} <span className="text-primary">{isVi ? "nói gì?" : "say?"}</span>
                     </h2>
                     <p className="text-lg text-slate-600 font-medium">
                         {isVi ? "Hàng nghìn đánh giá 5 sao từ cộng đồng người Việt ở Mỹ" : "Thousands of 5-star reviews from Vietnamese communities in the U.S."}
@@ -236,17 +236,17 @@ export default function CustomerReviews() {
                 </div>
 
                 {/* Testimonials Carousel */}
-                <div className="page-container-wide">
-                    <div className="relative min-h-[400px] flex items-center justify-center">
+                <div className="w-full">
+                    <div className="relative min-h-[300px] flex items-center justify-center">
                         {/* Previous Review (Left - Faded with Animation) */}
                         <motion.div
                             key={`prev-${currentIndex}`}
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 0.3, x: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-[280px] scale-90 pointer-events-none group/preview"
+                            className="hidden lg:block absolute left-0 lg:left-[4%] top-1/2 -translate-y-1/2 w-[300px] scale-[0.8] pointer-events-none group/preview"
                         >
-                            <div className="bg-white rounded-2xl p-8 shadow-lg blur-[1px] relative overflow-hidden">
+                            <div className="bg-white rounded-2xl p-6 shadow-lg blur-[1px] relative overflow-hidden">
                                 {/* Gradient Overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-50"></div>
 
@@ -270,7 +270,7 @@ export default function CustomerReviews() {
                         </motion.div>
 
                         {/* Main Review (Center with Enhanced Effects) */}
-                        <div className="w-full max-w-4xl mx-auto px-4 lg:px-16">
+                        <div className="w-full max-w-2xl mx-auto px-4 lg:px-12">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={currentIndex}
@@ -281,7 +281,7 @@ export default function CustomerReviews() {
                                         duration: 0.6,
                                         ease: [0.22, 1, 0.36, 1] // Custom easing
                                     }}
-                                    className="bg-white rounded-3xl p-12 md:p-16 shadow-2xl relative overflow-hidden group"
+                                    className="bg-white rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden group"
                                 >
                                     {/* Animated Gradient Background */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-pink-50 opacity-60"></div>
@@ -293,9 +293,9 @@ export default function CustomerReviews() {
                                         initial={{ scale: 0, rotate: -180 }}
                                         animate={{ scale: 1, rotate: 0 }}
                                         transition={{ delay: 0.3, duration: 0.5 }}
-                                        className="absolute top-8 left-8 opacity-10"
+                                        className="absolute top-6 left-6 opacity-10"
                                     >
-                                        <Quote className="w-16 h-16 text-primary" />
+                                        <Quote className="w-10 h-10 text-primary" />
                                     </motion.div>
 
                                     <div className="relative z-10">
@@ -304,7 +304,7 @@ export default function CustomerReviews() {
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.2 }}
-                                            className="flex justify-center gap-1 mb-6"
+                                            className="flex justify-center gap-1 mb-4"
                                         >
                                             {[...Array(currentTestimonial.rating)].map((_, i) => (
                                                 <motion.div
@@ -313,7 +313,7 @@ export default function CustomerReviews() {
                                                     animate={{ scale: 1, rotate: 0 }}
                                                     transition={{ delay: 0.3 + i * 0.1 }}
                                                 >
-                                                    <Star className="w-6 h-6 fill-amber-400 text-amber-400 drop-shadow-md" />
+                                                    <Star className="w-4 h-4 fill-amber-400 text-amber-400 drop-shadow-md" />
                                                 </motion.div>
                                             ))}
                                         </motion.div>
@@ -323,7 +323,7 @@ export default function CustomerReviews() {
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: 0.4, duration: 0.6 }}
-                                            className="text-xl md:text-2xl text-slate-700 text-center mb-8 leading-relaxed font-medium italic"
+                                            className="text-base md:text-lg text-slate-700 text-center mb-5 leading-relaxed font-medium italic"
                                         >
                                             &ldquo;{currentTestimonial.quote}&rdquo;
                                         </motion.p>
@@ -333,14 +333,14 @@ export default function CustomerReviews() {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.5, duration: 0.5 }}
-                                            className="flex flex-col items-center gap-3"
+                                            className="flex flex-col items-center gap-2"
                                         >
-                                            <div className="text-5xl">{currentTestimonial.avatar}</div>
+                                            <div className="text-3xl lg:text-4xl">{currentTestimonial.avatar}</div>
                                             <div className="text-center">
-                                                <p className="font-bold text-slate-900 text-lg">
+                                                <p className="font-bold text-slate-900 text-sm md:text-base">
                                                     {currentTestimonial.name}
                                                 </p>
-                                                <p className="text-slate-500">
+                                                <p className="text-xs text-slate-500 mt-0.5">
                                                     📍 {currentTestimonial.location}
                                                 </p>
                                             </div>
@@ -356,9 +356,9 @@ export default function CustomerReviews() {
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 0.3, x: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-[280px] scale-90 pointer-events-none group/preview"
+                            className="hidden lg:block absolute right-0 lg:right-[4%] top-1/2 -translate-y-1/2 w-[300px] scale-[0.8] pointer-events-none group/preview"
                         >
-                            <div className="bg-white rounded-2xl p-8 shadow-lg blur-[1px] relative overflow-hidden">
+                            <div className="bg-white rounded-2xl p-6 shadow-lg blur-[1px] relative overflow-hidden">
                                 {/* Gradient Overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-pink-50/50 to-orange-50/50 opacity-50"></div>
 
@@ -385,18 +385,18 @@ export default function CustomerReviews() {
                         <motion.button
                             whileTap={{ scale: 0.95 }}
                             onClick={previousSlide}
-                            className="absolute left-2 lg:left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-gradient-to-br from-white to-slate-50 shadow-xl flex items-center justify-center transition-all duration-300 border-2 border-slate-100"
+                            className="absolute left-2 lg:left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-gradient-to-br from-white to-slate-50 shadow-xl flex items-center justify-center transition-all duration-300 border-2 border-slate-100"
                             aria-label={isVi ? "Đánh giá trước" : "Previous review"}
                         >
-                            <ChevronLeft className="w-6 h-6 text-slate-700" />
+                            <ChevronLeft className="w-5 h-5 text-slate-700" />
                         </motion.button>
                         <motion.button
                             whileTap={{ scale: 0.95 }}
                             onClick={nextSlide}
-                            className="absolute right-2 lg:right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-gradient-to-br from-white to-slate-50 shadow-xl flex items-center justify-center transition-all duration-300 border-2 border-slate-100"
+                            className="absolute right-2 lg:right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-gradient-to-br from-white to-slate-50 shadow-xl flex items-center justify-center transition-all duration-300 border-2 border-slate-100"
                             aria-label={isVi ? "Đánh giá tiếp theo" : "Next review"}
                         >
-                            <ChevronRight className="w-6 h-6 text-slate-700" />
+                            <ChevronRight className="w-5 h-5 text-slate-700" />
                         </motion.button>
                     </div>
 

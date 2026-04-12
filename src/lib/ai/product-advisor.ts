@@ -106,9 +106,9 @@ Trả về JSON:
 }
 
 QUY TẮC:
-- Dựa trên dữ liệu thật, KHÔNG bịa
+- CHỈ dựa trên dữ liệu thật, KHÔNG được bịa đặt tên sản phẩm hay tính năng
 - Strengths/weaknesses phải cụ thể
-- Recommendation phải rõ ràng`;
+- Recommendation phải rõ ràng, ngắn gọn (max 2 câu)`;
 
   const aiResult = await callGPTJSON<{
     items: Array<{
@@ -272,14 +272,14 @@ ${productList}
 
 Trả về JSON:
 {
-  "content": "câu tư vấn chi tiết bằng ${language === "vi" ? "tiếng Việt" : "English"}, 3-5 câu",
+  "content": "câu tư vấn CỰC KỲ ngắn gọn bằng ${language === "vi" ? "tiếng Việt" : "English"}, 1-3 câu. TUYỆT ĐỐI không lan man.",
   "productIds": [id sản phẩm gợi ý, tối đa 5],
   "type": "recommendation"
 }
 
 QUY TẮC:
-- Dựa trên sản phẩm thật
-- Tư vấn cụ thể, không chung chung`;
+- CHỈ dựa trên sản phẩm thật trong danh sách, KHÔNG BỊA ĐẶT
+- Tư vấn chi tiết, CỰC KỲ NGẮN GỌN (1-3 câu max)`;
 
   const aiResult = await callGPTJSON<{
     content: string;

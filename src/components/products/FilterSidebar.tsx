@@ -29,7 +29,6 @@ interface FilterSidebarProps {
     onFreeShippingChange: (val: boolean) => void;
     onClearFilters: () => void;
     onPageReset: () => void;
-    getCategoryGradient: (cat: string) => string;
 }
 
 function FilterSidebarInner({
@@ -49,12 +48,11 @@ function FilterSidebarInner({
     onFreeShippingChange,
     onClearFilters,
     onPageReset,
-    getCategoryGradient,
 }: FilterSidebarProps) {
     const { t } = useLanguage();
 
     return (
-        <div className="bg-white/90 backdrop-blur-xl p-3 sm:p-4 rounded-xl border border-slate-100/80 sticky top-20 shadow-[0_8px_40px_rgba(0,0,0,0.04)] max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <div className="bg-white p-3 sm:p-4 rounded-xl border border-slate-100/80 shadow-[0_8px_40px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                     <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center">
@@ -81,14 +79,13 @@ function FilterSidebarInner({
                     <div className="flex flex-col gap-0.5">
                         {categories.map((cat) => {
                             const isActive = selectedCategory === cat;
-                            const gradient = getCategoryGradient(cat);
                             return (
                                 <button
                                     key={cat}
                                     onClick={() => onCategoryChange(cat)}
-                                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${isActive
-                                        ? `bg-gradient-to-r ${gradient} text-white shadow-md scale-[1.01]`
-                                        : "text-slate-600 hover:bg-slate-50 hover:pl-4"
+                                    className={`text-left px-3 py-2 rounded-lg text-xs transition-all duration-200 border ${isActive
+                                        ? "bg-slate-900 border-slate-900 text-white shadow-md font-bold"
+                                        : "bg-white border-transparent text-slate-600 hover:bg-slate-50 font-semibold"
                                         }`}
                                 >
                                     {cat}

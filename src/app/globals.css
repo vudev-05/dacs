@@ -60,7 +60,6 @@
   /* ── Unified container system ── */
   .page-container-wide {
     width: 100%;
-    max-width: 82rem; /* 1312px — tighter than 90rem */
     margin-left: auto;
     margin-right: auto;
     padding-left: 1rem;
@@ -74,8 +73,8 @@
   }
   @media (min-width: 1024px) {
     .page-container-wide {
-      padding-left: 2rem;
-      padding-right: 2rem;
+      padding-left: 6%;
+      padding-right: 6%;
     }
   }
   /* Standard section spacing — compact */
@@ -113,7 +112,6 @@
   /* Narrower container for home sections like recommendations */
   .page-container-narrow {
     width: 100%;
-    max-width: 64rem;
     margin-left: auto;
     margin-right: auto;
     padding-left: 1rem;
@@ -313,3 +311,4 @@
   box-shadow: 0 0 0 3px rgb(20 184 166 / 0.1);
   background: rgb(17 17 19) !important;
 }
+

@@ -520,16 +520,12 @@ function ProductCatalogContent() {
         if (lower.includes('gia vị')) return 'from-rose-500 to-red-600';
         return 'from-primary to-orange-600';
     };
-
     return (
         <>
         <div className="bg-white min-h-screen">
-            {/* Layout thu gọn: max-width nhỏ lại ~ một nửa so với full width */}
             <div className="max-w-[82rem] mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header section - Cleaned up to avoid double search bar */}
             <section className="bg-white pt-5 pb-4 sm:pt-7 sm:pb-5 border-b border-slate-100">
                 <div>
-                    {/* Breadcrumbs */}
                     <div className="mb-4 sm:mb-6 flex items-center gap-2 text-sm">
                         <Link href="/" className="text-slate-400 hover:text-primary">
                             {t("common.home")}
@@ -547,150 +543,12 @@ function ProductCatalogContent() {
                                 {t("shopPage.qualityProducts")}
                             </p>
                         </div>
-
-                        {/* Search bar + total products — visible on mobile too */}
-                        <div className="w-full md:w-[380px] relative" ref={searchContainerRef}>
-                            <div className="hidden md:flex bg-slate-900 text-white px-4 py-2 rounded-2xl mb-2 items-center justify-between gap-2">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
-                                    {t("shopPage.available")}
-                                </span>
-                                <span className="font-black text-xl flex items-center gap-2">
-                                    {total}
-                                    <span className="text-[10px] uppercase opacity-60 tracking-widest font-bold">
-                                        {t("shopPage.productsCount")}
-                                    </span>
-                                </span>
-                            </div>
-                            <div className="relative">
-                                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
-                                    <Search className="w-4 h-4 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => {
-                                            setSearchQuery(e.target.value);
-                                            setShowSearchHints(true);
-                                        }}
-                                        onFocus={() => setShowSearchHints(true)}
-                                        placeholder={t("shopPage.searchPlaceholder")}
-                                        className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-slate-900 placeholder:text-slate-400"
-                                    />
-                                    {searchQuery && (
-                                        <button
-                                            onClick={() => {
-                                                setSearchQuery("");
-                                                setShowSearchHints(false);
-                                            }}
-                                            className="p-1 rounded-full hover:bg-slate-100 text-slate-400"
-                                        >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    )}
-                                </div>
-
-                                        {/* Search hints + recent searches dropdown */}
-                                {showSearchHints && (searchHints.length > 0 || recentSearches.length > 0) && (
-                                    <div className="absolute z-20 mt-2 w-full bg-white rounded-2xl border border-slate-100 shadow-xl max-h-96 overflow-y-auto">
-                                        {recentSearches.length > 0 && (
-                                            <div className="px-4 pt-3 pb-2 border-b border-slate-50">
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-                                                    {t("shopPage.recentSearches")}
-                                                </p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {recentSearches.map((term) => (
-                                                        <button
-                                                            key={term}
-                                                            onMouseDown={(e) => e.preventDefault()}
-                                                            onClick={() => {
-                                                                setSearchQuery(term);
-                                                                setShowSearchHints(false);
-                                                            }}
-                                                            className="px-3 py-1.5 rounded-full bg-slate-50 text-xs font-bold text-slate-600 hover:bg-slate-100"
-                                                        >
-                                                            {term}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {searchHints.length > 0 && (
-                                            <div className="py-2">
-                                                <p className="px-4 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                                    {t("common.suggestionsFor") || "Gợi ý cho"} &quot;{searchQuery}&quot;
-                                                </p>
-                                                {searchHints.map((hint) => (
-                                                    <button
-                                                        key={hint.id}
-                                                        onMouseDown={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                        }}
-                                                        onClick={() => {
-                                                            setShowSearchHints(false);
-                                                            // LUÔN navigate đến trang chi tiết sản phẩm
-                                                            const productUrl = `/products/${hint.slug || hint.id}`;
-                                                            router.push(productUrl);
-                                                        }}
-                                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-primary/5 text-left transition-colors group cursor-pointer"
-                                                    >
-                                                        {/* Thumbnail */}
-                                                        <div className="w-12 h-12 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200/50 relative">
-                                                            {hint.image ? (
-                                                                <img
-                                                                    src={hint.image}
-                                                                    alt={hint.name}
-                                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                                                    loading="lazy"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-full h-full flex items-center justify-center">
-                                                                    <Search className="w-4 h-4 text-slate-300" />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        {/* Info */}
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
-                                                                {hint.name}
-                                                            </p>
-                                                            <p className="text-[11px] text-slate-400">
-                                                                {hint.category}
-                                                            </p>
-                                                        </div>
-                                                        {/* Price */}
-                                                        <span className="text-sm font-black text-primary flex-shrink-0">
-                                                            {hint.price != null ? formatPrice(hint.price) : ""}
-                                                        </span>
-                                                    </button>
-                                                ))}
-
-                                                {/* Xem tất cả kết quả */}
-                                                <div className="px-3 py-2 border-t border-slate-100">
-                                                    <button
-                                                        onMouseDown={(e) => e.preventDefault()}
-                                                        onClick={() => {
-                                                            setShowSearchHints(false);
-                                                            // Giữ nguyên search query → filter products page
-                                                        }}
-                                                        className="w-full py-2.5 text-center text-[11px] font-black uppercase tracking-wider bg-slate-900 hover:bg-primary text-white rounded-xl transition-colors"
-                                                    >
-                                                        {t("common.viewAllResults") || "Xem tất cả kết quả"} &quot;{searchQuery}&quot;
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
 
             <div className="py-5">
                 <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Mobile: Filter toggle button */}
                     <div className="lg:hidden flex items-center justify-between mb-2">
                         <button
                             onClick={() => setShowMobileFilters(v => !v)}
@@ -699,7 +557,7 @@ function ProductCatalogContent() {
                             <Filter className="w-4 h-4" />
                             {language === "vi" ? "Bộ lọc" : "Filters"}
                             {hasActiveFilters && (
-                                <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center">
+                                <span className="w-5 h-5 rounded-full bg-primary text-slate-900 text-[10px] font-black flex items-center justify-center">
                                     {[selectedCategory !== t("shopPage.allCategories"), debouncedMinPrice || debouncedMaxPrice, minRating > 0, inStockOnly, freeShippingOnly, sort !== "newest"].filter(Boolean).length}
                                 </span>
                             )}
@@ -707,15 +565,12 @@ function ProductCatalogContent() {
                         <span className="text-xs text-slate-500 font-medium">{total} {t("shopPage.productsLabel")}</span>
                     </div>
 
-                    {/* Filters Sidebar — desktop always visible, mobile conditionally shown */}
                     <div className={`w-full lg:w-64 shrink-0 ${showMobileFilters ? "block" : "hidden lg:block"}`}>
                         <FilterSidebar
                             categories={CATEGORIES}
-
                             selectedCategory={selectedCategory}
                             minPrice={minPrice}
                             maxPrice={maxPrice}
-
                             minRating={minRating}
                             inStockOnly={inStockOnly}
                             freeShippingOnly={freeShippingOnly}
@@ -723,17 +578,14 @@ function ProductCatalogContent() {
                             onCategoryChange={setSelectedCategory}
                             onMinPriceChange={setMinPrice}
                             onMaxPriceChange={setMaxPrice}
-
                             onRatingChange={setMinRating}
                             onInStockChange={setInStockOnly}
                             onFreeShippingChange={setFreeShippingOnly}
                             onClearFilters={handleClearFilters}
                             onPageReset={() => setPage(1)}
-                            getCategoryGradient={getCategoryGradient}
                         />
                     </div>
 
-                    {/* Product Grid Area */}
                     <div className="flex-1">
                         <SortBar
                             total={total}
@@ -755,17 +607,14 @@ function ProductCatalogContent() {
                                 selectedCategory={selectedCategory}
                                 minPrice={minPrice}
                                 maxPrice={maxPrice}
-
                                 minRating={minRating}
                                 inStockOnly={inStockOnly}
                                 freeShippingOnly={freeShippingOnly}
                                 sort={sort}
-
                                 sortOptions={SORT_OPTIONS}
                                 onSearchClear={() => { setSearchQuery(""); setPage(1); }}
                                 onCategoryClear={() => { setSelectedCategory(t("shopPage.allCategories")); setPage(1); }}
                                 onPriceClear={() => { setMinPrice(""); setMaxPrice(""); setPage(1); }}
-
                                 onRatingClear={() => { setMinRating(0); setPage(1); }}
                                 onInStockClear={() => { setInStockOnly(false); setPage(1); }}
                                 onFreeShippingClear={() => { setFreeShippingOnly(false); setPage(1); }}
@@ -794,10 +643,38 @@ function ProductCatalogContent() {
                     </div>
                 </div>
             </div>
+            
+            <div className="py-8 flex justify-center border-t border-slate-100">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            setPage(p => Math.max(1, p - 1));
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        disabled={page === 1}
+                        className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold disabled:opacity-50 hover:bg-slate-50 transition-colors"
+                    >
+                        {t("common.prev")}
+                    </button>
+                    <span className="text-sm font-medium text-slate-500">
+                        {page} / {totalPages}
+                    </span>
+                    <button
+                        onClick={() => {
+                            setPage(p => Math.min(totalPages, p + 1));
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        disabled={page === totalPages}
+                        className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold disabled:opacity-50 hover:bg-slate-50 transition-colors"
+                    >
+                        {t("common.next")}
+                    </button>
+                </div>
             </div>
-        </div>
 
-        {/* Scroll to Top Button */}
+            </div> {/* Close max-w-[82rem] */}
+        </div> {/* Close bg-white min-h-screen */}
+        
         <AnimatePresence>
             {showScrollTop && (
                 <motion.button
@@ -818,28 +695,14 @@ function ProductCatalogContent() {
 }
 
 export default function ProductCatalog() {
-    const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://likefood.app";
-    const breadcrumbSchema = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Trang chủ", item: SITE_URL },
-            { "@type": "ListItem", position: 2, name: "Sản phẩm", item: `${SITE_URL}/products` },
-        ],
-    };
-
     return (
         <Suspense fallback={
-            <div className="page-container-wide py-8">
+            <div className="w-full mx-auto px-4 sm:px-6 lg:px-[6%] py-8">
                 <div className="flex items-center justify-center h-96">
                     <Loader2 className="w-10 h-10 animate-spin text-primary" />
                 </div>
             </div>
         }>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-            />
             <ProductCatalogContent />
         </Suspense>
     );
