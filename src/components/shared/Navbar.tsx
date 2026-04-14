@@ -398,8 +398,8 @@ function NavbarContent() {
                                 <motion.div
                                     whileHover={{
                                         y: -4,
-                                        backgroundColor: "rgba(244, 63, 94, 0.05)",
-                                        borderColor: "rgba(244, 63, 94, 0.2)"
+                                        backgroundColor: "#f43f5e0d", // rgba(244, 63, 94, 0.05)
+                                        borderColor: "#f43f5e33"      // rgba(244, 63, 94, 0.2)
                                     }}
                                     whileTap={{ scale: 0.9 }}
                                     className="p-3 bg-slate-50/50 hover:bg-white/70 border border-transparent rounded-2xl transition-all group relative"
@@ -429,8 +429,8 @@ function NavbarContent() {
                                     transition={{ duration: 0.4 }}
                                     whileHover={{
                                         y: -4,
-                                        backgroundColor: "rgba(16, 185, 129, 0.05)",
-                                        borderColor: "rgba(16, 185, 129, 0.2)"
+                                        backgroundColor: "#10b9810d", // rgba(16, 185, 129, 0.05)
+                                        borderColor: "#10b98133"      // rgba(16, 185, 129, 0.2)
                                     }}
                                     whileTap={{ scale: 0.9 }}
                                     className="p-3 bg-slate-50/50 hover:bg-white/70 border border-transparent rounded-2xl transition-all group relative"

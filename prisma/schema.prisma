@@ -1,6 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
-  output          = "../src/generated/client"
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -9,49 +9,49 @@ datasource db {
 }
 
 model user {
-  id                      Int                @id @default(autoincrement())
-  email                   String             @unique
-  password                String?
-  name                    String?
-  role                    String             @default("USER")
-  emailVerified           DateTime?
-  image                   String?            @db.LongText
-  phone                   String?
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @default(now()) @updatedAt
-  avatarUrl               String?            @db.VarChar(512)
-  lastCheckIn             DateTime?
-  points                  Int                @default(0)
-  twoFactorEnabled        Boolean            @default(false)
-  failedLoginAttempts     Int                @default(0)
-  lockedUntil             DateTime?
-  notificationPreferences String?            @db.LongText
-  googleId                String?            @unique
-  activeSessions          activesession[]
-  addresses               address[]
-  cart                    cart?
-  loginHistory            loginhistory[]
-  notifications           notification[]
-  orders                  order[]
-  pointTransactions       pointtransaction[]
-  productQAs              productqa[]
-  refundRequests          refundrequest[]
-  reviews                 review[]
-  twoFactorTokens         twofactortoken[]
-  userVouchers            uservoucher[]
-  wishlists               wishlist[]
-  referralProfile              referralprofile?
-  referralRelationsAsReferrer  referralrelation[]       @relation("ReferralReferrer")
-  referralRelationsAsReferred  referralrelation?        @relation("ReferralReferred")
-  referralCommissionsEarned    referralcommission[]     @relation("CommissionReferrer")
-  referralCommissionsGenerated referralcommission[]     @relation("CommissionReferred")
-  referralMilestoneRewards     referralmilestonereward[]
+  id                           Int                       @id @default(autoincrement())
+  email                        String                    @unique
+  password                     String?
+  name                         String?
+  role                         String                    @default("USER")
+  emailVerified                DateTime?
+  image                        String?                   @db.LongText
+  phone                        String?
+  createdAt                    DateTime                  @default(now())
+  updatedAt                    DateTime                  @default(now()) @updatedAt
+  avatarUrl                    String?                   @db.VarChar(512)
+  lastCheckIn                  DateTime?
+  points                       Int                       @default(0)
+  twoFactorEnabled             Boolean                   @default(false)
+  failedLoginAttempts          Int                       @default(0)
+  lockedUntil                  DateTime?
+  notificationPreferences      String?                   @db.LongText
+  googleId                     String?                   @unique
+  activeSessions               activesession[]
+  addresses                    address[]
+  cart                         cart?
+  liveChatsAsAdmin             livechat[]                @relation("adminLiveChats")
+  liveChatsAsUser              livechat[]                @relation("userLiveChats")
+  loginHistory                 loginhistory[]
+  notifications                notification[]
+  orders                       order[]
+  pointTransactions            pointtransaction[]
+  productQAs                   productqa[]
+  referralAuditLogsAsActor     referralauditlog[]        @relation("AuditActor")
+  referralAuditLogsAsTarget    referralauditlog[]        @relation("AuditTarget")
   referralCashouts             referralcashout[]
+  referralCommissionsGenerated referralcommission[]      @relation("CommissionReferred")
+  referralCommissionsEarned    referralcommission[]      @relation("CommissionReferrer")
+  referralMilestoneRewards     referralmilestonereward[]
+  referralProfile              referralprofile?
+  referralRelationsAsReferred  referralrelation?         @relation("ReferralReferred")
+  referralRelationsAsReferrer  referralrelation[]        @relation("ReferralReferrer")
   referralWalletTxs            referralwallettx[]
-  referralAuditLogsAsActor     referralauditlog[]       @relation("AuditActor")
-  referralAuditLogsAsTarget    referralauditlog[]       @relation("AuditTarget")
-  liveChatsAsUser              livechat[]               @relation("userLiveChats")
-  liveChatsAsAdmin             livechat[]               @relation("adminLiveChats")
+  refundRequests               refundrequest[]
+  reviews                      review[]
+  twoFactorTokens              twofactortoken[]
+  userVouchers                 uservoucher[]
+  wishlists                    wishlist[]
 }
 
 model verificationtoken {
@@ -171,16 +171,16 @@ model product {
   flashSaleProducts flashsaleproduct[]
   orderItems        orderitem[]
   brand             brand?                 @relation(fields: [brandId], references: [id])
-  categoryRel       category?              @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryRel       category?              @relation(fields: [categoryId], references: [id])
   productImages     productimage[]
   productMedia      productmedia[]
   productQAs        productqa[]
   shipping          productshipping?
   specifications    productspecification[]
+  productTags       producttag[]
   productVariants   productvariant[]
   productViews      productview[]
   reviews           review[]
-  productTags       producttag[]
   wishlists         wishlist[]
 
   @@index([brandId])
@@ -195,23 +195,22 @@ model product {
 }
 
 model category {
-  id          Int        @id @default(autoincrement())
-  name        String
-  nameEn      String?
-  slug        String     @unique
-  description String?    @db.Text
-  descriptionEn String?  @db.Text
-  imageUrl    String?    @db.VarChar(512)
-  parentId    Int?
-  position    Int        @default(0)
-  isVisible   Boolean    @default(true)
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  parent      category?  @relation("CategoryParent", fields: [parentId], references: [id], onDelete: SetNull)
-  children    category[] @relation("CategoryParent")
-  products    product[]
+  id            Int        @id @default(autoincrement())
+  name          String
+  nameEn        String?
+  slug          String     @unique
+  description   String?    @db.Text
+  descriptionEn String?    @db.Text
+  imageUrl      String?    @db.VarChar(512)
+  parentId      Int?
+  position      Int        @default(0)
+  isVisible     Boolean    @default(true)
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  parent        category?  @relation("CategoryParent", fields: [parentId], references: [id])
+  children      category[] @relation("CategoryParent")
+  products      product[]
 
   @@index([parentId])
   @@index([position])
@@ -220,13 +219,13 @@ model category {
 }
 
 model tag {
-  id        Int         @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   name      String
   nameEn    String?
-  slug      String      @unique
-  isActive  Boolean     @default(true)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  slug      String       @unique
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   products  producttag[]
 
   @@index([isActive])
@@ -236,7 +235,6 @@ model producttag {
   productId Int
   tagId     Int
   createdAt DateTime @default(now())
-
   product   product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   tag       tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
@@ -336,37 +334,37 @@ model cartitem {
 }
 
 model order {
-  id              Int             @id @default(autoincrement())
-  userId          Int
-  status          String          @default("PENDING")
-  subtotal        Float           @default(0)
-  shippingFee     Float           @default(0)
-  discount        Float           @default(0)
-  total           Float
-  couponId        Int?
-  couponCode      String?
-  shippingAddress String?
-  shippingCity    String?
-  shippingZipCode String?
-  shippingPhone   String?
-  shippingMethod  String?         @default("standard")
-  carrier         String?
-  trackingCode    String?
-  shippedAt       DateTime?
-  deliveredAt     DateTime?
-  paymentMethod   String?
-  paymentStatus   String          @default("UNPAID")
-  paymentIntentId String?
-  notes           String?         @db.Text
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @default(now()) @updatedAt
-  pointsDiscount  Float?
-  pointsUsed      Int?
-  user            user            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  events          orderevent[]
-  orderItems      orderitem[]
-  refundRequests  refundrequest[]
+  id                  Int                  @id @default(autoincrement())
+  userId              Int
+  status              String               @default("PENDING")
+  subtotal            Float                @default(0)
+  shippingFee         Float                @default(0)
+  discount            Float                @default(0)
+  total               Float
+  couponId            Int?
+  couponCode          String?
+  shippingAddress     String?
+  shippingCity        String?
+  shippingZipCode     String?
+  shippingPhone       String?
+  shippingMethod      String?              @default("standard")
+  carrier             String?
+  trackingCode        String?
+  shippedAt           DateTime?
+  deliveredAt         DateTime?
+  paymentMethod       String?
+  paymentStatus       String               @default("UNPAID")
+  paymentIntentId     String?
+  notes               String?              @db.Text
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+  pointsDiscount      Float?
+  pointsUsed          Int?
+  user                user                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events              orderevent[]
+  orderItems          orderitem[]
   referralCommissions referralcommission[]
+  refundRequests      refundrequest[]
 
   @@index([userId])
   @@index([status])
@@ -469,22 +467,22 @@ model reviewmedia {
 }
 
 model Coupon {
-  id            Int           @id @default(autoincrement())
-  code          String        @unique
-  discountType  String
-  discountValue Float
-  minOrderValue Float?        @default(0)
-  maxDiscount   Float?
-  startDate     DateTime      @default(now())
-  endDate       DateTime
-  isActive      Boolean       @default(true)
-  usageLimit    Int?
-  usedCount     Int           @default(0)
-  category      String        @default("all")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
-  userVouchers  uservoucher[]
+  id                       Int                       @id @default(autoincrement())
+  code                     String                    @unique
+  discountType             String
+  discountValue            Float
+  minOrderValue            Float?                    @default(0)
+  maxDiscount              Float?
+  startDate                DateTime                  @default(now())
+  endDate                  DateTime
+  isActive                 Boolean                   @default(true)
+  usageLimit               Int?
+  usedCount                Int                       @default(0)
+  category                 String                    @default("all")
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @default(now()) @updatedAt
   referralMilestoneRewards referralmilestonereward[]
+  userVouchers             uservoucher[]
 
   @@map("coupon")
 }
@@ -520,22 +518,22 @@ model notification {
 }
 
 model banner {
-  id        Int       @id @default(autoincrement())
-  imageUrl  String
-  title     String
-  titleEn   String?
-  subtitle  String?
+  id         Int       @id @default(autoincrement())
+  imageUrl   String
+  title      String
+  titleEn    String?
+  subtitle   String?
   subtitleEn String?
-  ctaText   String?
-  ctaTextEn String?
-  ctaLink   String?
-  startAt   DateTime?
-  endAt     DateTime?
-  priority  Int       @default(0)
-  isActive  Boolean   @default(true)
-  placement String    @default("home")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  ctaText    String?
+  ctaTextEn  String?
+  ctaLink    String?
+  startAt    DateTime?
+  endAt      DateTime?
+  priority   Int       @default(0)
+  isActive   Boolean   @default(true)
+  placement  String    @default("home")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
 
   @@index([placement, isActive, priority])
 }
@@ -836,23 +834,23 @@ model emailcampaign {
 }
 
 model HomepageSection {
-  id          Int       @id @default(autoincrement())
-  key         String    @unique(map: "homepageSection_key_key")
-  title       String?
-  titleEn     String?
-  subtitle    String?
-  subtitleEn  String?
-  description String?   @db.Text
-  descriptionEn String? @db.Text
-  config      String?   @db.LongText
-  type        String
-  isActive    Boolean   @default(true)
-  position    Int       @default(0)
-  limit       Int       @default(10)
-  startAt     DateTime?
-  endAt       DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  key           String    @unique(map: "homepageSection_key_key")
+  title         String?
+  titleEn       String?
+  subtitle      String?
+  subtitleEn    String?
+  description   String?   @db.Text
+  descriptionEn String?   @db.Text
+  config        String?   @db.LongText
+  type          String
+  isActive      Boolean   @default(true)
+  position      Int       @default(0)
+  limit         Int       @default(10)
+  startAt       DateTime?
+  endAt         DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([isActive], map: "homepageSection_isActive_idx")
   @@index([position], map: "homepageSection_position_idx")
@@ -860,10 +858,10 @@ model HomepageSection {
 }
 
 model MenuItem {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   name       String
   nameEn     String?
-  slug       String    @unique(map: "menuItem_slug_key")
+  slug       String     @unique(map: "menuItem_slug_key")
   type       String
   url        String?
   categoryId Int?
@@ -871,13 +869,12 @@ model MenuItem {
   pageId     Int?
   icon       String?
   parentId   Int?
-  position   Int       @default(0)
-  isVisible  Boolean   @default(true)
-  isActive   Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  parent     MenuItem?  @relation("MenuItemParent", fields: [parentId], references: [id], onDelete: SetNull, map: "menuItem_parentId_fkey")
+  position   Int        @default(0)
+  isVisible  Boolean    @default(true)
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  parent     MenuItem?  @relation("MenuItemParent", fields: [parentId], references: [id], map: "menuItem_parentId_fkey")
   children   MenuItem[] @relation("MenuItemParent")
 
   @@index([isVisible], map: "menuItem_isVisible_idx")
@@ -933,10 +930,6 @@ model UserSegment {
   @@map("usersegment")
 }
 
-// ============================================================================
-// REFERRAL & REWARDS SYSTEM
-// ============================================================================
-
 model referralprofile {
   id                       Int      @id @default(autoincrement())
   userId                   Int      @unique
@@ -946,10 +939,10 @@ model referralprofile {
   customCodeChanges        Int      @default(0)
   totalInvites             Int      @default(0)
   qualifiedInvites         Int      @default(0)
-  pendingBalance           Decimal  @default(0) @db.Decimal(12, 2)
-  availableBalance         Decimal  @default(0) @db.Decimal(12, 2)
-  withdrawnBalance         Decimal  @default(0) @db.Decimal(12, 2)
-  convertedBalance         Decimal  @default(0) @db.Decimal(12, 2)
+  pendingBalance           Decimal  @default(0.00) @db.Decimal(12, 2)
+  availableBalance         Decimal  @default(0.00) @db.Decimal(12, 2)
+  withdrawnBalance         Decimal  @default(0.00) @db.Decimal(12, 2)
+  convertedBalance         Decimal  @default(0.00) @db.Decimal(12, 2)
   tier                     String   @default("MEMBER") @db.VarChar(20)
   fraudScore               Int      @default(0)
   isLocked                 Boolean  @default(false)
@@ -965,23 +958,23 @@ model referralprofile {
 }
 
 model referralrelation {
-  id                Int      @id @default(autoincrement())
+  id                Int                   @id @default(autoincrement())
   referrerUserId    Int
-  referredUserId    Int      @unique
-  referralCodeUsed  String   @db.VarChar(20)
-  source            String   @default("LINK") @db.VarChar(10)
-  status            String   @default("SIGNED_UP") @db.VarChar(15)
-  ip                String?  @db.VarChar(64)
-  userAgent         String?  @db.Text
-  deviceFingerprint String?  @db.VarChar(128)
-  note              String?  @db.Text
+  referredUserId    Int                   @unique
+  referralCodeUsed  String                @db.VarChar(20)
+  source            String                @default("LINK") @db.VarChar(10)
+  status            String                @default("SIGNED_UP") @db.VarChar(15)
+  ip                String?               @db.VarChar(64)
+  userAgent         String?               @db.Text
+  deviceFingerprint String?               @db.VarChar(128)
+  note              String?               @db.Text
   qualifiedAt       DateTime?
   lockedAt          DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  referrer          user     @relation("ReferralReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
-  referred          user     @relation("ReferralReferred", fields: [referredUserId], references: [id], onDelete: Cascade)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
   fraudSignals      referralfraudsignal[]
+  referred          user                  @relation("ReferralReferred", fields: [referredUserId], references: [id], onDelete: Cascade)
+  referrer          user                  @relation("ReferralReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
 
   @@index([referrerUserId])
   @@index([referredUserId])
@@ -1003,9 +996,9 @@ model referralcommission {
   voidReason       String?   @db.Text
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
-  referrer         user      @relation("CommissionReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
-  referred         user      @relation("CommissionReferred", fields: [referredUserId], references: [id], onDelete: Cascade)
   order            order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  referred         user      @relation("CommissionReferred", fields: [referredUserId], references: [id], onDelete: Cascade)
+  referrer         user      @relation("CommissionReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
 
   @@unique([orderId, referrerUserId])
   @@index([referrerUserId])
@@ -1016,19 +1009,19 @@ model referralcommission {
 }
 
 model referralmilestone {
-  id          Int       @id @default(autoincrement())
-  milestone   Int       @unique
-  rewardType  String    @db.VarChar(20)
-  rewardValue Decimal   @db.Decimal(12, 2)
-  label       String?   @db.VarChar(100)
-  labelEn     String?   @db.VarChar(100)
-  description String?   @db.Text
-  descriptionEn String? @db.Text
-  voucherConfig String? @db.Text
-  isActive    Boolean   @default(true)
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id               Int                       @id @default(autoincrement())
+  milestone        Int                       @unique
+  rewardType       String                    @db.VarChar(20)
+  rewardValue      Decimal                   @db.Decimal(12, 2)
+  label            String?                   @db.VarChar(100)
+  labelEn          String?                   @db.VarChar(100)
+  description      String?                   @db.Text
+  descriptionEn    String?                   @db.Text
+  voucherConfig    String?                   @db.Text
+  isActive         Boolean                   @default(true)
+  sortOrder        Int                       @default(0)
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
   milestoneRewards referralmilestonereward[]
 
   @@index([isActive])
@@ -1036,24 +1029,25 @@ model referralmilestone {
 }
 
 model referralmilestonereward {
-  id          Int       @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   userId      Int
   milestoneId Int
-  rewardType  String    @db.VarChar(20)
-  rewardValue Decimal   @db.Decimal(12, 2)
+  rewardType  String            @db.VarChar(20)
+  rewardValue Decimal           @db.Decimal(12, 2)
   couponId    Int?
-  status      String    @default("GRANTED") @db.VarChar(12)
-  grantedAt   DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      String            @default("GRANTED") @db.VarChar(12)
+  grantedAt   DateTime          @default(now())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  coupon      Coupon?           @relation(fields: [couponId], references: [id])
   milestone   referralmilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
-  coupon      Coupon?   @relation(fields: [couponId], references: [id])
+  user        user              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, milestoneId])
   @@index([userId])
   @@index([milestoneId])
   @@index([status])
+  @@index([couponId], map: "referralmilestonereward_couponId_fkey")
 }
 
 model referralcashout {
@@ -1086,8 +1080,8 @@ model referralauditlog {
   afterData    String?  @db.LongText
   metadata     String?  @db.Text
   createdAt    DateTime @default(now())
-  actor        user?    @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
-  target       user?    @relation("AuditTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+  actor        user?    @relation("AuditActor", fields: [actorUserId], references: [id])
+  target       user?    @relation("AuditTarget", fields: [targetUserId], references: [id])
 
   @@index([actorUserId])
   @@index([targetUserId])
@@ -1097,14 +1091,14 @@ model referralauditlog {
 }
 
 model referralfraudsignal {
-  id           Int      @id @default(autoincrement())
-  relationId   Int
-  signalType   String   @db.VarChar(30)
-  severity     String   @default("MEDIUM") @db.VarChar(10)
-  score        Int      @default(10)
-  details      String?  @db.Text
-  createdAt    DateTime @default(now())
-  relation     referralrelation @relation(fields: [relationId], references: [id], onDelete: Cascade)
+  id         Int              @id @default(autoincrement())
+  relationId Int
+  signalType String           @db.VarChar(30)
+  severity   String           @default("MEDIUM") @db.VarChar(10)
+  score      Int              @default(10)
+  details    String?          @db.Text
+  createdAt  DateTime         @default(now())
+  relation   referralrelation @relation(fields: [relationId], references: [id], onDelete: Cascade)
 
   @@index([relationId])
   @@index([signalType])
@@ -1132,19 +1126,17 @@ model referralwallettx {
   @@index([createdAt])
 }
 
-// ─── Live Chat System ─────────────────────────────────────────
-
 model livechat {
   id        Int               @id @default(autoincrement())
   userId    Int
   adminId   Int?
-  status    String            @default("OPEN") @db.VarChar(20) // OPEN, ASSIGNED, CLOSED
+  status    String            @default("OPEN") @db.VarChar(20)
   subject   String?
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   closedAt  DateTime?
+  admin     user?             @relation("adminLiveChats", fields: [adminId], references: [id])
   user      user              @relation("userLiveChats", fields: [userId], references: [id], onDelete: Cascade)
-  admin     user?             @relation("adminLiveChats", fields: [adminId], references: [id], onDelete: SetNull)
   messages  livechatmessage[]
 
   @@index([userId])
@@ -1156,7 +1148,7 @@ model livechat {
 model livechatmessage {
   id         Int      @id @default(autoincrement())
   chatId     Int
-  senderType String   @db.VarChar(10) // USER, ADMIN, AI
+  senderType String   @db.VarChar(10)
   senderId   Int?
   content    String   @db.Text
   isRead     Boolean  @default(false)
@@ -1168,22 +1160,18 @@ model livechatmessage {
   @@index([isRead])
 }
 
-// ============================================================================
-// AI COMMERCE PLATFORM
-// ============================================================================
-
 model AiCombo {
   id          Int           @id @default(autoincrement())
   name        String
   nameEn      String?
-  type        String        @db.VarChar(30) // snack, cooking, gift, savings, bestseller, behavioral, flashsale, frequently_bought
+  type        String        @db.VarChar(30)
   description String?       @db.Text
   totalPrice  Float
   discountPct Float         @default(0)
   finalPrice  Float
   reason      String?       @db.Text
   isActive    Boolean       @default(true)
-  createdBy   String        @default("AI") @db.VarChar(10) // AI or ADMIN
+  createdBy   String        @default("AI") @db.VarChar(10)
   usageCount  Int           @default(0)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

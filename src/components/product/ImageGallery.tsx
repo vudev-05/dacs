@@ -10,7 +10,7 @@
 import { useState, useCallback, useEffect } from "react";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { useLanguage } from "@/lib/i18n/context";
 import { createPortal } from "react-dom";
 
@@ -107,57 +107,41 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
 
     return (
         <div className="space-y-3">
-            {/* Main Image */}
+            {/* Main Image Container */}
             <div
-                className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-white border border-slate-100/80 shadow-lg relative group cursor-pointer touch-none"
+                className="aspect-square rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100/50 relative group cursor-zoom-in touch-none"
                 onClick={() => setIsLightboxOpen(true)}
             >
-                <AnimatePresence mode="popLayout" custom={direction}>
+                {/* Main Image View */}
+                <div className="absolute inset-0 flex items-center justify-center">
                     {currentImage && (
-                        <motion.div
-                            key={selectedIndex}
-                            custom={direction}
-                            variants={slideVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            drag="x"
-                            dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={0.7}
-                            onDragEnd={(_, info) => {
-                                if (info.offset.x > 100) handlePrevious();
-                                else if (info.offset.x < -100) handleNext();
-                            }}
-                            className="absolute inset-0 flex items-center justify-center"
-                        >
-                            <ImageWithFallback
-                                src={currentImage.imageUrl}
-                                alt={currentImage.altText || productName}
-                                fill
-                                className="object-cover transition-transform duration-700 group-hover:scale-[1.03] select-none"
-                                priority
-                                sizes="(max-width: 768px) 100vw, 420px"
-                            />
-                        </motion.div>
+                        <ImageWithFallback
+                            src={currentImage.imageUrl}
+                            alt={currentImage.altText || productName}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-[1.03] select-none"
+                            priority
+                            sizes="(max-width: 768px) 100vw, 420px"
+                        />
                     )}
-                </AnimatePresence>
+                </div>
 
-                {/* Navigation Arrows - luôn hiển thị để dễ chuyển ảnh */}
+                {/* Navigation Arrows - Glassmorphism Style */}
                 {sortedImages.length > 1 && (
                     <>
                         <button
                             onClick={(e) => { e.stopPropagation(); handlePrevious(); }}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-white/95 backdrop-blur-md shadow-lg flex items-center justify-center hover:bg-white hover:scale-105 active:scale-95 transition-all z-20 border border-slate-100"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-2xl bg-white/40 backdrop-blur-xl shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white/80 hover:scale-110 active:scale-95 transition-all duration-300 z-20 border border-white/40"
                             aria-label={t("imageGallery.previousImage")}
                         >
-                            <ChevronLeft className="w-4 h-4 text-slate-700" />
+                            <ChevronLeft className="w-5 h-5 text-slate-800" />
                         </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-white/95 backdrop-blur-md shadow-lg flex items-center justify-center hover:bg-white hover:scale-105 active:scale-95 transition-all z-20 border border-slate-100"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-2xl bg-white/40 backdrop-blur-xl shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white/80 hover:scale-110 active:scale-95 transition-all duration-300 z-20 border border-white/40"
                             aria-label={t("imageGallery.nextImage")}
                         >
-                            <ChevronRight className="w-4 h-4 text-slate-700" />
+                            <ChevronRight className="w-5 h-5 text-slate-800" />
                         </button>
                     </>
                 )}
@@ -170,16 +154,16 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                 )}
             </div>
 
-            {/* Thumbnail Strip - lớn hơn, dễ nhìn và bấm */}
+            {/* Thumbnail Strip - VIP Style */}
             {sortedImages.length > 1 && (
-                <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide px-1 mt-6">
                     {sortedImages.map((img, idx) => (
                         <button
                             key={img.id}
                             onClick={() => { setDirection(idx > selectedIndex ? 1 : -1); setSelectedIndex(idx); }}
-                            className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0 flex-shrink-0 ${idx === selectedIndex
-                                    ? "border-emerald-500 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-500/30"
-                                    : "border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100"
+                            className={`relative w-24 h-24 rounded-3xl overflow-hidden border-2 transition-all duration-500 shrink-0 flex-shrink-0 group/thumb ${idx === selectedIndex
+                                    ? "border-emerald-500 shadow-xl shadow-emerald-500/20 scale-105"
+                                    : "border-slate-100 hover:border-slate-300 opacity-70 hover:opacity-100"
                                 }`}
                             aria-label={`${t("imageGallery.viewImage")} ${idx + 1}`}
                         >
@@ -187,9 +171,12 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                                 src={img.imageUrl}
                                 alt={img.altText || `${productName} ${idx + 1}`}
                                 fill
-                                className="object-cover"
-                                sizes="80px"
+                                className={`object-cover transition-transform duration-500 ${idx === selectedIndex ? 'scale-110' : 'group-hover/thumb:scale-110'}`}
+                                sizes="96px"
                             />
+                            {idx === selectedIndex && (
+                                <div className="absolute inset-0 ring-4 ring-emerald-500/10 inset-[-2px] rounded-3xl" />
+                            )}
                         </button>
                     ))}
                 </div>
@@ -197,15 +184,11 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
 
             {/* Lightbox Modal */}
             {isMounted && createPortal(
-                <AnimatePresence>
-                    {isLightboxOpen && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsLightboxOpen(false)}
-                            className="fixed inset-0 z-[10000] bg-black flex items-center justify-center p-4"
-                        >
+                isLightboxOpen && (
+                    <div
+                        onClick={() => setIsLightboxOpen(false)}
+                        className="fixed inset-0 z-[10000] bg-black flex items-center justify-center p-4"
+                    >
                             {/* Close */}
                             <button
                                 onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(false); }}
@@ -236,35 +219,22 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                             )}
 
                             {/* Image only */}
-                            <AnimatePresence mode="wait" custom={direction}>
-                                <motion.div
-                                    key={selectedIndex}
-                                    custom={direction}
-                                    variants={slideVariants}
-                                    initial="enter"
-                                    animate="center"
-                                    exit="exit"
-                                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="relative w-[min(96vw,1400px)] h-[92vh]"
-                                >
-                                    {currentImage && (
-                                        <ImageWithFallback
-                                            src={currentImage.imageUrl}
-                                            alt={currentImage.altText || productName}
-                                            fill
-                                            className="object-contain"
-                                            quality={100}
-                                            sizes="100vw"
-                                        />
-                                    )}
-                                </motion.div>
-                            </AnimatePresence>
-                        </motion.div>
-                    )}
-                </AnimatePresence>,
-                document.body
-            )}
+                            <div className="relative w-[min(96vw,1400px)] h-[92vh]" onClick={(e) => e.stopPropagation()}>
+                                {currentImage && (
+                                    <ImageWithFallback
+                                        src={currentImage.imageUrl}
+                                        alt={currentImage.altText || productName}
+                                        fill
+                                        className="object-contain"
+                                        quality={100}
+                                        sizes="100vw"
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    ),
+                    document.body
+                )}
         </div>
     );
 }

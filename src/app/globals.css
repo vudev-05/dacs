@@ -36,6 +36,9 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  --font-inter: var(--font-inter), ui-sans-serif, system-ui;
+  --font-outfit: var(--font-outfit), ui-sans-serif, system-ui;
 }
 
 /*
@@ -137,6 +140,28 @@
   }
   .pt-safe {
     padding-top: env(safe-area-inset-top);
+  }
+
+  /* VIP Mesh Gradients */
+  .mesh-shimmer {
+    background: linear-gradient(-45deg, #f0fdf4, #ecfdf5, #f0f9ff, #fdf2f8);
+    background-size: 400% 400%;
+    animation: gradient-shimmer 15s ease infinite;
+  }
+
+  @keyframes gradient-shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes shimmer-slide {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+
+  .animate-shimmer {
+    animation: shimmer-slide 2.5s infinite;
   }
 }
 

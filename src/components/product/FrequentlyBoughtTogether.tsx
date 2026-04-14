@@ -15,6 +15,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/lib/i18n/context";
 import { toast } from "sonner";
 import PriceDisplay from "@/components/ui/price-display";
+import { formatPrice, formatVndEquivalent } from "@/lib/currency";
 
 interface Product {
     id: number;
@@ -141,124 +142,158 @@ export default function FrequentlyBoughtTogether({ currentProduct }: FrequentlyB
     const totalPrice = currentPrice + selectedTotal;
 
     return (
-        <section className="mb-20">
-            <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <Sparkles className="w-5 h-5 text-white" />
+        <section className="mb-24">
+            <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 rounded-[1.25rem] bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter">
-                        {vi ? "Gợi ý Combo" : "Combo Suggestions"}
+                    <h2 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter font-outfit text-slate-900">
+                        {vi ? "Gợi ý Combo Hoàn Hảo" : "Perfect Combo Deals"}
                     </h2>
-                    <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">
-                        {vi ? "Kết hợp để có trải nghiệm hoàn hảo" : "Combine for the perfect experience"}
+                    <p className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase mt-1">
+                        {vi ? "Tiết kiệm hơn khi mua trọn bộ tinh hoa" : "Save more when buying the essence bundle"}
                     </p>
                 </div>
             </div>
 
-            <div className="bg-white p-4 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-slate-100 shadow-xl lg:flex items-center gap-12">
-                {/* Product List — 3-col grid on mobile, flex-wrap on desktop */}
-                <div className="flex-1 grid grid-cols-3 sm:flex sm:flex-wrap items-start sm:items-center justify-items-center sm:justify-center lg:justify-start gap-3 sm:gap-6">
-                    {/* Current Product */}
-                    <div className="relative group">
-                        <div className="w-24 h-24 sm:w-40 sm:h-40 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 relative shadow-sm">
-                            <ImageWithFallback
-                                src={currentProduct.image}
-                                alt={currentProduct.name}
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 640px) 96px, 160px"
-                            />
-                            <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg">
-                                <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+            <div className="bg-white/40 backdrop-blur-3xl rounded-[3.5rem] p-8 sm:p-12 border border-white/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] flex flex-col items-center gap-12 relative overflow-hidden group">
+                {/* Background Decoration */}
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-100/30 blur-[120px] rounded-full -mr-32 -mt-32 opacity-60" />
+                <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-amber-100/30 blur-[100px] rounded-full -ml-24 -mb-24 opacity-60" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-emerald-50/10 via-transparent to-amber-50/10 pointer-events-none" />
+
+                {/* Product List - Centered Row */}
+                <div className="w-full relative z-10 flex flex-wrap items-start justify-center gap-y-10 gap-x-6 sm:gap-x-10">
+                    {/* Current Product - The Core Luxury Item */}
+                    <div className="flex flex-col items-center shrink-0">
+                        <div className="relative group/main">
+                            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2.5rem] p-1 bg-gradient-to-br from-emerald-400 to-teal-600 shadow-xl transition-transform duration-700 hover:scale-105">
+                                <div className="w-full h-full rounded-[2.35rem] overflow-hidden bg-white relative">
+                                    <ImageWithFallback
+                                        src={currentProduct.image}
+                                        alt={currentProduct.name}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 640px) 96px, 128px"
+                                    />
+                                </div>
+                            </div>
+                            <div className="absolute -top-2 -right-2 w-8 h-8 sm:w-10 sm:h-10 bg-white text-emerald-600 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-xl z-20">
+                                <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
                             </div>
                         </div>
-                        <div className="mt-2 sm:mt-3 text-center w-24 sm:w-40">
-                            <p className="text-[9px] sm:text-[10px] font-black uppercase text-slate-900 truncate">{currentProduct.name}</p>
-                            <PriceDisplay
-                                currentPrice={currentPrice}
-                                originalPrice={currentProduct.originalPrice && currentProduct.originalPrice > currentPrice ? currentProduct.originalPrice : undefined}
-                                salePrice={currentProduct.salePrice}
-                                isOnSale={!!(currentProduct.originalPrice && currentProduct.originalPrice > currentPrice)}
-                                size="sm"
-                                showDiscountBadge={false}
-                                className="justify-center gap-1"
-                            />
+                        <div className="mt-5 text-center w-24 sm:w-32">
+                            <p className="text-[10px] font-black uppercase text-slate-900 tracking-tight truncate mb-1">{currentProduct.name}</p>
+                            <PriceDisplay currentPrice={currentPrice} size="sm" className="justify-center" showDiscountBadge={false} />
                         </div>
                     </div>
 
+                    {/* Recommendations with Plus signs */}
                     {recommended.map((product) => (
-                        <div key={product.id} className="flex items-center gap-3 sm:gap-6">
-                            {/* Plus sign — hidden on mobile grid, visible on desktop flex */}
-                            <div className="hidden sm:block text-slate-200 text-3xl font-black">+</div>
+                        <div key={product.id} className="flex items-start gap-4 sm:gap-10 shrink-0">
+                            <div className="flex items-center self-start pt-10 sm:pt-14 shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-white/80 shadow-inner flex items-center justify-center border border-white">
+                                    <span className="text-slate-300 font-black text-lg">+</span>
+                                </div>
+                            </div>
+                            
                             <div
-                                className={`relative group cursor-pointer transition-all duration-500 ${selectedIds.includes(product.id) ? "grayscale-0 opacity-100" : "grayscale opacity-40 hover:opacity-70"
-                                    }`}
+                                className={`flex flex-col items-center shrink-0 transition-all duration-700 cursor-pointer ${
+                                    selectedIds.includes(product.id) ? "opacity-100 scale-100" : "opacity-40 grayscale-[0.8] scale-95 hover:opacity-80 hover:grayscale-0"
+                                }`}
                                 onClick={() => toggleSelection(String(product.id))}
                             >
-                                <div className="w-24 h-24 sm:w-40 sm:h-40 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 relative shadow-md group-hover:shadow-xl transition-all">
-                                    <ImageWithFallback
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 640px) 96px, 160px"
-                                    />
-                                    {selectedIds.includes(product.id) && (
-                                        <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-in zoom-in-50 duration-300">
-                                            <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                                <div className="relative group/rec">
+                                    <div className={`absolute -inset-1 rounded-[2.5rem] blur-lg transition-all duration-700 ${
+                                        selectedIds.includes(product.id) ? "bg-emerald-500/30 opacity-100" : "opacity-0"
+                                    }`} />
+                                    
+                                    <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-[2.5rem] p-1 bg-gradient-to-br transition-all duration-700 ${
+                                        selectedIds.includes(product.id) 
+                                            ? "from-emerald-400 to-teal-500 shadow-xl" 
+                                            : "from-slate-200/50 to-slate-100/50"
+                                    }`}>
+                                        <div className="w-full h-full rounded-[2.35rem] overflow-hidden bg-white relative">
+                                            <ImageWithFallback
+                                                src={product.image}
+                                                alt={product.name}
+                                                fill
+                                                className="object-cover"
+                                                sizes="(max-width: 640px) 96px, 128px"
+                                            />
                                         </div>
-                                    )}
+                                    </div>
+                                    
+                                    <div className={`absolute -top-2 -right-2 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-4 border-white shadow-xl z-20 transition-all duration-500 ${
+                                        selectedIds.includes(product.id) ? "bg-emerald-500 text-white scale-100 rotate-0" : "bg-slate-100 text-slate-400 scale-0 rotate-45"
+                                    }`}>
+                                        <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3px]" />
+                                    </div>
                                 </div>
-                                <div className="mt-2 sm:mt-3 text-center w-24 sm:w-40">
-                                    <p className="text-[9px] sm:text-[10px] font-black uppercase text-slate-900 truncate">{product.name}</p>
-                                    <PriceDisplay
-                                        currentPrice={getEffectivePrice(product)}
-                                        originalPrice={product.originalPrice && product.originalPrice > getEffectivePrice(product) ? product.originalPrice : undefined}
-                                        salePrice={product.salePrice}
-                                        isOnSale={!!(product.originalPrice && product.originalPrice > getEffectivePrice(product))}
-                                        size="sm"
-                                        showDiscountBadge={false}
-                                        className="justify-center gap-1"
-                                    />
+                                <div className="mt-5 text-center w-24 sm:w-32">
+                                    <p className="text-[10px] font-black uppercase text-slate-900 tracking-tight truncate mb-1">{product.name}</p>
+                                    <PriceDisplay currentPrice={getEffectivePrice(product)} size="sm" className="justify-center" showDiscountBadge={false} />
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* Bundle Summary & Action */}
-                <div className="mt-10 lg:mt-0 lg:w-80 p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
-                    <div className="space-y-4 mb-8">
-                        <div className="flex justify-between items-center text-sm font-bold text-slate-500">
-                            <span>{vi ? "Sản phẩm đã chọn:" : "Selected products:"}</span>
-                            <span className="text-slate-900">{selectedIds.length + 1}</span>
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <span className="text-sm font-black uppercase tracking-widest text-slate-400">
-                                {vi ? "Tổng cộng:" : "Total:"}
-                            </span>
-                            <PriceDisplay currentPrice={totalPrice} size="lg" showDiscountBadge={false} className="justify-end" />
+                {/* Summary Card - Now Below for Ultimate Logic Flow */}
+                <div className="w-full max-w-4xl relative z-20">
+                    <div className="bg-slate-900 rounded-[3rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden group/card border border-white/5">
+                        {/* Interactive Sparkle Background */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full -mr-32 -mt-32 group-hover/card:bg-emerald-500/20 transition-colors duration-700" />
+                        
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                            <div className="space-y-6 text-center md:text-left">
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                    <div className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full flex items-center gap-2">
+                                        <Sparkles className="w-3 h-3 text-amber-400" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-50">{vi ? "ƯU ĐÃI COMBO" : "ULTIMATE BUNDLE"}</span>
+                                    </div>
+                                    <div className="text-[10px] font-black text-slate-500">
+                                        {selectedIds.length + 1} TOTAL ITEMS
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{vi ? "TỔNG GIÁ TRỊ COMBO" : "BUNDLE MARKET VALUE"}</p>
+                                    <div className="flex flex-col items-center md:items-start">
+                                        <span className="text-5xl sm:text-6xl font-black font-outfit text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-slate-400">
+                                            {formatPrice(totalPrice)}
+                                        </span>
+                                        <div className="text-[11px] font-black text-emerald-400/90 uppercase tracking-widest mt-2 flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]" />
+                                            ≈ {formatVndEquivalent(totalPrice)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="w-full md:w-auto flex flex-col items-center gap-4">
+                                <Button
+                                    onClick={handleAddAll}
+                                    disabled={isAddingAll}
+                                    className="h-20 px-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-[2rem] border-0 shadow-[0_20px_40px_-10px_rgba(16,185,129,0.5)] transition-all duration-500 hover:scale-105 active:scale-95 group/btn overflow-hidden relative min-w-[300px]"
+                                >
+                                    {isAddingAll ? (
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                    ) : (
+                                        <div className="flex items-center justify-center gap-4">
+                                            <ShoppingCart className="w-6 h-6 transition-transform group-hover/btn:scale-110" />
+                                            <span className="text-lg font-black uppercase tracking-widest">{vi ? "CHỐT COMBO NGAY" : "GET THIS BUNDLE"}</span>
+                                        </div>
+                                    )}
+                                    <span className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer" />
+                                </Button>
+                                <p className="text-center text-[9px] font-black text-slate-500/60 uppercase tracking-widest">
+                                    {vi ? "* CÀNG MUA CÀNG GIẢM - TIẾT KIỆM TỐI ĐA" : "* MORE ITEMS, MORE SAVINGS"}
+                                </p>
+                            </div>
                         </div>
                     </div>
-
-                    <Button
-                        onClick={handleAddAll}
-                        disabled={selectedIds.length === 0 || isAddingAll}
-                        className="w-full h-16 rounded-full bg-slate-900 hover:bg-primary text-white font-black uppercase tracking-widest shadow-xl transition-all disabled:opacity-50"
-                    >
-                        {isAddingAll ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                            <>
-                                <ShoppingCart className="w-5 h-5 mr-3" />
-                                {vi ? "Mua cả bộ" : "Buy bundle"}
-                            </>
-                        )}
-                    </Button>
-                    <p className="mt-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-                        {vi ? "* Tiết kiệm thời gian, tăng trải nghiệm" : "* Save time, enhance your experience"}
-                    </p>
                 </div>
             </div>
         </section>
