@@ -388,6 +388,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, metadat
             });
         }
 
+        // 7. Clear user's cart
+        try {
+            await tx.cartitem.deleteMany({
+                where: { cart: { userId } }
+            });
+        } catch (cartErr) {
+            logger.warn("[STRIPE] Failed to clear cart after successful order", { userId, error: cartErr });
+        }
+
         return newOrder;
     });
 
@@ -513,6 +522,16 @@ async function handleLegacyPayment(orderId: number, session: Stripe.Checkout.Ses
                 paymentIntentId: (session.payment_intent as string) || session.id,
             },
         });
+
+        // Clear cart
+        try {
+            await prisma.cartitem.deleteMany({
+                where: { cart: { userId: order.userId } }
+            });
+        } catch (cartErr) {
+            logger.warn("[STRIPE] Failed to clear cart after legacy payment", { userId: order.userId, error: cartErr });
+        }
+
         logger.info(`[STRIPE] Legacy order ${orderId} marked as paid`, { sessionId: session.id });
     }
 }

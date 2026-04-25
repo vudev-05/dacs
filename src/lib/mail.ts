@@ -108,6 +108,19 @@ export const sendVerificationEmail = async (
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown mail error";
         logger.error(`[MAIL ERROR] ${message}`, error as Error, { email, smtpHost: process.env.SMTP_HOST });
+
+        // --- DEVELOPMENT FALLBACK ---
+        if (process.env.NODE_ENV === "development") {
+            console.log("\n--- DEVELOPMENT MAIL FALLBACK ---");
+            console.log(`To: ${email}`);
+            console.log(`Type: ${type}`);
+            console.log(`OTP Code: ${otp}`);
+            if (verifyUrl) console.log(`Verify URL: ${verifyUrl}`);
+            console.log("---------------------------------\n");
+            return { success: true };
+        }
+        // --- END DEVELOPMENT FALLBACK ---
+
         return { success: false, error: message };
     }
 };

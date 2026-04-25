@@ -295,7 +295,7 @@ export default async function RootLayout({
           }} />
         )}
       </head>
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased text-slate-900 bg-white`}>
+      <body suppressHydrationWarning className={`${inter.variable} ${outfit.variable} font-sans antialiased text-slate-900 bg-white`}>
         {/* Google Tag Manager (noscript) — must be immediately after <body> per GTM spec */}
         {gtmId && (
           <noscript>

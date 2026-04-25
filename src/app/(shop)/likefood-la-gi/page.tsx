@@ -56,6 +56,7 @@ export default function LikefoodLaGiPage() {
  src="/icon-512.png"
  alt="LIKEFOOD Logo - Like Food Vietnamese Specialty Store"
  fill
+ sizes="(max-width: 640px) 160px, 192px"
  className="object-contain drop-shadow-lg"
  priority
  />

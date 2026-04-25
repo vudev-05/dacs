@@ -100,6 +100,8 @@ export async function GET(req: Request) {
             }
         });
 
+        logger.info("QR payment settings found", { count: settings.length, keys: settings.map(s => s.key) });
+        
         const settingsMap = settings.reduce((acc: Record<string, string>, curr) => {
             acc[curr.key] = curr.value;
             return acc;

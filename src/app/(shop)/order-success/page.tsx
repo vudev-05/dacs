@@ -22,6 +22,7 @@ import { formatPrice } from "@/lib/currency";
 import { logger } from "@/lib/logger";
 import { useLanguage } from "@/lib/i18n/context";
 import { analytics } from "@/lib/analytics/sdk";
+import PaymentInvoice from "@/components/checkout/PaymentInvoice";
 
 // ─── Confetti Particle System ──────────────────────────────────────────
 interface Particle {
@@ -205,7 +206,6 @@ function getShippingLabel(method: string | null | undefined, vi: boolean) {
 export default function OrderSuccessPage() {
  const searchParams = useSearchParams();
  const router = useRouter();
- const orderId = searchParams.get("orderId");
  const [order, setOrder] = useState<Order | null>(null);
  const [isLoading, setIsLoading] = useState(true);
  const [copied, setCopied] = useState(false);
@@ -214,27 +214,75 @@ export default function OrderSuccessPage() {
  const vi = language === "vi";
  const trackedRef = useRef(false);
 
- const fetchOrder = useCallback(async () => {
- if (!orderId) {
- router.push("/");
- return;
- }
- try {
- setIsLoading(true);
- const response = await fetch(`/api/user/orders/${orderId}`);
- if (!response.ok) {
- router.push("/");
- return;
- }
- const data = await response.json();
- setOrder(data);
- } catch (error) {
- logger.error("Failed to fetch order", error as Error, { context: "order-success-page" });
- router.push("/");
- } finally {
- setIsLoading(false);
- }
- }, [orderId, router]);
+  const fetchOrder = useCallback(async () => {
+    const sessionId = searchParams.get("session_id");
+    const directOrderId = searchParams.get("orderId");
+
+    if (!directOrderId && !sessionId) {
+      router.push("/");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Case 1: We have a direct order ID (Offline or Free payments)
+      if (directOrderId) {
+        const response = await fetch(`/api/user/orders/${directOrderId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setOrder(data);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Case 2: We have a Stripe session ID (need to poll for order creation by webhook)
+      if (sessionId) {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        const poll = async () => {
+          try {
+            const statusRes = await fetch(`/api/checkout/session-status?session_id=${sessionId}`);
+            if (statusRes.ok) {
+              const statusData = await statusRes.json();
+              if (statusData.orderId) {
+                const orderRes = await fetch(`/api/user/orders/${statusData.orderId}`);
+                if (orderRes.ok) {
+                  const orderData = await orderRes.json();
+                  setOrder(orderData);
+                  setIsLoading(false);
+                  return true;
+                }
+              }
+            }
+          } catch (err) {
+             logger.error("Polling error", err as Error);
+          }
+          return false;
+        };
+
+        // Start polling
+        const interval = setInterval(async () => {
+          attempts++;
+          const success = await poll();
+          if (success || attempts >= maxAttempts) {
+            clearInterval(interval);
+            if (!success) {
+                // If still not found after 10 attempts, try one last time or show error
+                setIsLoading(false);
+            }
+          }
+        }, 2000); // Poll every 2 seconds
+
+        return () => clearInterval(interval);
+      }
+    } catch (error) {
+      logger.error("Failed to fetch order", error as Error, { context: "order-success-page" });
+      router.push("/");
+    }
+  }, [searchParams, router]);
 
  useEffect(() => {
  fetchOrder();
@@ -341,17 +389,27 @@ export default function OrderSuccessPage() {
  animate={{ opacity: 1, y: 0 }}
  transition={{ delay: 0.4 }}
  >
- <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
- <Sparkles className="w-3.5 h-3.5" />
- {vi ? "Thanh toán thành công" : "Payment Successful"}
- </div>
+	<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
+		(searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+			? "bg-amber-100 text-amber-700"
+			: "bg-emerald-100 text-emerald-700"
+	}`}>
+		<Sparkles className="w-3.5 h-3.5" />
+		{(searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+			? (vi ? "Đã ghi nhận đơn hàng" : "Order Recorded")
+			: (vi ? "Thanh toán thành công" : "Payment Successful")}
+	</div>
  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
  {vi ? "Cảm ơn bạn đã đặt hàng!" : "Thank you for your order!"}
  </h1>
  <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
  {vi
- ? "Đơn hàng của bạn đã được xác nhận. Chúng tôi sẽ xử lý và giao hàng sớm nhất."
- : "Your order has been confirmed. We'll process and deliver it as soon as possible."}
+ ? ((searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+ ? "Đơn hàng của bạn đã được ghi nhận thành công. Vui lòng kiểm tra thông tin bên dưới."
+ : "Đơn hàng của bạn đã được xác nhận. Chúng tôi sẽ xử lý và giao hàng sớm nhất.")
+ : ((searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+ ? "Your order has been recorded successfully. Please check the details below."
+ : "Your order has been confirmed. We'll process and deliver it as soon as possible.")}
  </p>
  </motion.div>
  </motion.div>
@@ -460,6 +518,56 @@ export default function OrderSuccessPage() {
  </div>
  </div>
  </motion.div>
+
+ {/* ─── Payment Invoice (MOMO / BANK) ─── */}
+ {(searchParams.get("method") === "MOMO" || searchParams.get("method") === "BANK") && (
+     <motion.div
+         initial={{ opacity: 0, scale: 0.95 }}
+         animate={{ opacity: 1, scale: 1 }}
+         transition={{ delay: 0.8 }}
+         className="mb-8"
+     >
+         <PaymentInvoice
+             orderId={order.id}
+             amount={order.total}
+             method={searchParams.get("method") as "MOMO" | "BANK"}
+             language={language}
+         />
+     </motion.div>
+ )}
+
+  {/* ─── COD Instructions ─── */}
+  {searchParams.get("method") === "COD" && (
+      <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mb-8"
+      >
+          <div className="p-6 rounded-3xl border-2 border-orange-500 bg-orange-50/50">
+              <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center">
+                    <Truck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">
+                        {vi ? "Thanh toán khi nhận hàng" : "Cash on Delivery"}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                        {vi ? "Bạn sẽ thanh toán bằng tiền mặt khi shipper giao hàng" : "Pay with cash when your package arrives"}
+                    </p>
+                  </div>
+              </div>
+              <div className="bg-white p-4 rounded-2xl border border-orange-100">
+                  <p className="text-sm text-slate-700 leading-relaxed italic">
+                      {vi 
+                        ? "Vui lòng chuẩn bị sẵn số tiền để thanh toán cho nhân viên giao hàng. Cảm ơn bạn!" 
+                        : "Please have the exact amount ready for the delivery person. Thank you!"}
+                  </p>
+              </div>
+          </div>
+      </motion.div>
+  )}
 
  {/* ─── Action Buttons ─── */}
  <motion.div

@@ -58,6 +58,7 @@ export async function PATCH(
         const trackingCode = body.trackingCode?.trim() || null;
         const carrier = body.carrier?.trim() || null;
         const notes = body.notes?.trim() || "";
+        const paymentStatus = body.paymentStatus?.trim() || null;
 
         if (!ORDER_STATUS_VALUES.includes(status)) {
             return NextResponse.json(
@@ -111,6 +112,7 @@ export async function PATCH(
 
         if (trackingCode) updateData["trackingCode"] = trackingCode;
         if (carrier) updateData["carrier"] = carrier;
+        if (paymentStatus) updateData["paymentStatus"] = paymentStatus;
         if (notes) {
             updateData["notes"] = order.notes
                 ? `${order.notes}\n[${new Date().toISOString()}] ${notes}`

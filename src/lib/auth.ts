@@ -260,7 +260,7 @@ export const authOptions: NextAuthOptions = {
                             ip,
                             userAgent,
                             isSuspicious,
-                            method: "password",
+                            method: account?.provider || "password",
                         }).catch(() => {});
                     }
                 }

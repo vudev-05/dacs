@@ -178,6 +178,29 @@ export default function AdminOrderDetailPage() {
     }
   };
 
+  const handleConfirmPayment = async () => {
+    if (!confirm("Bạn có chắc chắn muốn xác nhận đã nhận được tiền cho đơn hàng này?")) return;
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          status: "CONFIRMED", 
+          paymentStatus: "PAID",
+          notes: "Payment confirmed manually by Admin." 
+        }),
+      });
+      if (!response.ok) throw new Error("Không thể cập nhật thanh toán.");
+      toast.success("Xác nhận thanh toán thành công.");
+      await fetchOrder();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Có lỗi xảy ra.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-teal-500" /></div>;
   }
@@ -398,7 +421,14 @@ export default function AdminOrderDetailPage() {
                   <SummaryRow label="Giảm giá" value={`-${formatPrice(order.discount || 0)}`} />
                   {order.couponCode && <SummaryRow label="Mã giảm giá" value={order.couponCode} />}
                   <SummaryRow label="Phương thức thanh toán" value={paymentLabel(order.paymentMethod)} />
-                  <SummaryRow label="Trạng thái thanh toán" value={order.paymentStatus || "Chờ xử lý"} />
+                  <div className="flex items-center justify-between">
+                    <SummaryRow label="Trạng thái thanh toán" value={order.paymentStatus || "Chờ xử lý"} />
+                    {order.paymentStatus !== "PAID" && (order.paymentMethod === "BANK" || order.paymentMethod === "MOMO" || order.paymentMethod === "BANK_TRANSFER") && (
+                      <Button size="sm" variant="outline" className="h-7 border-teal-500/50 text-teal-400 hover:bg-teal-500/10" onClick={handleConfirmPayment}>
+                        Xác nhận tiền về
+                      </Button>
+                    )}
+                  </div>
                   <div className="border-t border-dashed border-zinc-700/50 pt-4">
                     <SummaryRow label="Tổng đơn hàng" value={formatPrice(order.total)} strong />
                   </div>

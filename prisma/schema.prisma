@@ -27,6 +27,7 @@ model user {
   lockedUntil                  DateTime?
   notificationPreferences      String?                   @db.LongText
   googleId                     String?                   @unique
+  balance                      Decimal                   @default(0.00) @db.Decimal(12, 2)
   activeSessions               activesession[]
   addresses                    address[]
   cart                         cart?
@@ -49,9 +50,28 @@ model user {
   referralWalletTxs            referralwallettx[]
   refundRequests               refundrequest[]
   reviews                      review[]
+  transactions                 transaction[]
   twoFactorTokens              twofactortoken[]
   userVouchers                 uservoucher[]
   wishlists                    wishlist[]
+}
+
+model transaction {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Decimal  @db.Decimal(12, 2)
+  type      String
+  status    String   @default("PENDING")
+  method    String?
+  reference String?  @unique
+  note      String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([reference])
 }
 
 model verificationtoken {

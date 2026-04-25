@@ -24,7 +24,18 @@ export async function POST(req: Request) {
             return rateResult.error;
         }
 
-        const { email, password, name, phone, referralCode, turnstileToken } = await req.json();
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            logger.error("Request body parse error", e as Error, { context: "auth-register" });
+            return NextResponse.json(
+                { error: "Dữ liệu yêu cầu không hợp lệ." },
+                { status: 400 }
+            );
+        }
+
+        const { email, password, name, phone, referralCode, turnstileToken } = body;
 
         if (!email || !password || !name || !phone) {
             return NextResponse.json(

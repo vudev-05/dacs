@@ -35,7 +35,7 @@ export interface CheckoutAddress {
     isDefault: boolean;
 }
 
-export type PaymentMethod = "STRIPE" | "PICKUP";
+export type PaymentMethod = "STRIPE" | "MOMO" | "BANK" | "PICKUP" | "COD";
 
 export interface CheckoutVoucher {
     id: number;
@@ -103,8 +103,8 @@ export function useCheckout(language: string) {
     const [usePoints, setUsePoints] = useState(false);
     const [pointsToUse, setPointsToUse] = useState(0);
 
-    // ── Payment — Stripe only ──
-    const [paymentMethod] = useState<PaymentMethod>("STRIPE");
+    // ── Payment Methods ──
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("STRIPE");
 
     // ── Computed Values ──
     const shippingFee = useMemo(
@@ -377,6 +377,7 @@ export function useCheckout(language: string) {
                 shippingMethod: formData.shippingMethod,
                 fullName: formData.fullName,
                 email: formData.email,
+                paymentMethod,
                 couponCode: selectedVoucher?.canUse ? selectedVoucher.code : null,
                 pointsToUse: usePoints ? pointsToUse : 0,
                 notes: orderNotes.trim() || `Order for ${formData.fullName}`,
@@ -398,11 +399,11 @@ export function useCheckout(language: string) {
             const sessionData = await sessionRes.json();
 
             if (sessionData.url) {
-                // Đơn hàng free ($0): xóa cart ngay vì không qua Stripe return page
-                if (sessionData.free) {
+                // Đơn hàng free ($0) hoặc chuyển khoản BANK/MOMO/COD: xóa cart ngay
+                if (sessionData.free || paymentMethod === "BANK" || paymentMethod === "MOMO" || paymentMethod === "COD") {
                     clearCart();
                 }
-                // Đơn hàng paid: KHÔNG xóa cart ở đây — chỉ xóa khi thanh toán thành công
+                // Đơn hàng paid (Stripe): KHÔNG xóa cart ở đây — chỉ xóa khi thanh toán thành công
                 // trên Stripe return page. Nếu user hủy, giỏ hàng vẫn còn.
                 window.location.href = sessionData.url;
                 return;
@@ -420,14 +421,14 @@ export function useCheckout(language: string) {
         }
     }, [
         validateForm, totalPrice, items, formData,
-        selectedVoucher, usePoints, pointsToUse, saveInfo, clearCart, language, orderNotes, router,
+        selectedVoucher, usePoints, pointsToUse, saveInfo, clearCart, language, orderNotes, router, paymentMethod,
     ]);
 
     return {
         // State
         step, isSubmitting, orderId, formData, formErrors, saveInfo, addresses,
         isLoadingAddresses, selectedAddressId, selectedVoucher, showVoucherModal,
-        userPoints, usePoints, pointsToUse, paymentMethod,
+        userPoints, usePoints, pointsToUse, paymentMethod, setPaymentMethod,
         items, totalPrice, isCartEmpty, session,
 
         // Computed
