@@ -21,7 +21,10 @@ import type { CheckoutVoucher } from "@/hooks/useCheckout";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-export default function CheckoutPage() {
+import LoadingState from "@/components/ui/loading-state";
+import { Suspense } from "react";
+
+function CheckoutContent() {
     const { language, t } = useLanguage();
     const checkout = useCheckout(language);
     const searchParams = useSearchParams();
@@ -233,5 +236,13 @@ export default function CheckoutPage() {
                 }
             />
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={<LoadingState fullPage text="Đang tải thanh toán..." />}>
+            <CheckoutContent />
+        </Suspense>
     );
 }

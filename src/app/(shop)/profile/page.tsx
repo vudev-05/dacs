@@ -59,6 +59,17 @@ export default function ProfilePage() {
  const [transactions, setTransactions] = useState([]);
  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
+ // Initialize tab from URL if present
+ useEffect(() => {
+  if (typeof window !== "undefined") {
+   const params = new URLSearchParams(window.location.search);
+   const tab = params.get("tab") as Tab;
+   if (tab && ["overview", "addresses", "notifications", "security", "wallet"].includes(tab)) {
+    setActiveTab(tab);
+   }
+  }
+ }, []);
+
  const [profileData, setProfileData] = useState({
   name: "",
   phone: "",

@@ -323,8 +323,8 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
     const handleBuyNow = () => {
         const item = buildCartItem();
         if (!item) return;
-        addItem(item);
-        router.push("/checkout");
+        sessionStorage.setItem("buyNowItem", JSON.stringify(item));
+        router.push("/checkout?buyNow=true");
     };
 
     const handleShare = async () => {

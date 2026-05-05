@@ -119,15 +119,15 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ url: `${appUrl}/order-success?orderId=${order.id}&method=${paymentMethod}` });
         }
 
-        const stripe = await getStripe();
+        // ─── Stripe Client Initialization ───
+        const stripeClient = await getStripe();
         
-        // --- Premium Demo Flow ---
-        // If we detect placeholders and are in dev/demo mode, we can mock the Stripe redirect
-        // to allow the user to see the success page and test the full flow.
-        const isPlaceholder = process.env.STRIPE_SECRET_KEY?.includes("placeholder") || (await getStripe().then(s => s.apiKey.includes("placeholder"))).catch(() => true);
+        // --- Demo Mode Detection ---
+        const stripeKey = process.env.STRIPE_SECRET_KEY || "";
+        const isPlaceholder = stripeKey.includes("placeholder") || stripeKey === "" || stripeKey.includes("sk_test_...");
         
         if (isPlaceholder && process.env.NODE_ENV === "development") {
-            logger.info("Demo Mode: Redirecting to success page since placeholder keys are used", { userId });
+            logger.info("Demo Mode Active: Redirecting to success page", { userId });
             
             // Create the order immediately in demo mode (similar to COD but marked as Stripe)
             const order = await prisma.$transaction(async (tx) => {
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
             },
         }));
 
-        const session = await stripe.checkout.sessions.create({
+        const session = await stripeClient.checkout.sessions.create({
             mode: "payment",
             line_items,
             success_url: `${appUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`,
@@ -181,10 +181,9 @@ export async function POST(req: NextRequest) {
             ? `Stripe Configuration Error: ${error.message}. Please check your API keys in .env or Admin Dashboard.`
             : (error?.message || "Internal server error during checkout");
 
-        logger.error("Checkout error", { 
+        logger.error("Checkout error", error, { 
             message: error.message,
-            stack: error.stack,
-            type: error.name
+            stack: error.stack
         });
 
         return NextResponse.json({ 

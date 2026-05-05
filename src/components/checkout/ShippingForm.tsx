@@ -181,7 +181,7 @@ export default function ShippingForm({
                             {vi ? "Địa chỉ giao hàng" : "Shipping address"}
                         </p>
                         <Link
-                            href="/profile"
+                            href="/profile?tab=addresses"
                             className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest hover:translate-x-1 transition-transform inline-flex items-center gap-1"
                         >
                             {vi ? "Thay đổi" : "Change"} <ChevronRight className="w-3 h-3" />
@@ -243,7 +243,7 @@ export default function ShippingForm({
                                     <p className="text-sm font-bold text-slate-500">
                                         {vi ? "Chưa có địa chỉ nào" : "No saved addresses"}
                                     </p>
-                                    <Link href="/profile" className="text-xs font-black text-primary uppercase tracking-widest mt-4 inline-block hover:underline decoration-2 underline-offset-4">
+                                    <Link href="/profile?tab=addresses" className="text-xs font-black text-primary uppercase tracking-widest mt-4 inline-block hover:underline decoration-2 underline-offset-4">
                                         {vi ? "+ Thêm ngay" : "+ Add new address"}
                                     </Link>
                                 </div>

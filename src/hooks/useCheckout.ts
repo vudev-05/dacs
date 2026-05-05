@@ -12,8 +12,8 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useCart } from "@/contexts/CartContext";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 // Stripe Checkout Sessions: no client-side SDK needed (redirect flow)
 import { tracking } from "@/lib/tracking";
 import { analytics } from "@/lib/analytics/sdk";
@@ -67,8 +67,29 @@ export interface CheckoutFormData {
 
 export function useCheckout(language: string) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const isBuyNow = searchParams.get("buyNow") === "true";
     const { data: session } = useSession();
-    const { items, totalPrice, clearCart } = useCart();
+    const { items: cartItems, totalPrice: cartTotalPrice, clearCart } = useCart();
+
+    const [buyNowItems, setBuyNowItems] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (isBuyNow) {
+            const savedItem = sessionStorage.getItem("buyNowItem");
+            if (savedItem) {
+                try {
+                    setBuyNowItems([JSON.parse(savedItem)]);
+                } catch (e) {
+                    console.error("Failed to parse buyNowItem", e);
+                }
+            }
+        }
+    }, [isBuyNow]);
+
+    const items = isBuyNow ? buyNowItems : cartItems;
+    const totalPrice = isBuyNow ? buyNowItems.reduce((sum, item) => sum + item.price * item.quantity, 0) : cartTotalPrice;
+
 
 
     // ── Core State ──
@@ -400,8 +421,11 @@ export function useCheckout(language: string) {
 
             if (sessionData.url) {
                 // Đơn hàng free ($0) hoặc chuyển khoản BANK/MOMO/COD: xóa cart ngay
-                if (sessionData.free || paymentMethod === "BANK" || paymentMethod === "MOMO" || paymentMethod === "COD") {
+                if (!isBuyNow && (sessionData.free || paymentMethod === "BANK" || paymentMethod === "MOMO" || paymentMethod === "COD")) {
                     clearCart();
+                }
+                if (isBuyNow) {
+                    sessionStorage.removeItem("buyNowItem");
                 }
                 // Đơn hàng paid (Stripe): KHÔNG xóa cart ở đây — chỉ xóa khi thanh toán thành công
                 // trên Stripe return page. Nếu user hủy, giỏ hàng vẫn còn.

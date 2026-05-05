@@ -15,7 +15,7 @@ import * as Sentry from "@sentry/nextjs";
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 type LogContext = Record<string, unknown> & {
-    userId?: string;
+    userId?: string | number;
     requestId?: string;
 };
 

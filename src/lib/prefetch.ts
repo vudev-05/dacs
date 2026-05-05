@@ -47,7 +47,6 @@ export function prefetchCommonRoutes(router: { prefetch: (url: string) => void }
         "/cart",
         "/checkout",
         "/profile",
-        "/orders",
         "/wishlist",
         "/vouchers",
     ];

@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
             { protocol: "https", hostname: "flagcdn.com" },
             { protocol: "https", hostname: "likefood.app" },
             { protocol: "https", hostname: "images.unsplash.com" },
+            { protocol: "https", hostname: "img.vietqr.io" },
         ],
         localPatterns: [
             { pathname: "/uploads/**" },
@@ -58,7 +59,7 @@ const nextConfig: NextConfig = {
     },
     poweredByHeader: false,
     reactStrictMode: true,
-    output: "standalone",
+    // output: "standalone",
     async headers() {
         return [
             {
@@ -81,7 +82,6 @@ const nextConfig: NextConfig = {
                             "object-src 'none'",
                             "base-uri 'self'",
                             "form-action 'self'",
-                            "upgrade-insecure-requests",
                         ].join("; "),
                     },
                 ],

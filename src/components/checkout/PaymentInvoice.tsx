@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { CreditCard, QrCode, Copy, Check, Download, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/currency";
+import { toast } from "sonner";
 
 interface PaymentInvoiceProps {
     orderId: number;
@@ -19,6 +20,7 @@ export default function PaymentInvoice({ orderId, amount, method, language }: Pa
     const [bankInfo, setBankInfo] = useState({ name: "", account: "" });
     const [isLoading, setIsLoading] = useState(true);
     const [copied, setCopied] = useState<string | null>(null);
+    const [isConfirmed, setIsConfirmed] = useState(false);
 
     useEffect(() => {
         const fetchQR = async () => {
@@ -47,6 +49,14 @@ export default function PaymentInvoice({ orderId, amount, method, language }: Pa
         navigator.clipboard.writeText(text);
         setCopied(key);
         setTimeout(() => setCopied(null), 2000);
+    };
+
+    const handleConfirm = () => {
+        setIsConfirmed(true);
+        toast.success(vi 
+            ? "Đã ghi nhận yêu cầu xác nhận thanh toán! Chúng tôi sẽ kiểm tra và cập nhật đơn hàng trong ít phút." 
+            : "Payment confirmation request received! We will verify and update your order shortly."
+        );
     };
 
     const paymentContent = `LIKEFOOD ${orderId}`;
@@ -153,8 +163,18 @@ export default function PaymentInvoice({ orderId, amount, method, language }: Pa
                 </div>
             </div>
             
-            <button className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20">
-                 {vi ? "Tôi đã chuyển khoản" : "I have transferred the money"}
+            <button 
+                onClick={handleConfirm}
+                disabled={isConfirmed}
+                className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl ${
+                    isConfirmed 
+                        ? "bg-emerald-500 text-white cursor-default shadow-emerald-500/20" 
+                        : "bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20"
+                }`}
+            >
+                 {isConfirmed 
+                    ? (vi ? "Đã gửi thông báo" : "Notification sent")
+                    : (vi ? "Tôi đã chuyển khoản" : "I have transferred the money")}
                  <Check className="w-4 h-4" />
             </button>
         </div>

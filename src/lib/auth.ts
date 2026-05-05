@@ -312,19 +312,6 @@ export const authOptions: NextAuthOptions = {
         // Default: 7 days, extended to 30 days only if rememberMe is enabled
         maxAge: 7 * 24 * 60 * 60, // 7 days default
     },
-    // SEC-007: Hardened cookie configuration
-    cookies: {
-        sessionToken: {
-            name: process.env.NODE_ENV === "production"
-                ? "__Secure-next-auth.session-token"
-                : "next-auth.session-token",
-            options: {
-                httpOnly: true,
-                sameSite: "lax" as const,
-                path: "/",
-                secure: process.env.NODE_ENV === "production",
-            },
-        },
-    },
+
     secret: process.env.NEXTAUTH_SECRET,
 };

@@ -315,7 +315,6 @@ export default withAuth(
 
                 if (
                     pathname.startsWith("/profile") ||
-                    pathname.startsWith("/orders") ||
                     (pathname.startsWith("/admin") && pathname !== "/admin/login")
                 ) {
                     return !!token;
@@ -339,6 +338,5 @@ export const config = {
         "/api/reviews/:path*",
         "/api/payments/:path*",
         "/api/webhooks/:path*",
-        "/orders/:path*",
     ],
 };

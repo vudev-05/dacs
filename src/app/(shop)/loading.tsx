@@ -6,6 +6,7 @@
  */
 
 import { cookies } from "next/headers";
+import { Loader2 } from "lucide-react";
 
 export default async function Loading() {
  const cookieStore = await cookies();
@@ -15,18 +16,13 @@ export default async function Loading() {
  return (
  <div className="min-h-screen flex items-center justify-center bg-white/95  z-50 fixed inset-0">
  <div className="text-center flex flex-col items-center justify-center">
- <video
- autoPlay
- loop
- muted
- playsInline
- className="w-48 h-48 md:w-64 md:h-64 object-contain"
- >
- <source src="/loadtrang.mp4" type="video/mp4" />
- </video>
- <p className="text-slate-600 font-medium tracking-widest uppercase text-sm mt-4 animate-pulse">
- {text}
- </p>
+  <div className="relative">
+  <Loader2 className="w-12 h-12 md:w-16 md:h-16 animate-spin text-primary" />
+  <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse rounded-full" />
+  </div>
+  <p className="text-slate-500 font-bold tracking-[0.2em] uppercase text-[10px] md:text-xs mt-8 animate-pulse">
+  {text}
+  </p>
  </div>
  </div>
  );
