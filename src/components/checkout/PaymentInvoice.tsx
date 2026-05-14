@@ -10,7 +10,7 @@ import { toast } from "sonner";
 interface PaymentInvoiceProps {
     orderId: number;
     amount: number;
-    method: "MOMO" | "BANK";
+    method: "MOMO" | "VNPAY";
     language: string;
 }
 
@@ -32,7 +32,7 @@ export default function PaymentInvoice({ orderId, amount, method, language }: Pa
                 if (res.ok) {
                     const data = await res.json();
                     setQrCode(data.qrCode);
-                    if (method === "BANK") {
+                    if (method === "VNPAY") {
                         setBankInfo({ name: data.bankName, account: data.bankAccount });
                     }
                 }
@@ -109,7 +109,7 @@ export default function PaymentInvoice({ orderId, amount, method, language }: Pa
                             </p>
                             <div className="flex items-center justify-between">
                                 <span className="text-xl font-black text-slate-900">
-                                    {method === "MOMO" || method === "BANK" 
+                                    {method === "MOMO" || method === "VNPAY"
                                         ? `${(amount * 25450).toLocaleString()} VND` 
                                         : formatPrice(amount)}
                                 </span>
@@ -132,7 +132,7 @@ export default function PaymentInvoice({ orderId, amount, method, language }: Pa
                             </div>
                         </div>
 
-                        {method === "BANK" && (
+                        {method === "VNPAY" && (
                             <div className="bg-white p-3 rounded-xl border border-slate-100">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                                     {vi ? "Ngân hàng" : "Bank Info"}

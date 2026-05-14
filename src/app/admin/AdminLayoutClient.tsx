@@ -37,52 +37,15 @@ export default function AdminLayoutClient({
     );
 
     // Check 2FA session ONCE on mount only
+    // Admin 2FA removed - automatically set verified
     useEffect(() => {
         if (isBypassPage) {
             setIsChecking2FA(false);
             return;
         }
-
-        // Only check once per component lifecycle (tab open)
-        if (hasCheckedRef.current) return;
-        hasCheckedRef.current = true;
-
-        const check2FASession = async () => {
-            try {
-                const response = await fetch("/api/auth/admin-verify", {
-                    method: "GET",
-                    credentials: "include",
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    setIs2FAVerified(data.verified);
-                } else if (response.status === 401) {
-                    // Not authenticated at all → redirect to admin login
-                    setIs2FAVerified(false);
-                    router.push("/admin/login");
-                    return;
-                } else {
-                    setIs2FAVerified(false);
-                }
-            } catch {
-                setIs2FAVerified(false);
-            } finally {
-                setIsChecking2FA(false);
-            }
-        };
-
-        check2FASession();
-    }, [isBypassPage, router]);
-
-    // Redirect to verify page if not verified (but authenticated)
-    useEffect(() => {
-        if (isChecking2FA) return;
-        
-        if (!isBypassPage && is2FAVerified === false) {
-            router.push("/admin/verify");
-        }
-    }, [is2FAVerified, isChecking2FA, router, isBypassPage]);
+        setIs2FAVerified(true);
+        setIsChecking2FA(false);
+    }, [isBypassPage]);
 
     // Renew cookie on activity (debounced)
     const renewCookie = useCallback(async () => {

@@ -390,12 +390,12 @@ export default function OrderSuccessPage() {
  transition={{ delay: 0.4 }}
  >
 	<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
-		(searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+		(searchParams.get("method") === "VNPAY" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
 			? "bg-amber-100 text-amber-700"
 			: "bg-emerald-100 text-emerald-700"
 	}`}>
 		<Sparkles className="w-3.5 h-3.5" />
-		{(searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+		{(searchParams.get("method") === "VNPAY" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
 			? (vi ? "Đã ghi nhận đơn hàng" : "Order Recorded")
 			: (vi ? "Thanh toán thành công" : "Payment Successful")}
 	</div>
@@ -404,10 +404,10 @@ export default function OrderSuccessPage() {
  </h1>
  <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
  {vi
- ? ((searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+ ? ((searchParams.get("method") === "VNPAY" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
  ? "Đơn hàng của bạn đã được ghi nhận thành công. Vui lòng kiểm tra thông tin bên dưới."
  : "Đơn hàng của bạn đã được xác nhận. Chúng tôi sẽ xử lý và giao hàng sớm nhất.")
- : ((searchParams.get("method") === "BANK" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
+ : ((searchParams.get("method") === "VNPAY" || searchParams.get("method") === "MOMO" || searchParams.get("method") === "COD")
  ? "Your order has been recorded successfully. Please check the details below."
  : "Your order has been confirmed. We'll process and deliver it as soon as possible.")}
  </p>
@@ -519,8 +519,8 @@ export default function OrderSuccessPage() {
  </div>
  </motion.div>
 
- {/* ─── Payment Invoice (MOMO / BANK) ─── */}
- {(searchParams.get("method") === "MOMO" || searchParams.get("method") === "BANK") && (
+ {/* ─── Payment Invoice (MOMO / VNPAY) ─── */}
+ {(searchParams.get("method") === "MOMO" || searchParams.get("method") === "VNPAY") && (
      <motion.div
          initial={{ opacity: 0, scale: 0.95 }}
          animate={{ opacity: 1, scale: 1 }}
@@ -530,7 +530,7 @@ export default function OrderSuccessPage() {
          <PaymentInvoice
              orderId={order.id}
              amount={order.total}
-             method={searchParams.get("method") as "MOMO" | "BANK"}
+             method={searchParams.get("method") as "MOMO" | "VNPAY"}
              language={language}
          />
      </motion.div>

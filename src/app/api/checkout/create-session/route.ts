@@ -96,8 +96,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ url: `${appUrl}/order-success?orderId=${order.id}` });
         }
 
-        // 3. Handle Offline Payments (Momo/Bank/COD)
-        if (paymentMethod === "MOMO" || paymentMethod === "BANK" || paymentMethod === "COD") {
+        // 3. Handle Offline Payments (Momo/VNPAY/COD)
+        if (paymentMethod === "MOMO" || paymentMethod === "VNPAY" || paymentMethod === "COD") {
             const order = await prisma.$transaction(async (tx) => {
                 const newOrder = await tx.order.create({
                     data: {

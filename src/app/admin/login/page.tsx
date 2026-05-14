@@ -26,17 +26,7 @@ export default function AdminLoginPage() {
     // If already logged in as admin, redirect to verify or dashboard
     useEffect(() => {
         if (status === "authenticated" && session?.user?.role === "ADMIN") {
-            // Check if already verified
-            fetch("/api/auth/admin-verify", { method: "GET", credentials: "include" })
-                .then(res => res.ok ? res.json() : null)
-                .then(data => {
-                    if (data?.verified) {
-                        router.replace("/admin/dashboard");
-                    } else {
-                        router.replace("/admin/verify");
-                    }
-                })
-                .catch(() => router.replace("/admin/verify"));
+            router.replace("/admin/dashboard");
         }
     }, [status, session, router]);
 
@@ -84,8 +74,8 @@ export default function AdminLoginPage() {
                     return;
                 }
 
-                toast.success("Đăng nhập thành công! Chuyển tới xác thực OTP...");
-                router.push("/admin/verify");
+                toast.success("Đăng nhập thành công!");
+                router.push("/admin/dashboard");
             }
         } catch {
             setError("Lỗi kết nối. Vui lòng thử lại.");
@@ -218,7 +208,7 @@ export default function AdminLoginPage() {
 
                         <div className="mt-6 text-center pt-4 border-t border-white/5">
                             <p className="text-[11px] text-zinc-500 font-medium">
-                                Chỉ dành cho quản trị viên. Sau khi đăng nhập sẽ cần xác thực OTP qua email.
+                                Chỉ dành cho quản trị viên.
                             </p>
                         </div>
                     </div>

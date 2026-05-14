@@ -24,6 +24,7 @@ export async function POST(req: Request) {
         // Generate QR content based on payment type
         switch (type) {
             case "BANK":
+            case "VNPAY":
                 if (!bankAccount || !bankName) {
                     return NextResponse.json({ error: "Bank account details required" }, { status: 400 });
                 }
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const type = searchParams.get("type") || "BANK";
+        const type = searchParams.get("type") || "VNPAY";
         const amount = searchParams.get("amount");
         const orderId = searchParams.get("orderId");
 
@@ -102,7 +103,7 @@ export async function GET(req: Request) {
         const bankName = settingsMap.bank_name || "MB";
         const bankAccount = settingsMap.bank_account_number || "";
 
-        if (type === "BANK" && bankAccount) {
+        if ((type === "BANK" || type === "VNPAY") && bankAccount) {
             // RETURN THE DIRECT VietQR IMAGE URL (Most reliable)
             qrCodeUrl = `https://img.vietqr.io/image/${encodeURIComponent(bankName)}-${bankAccount}-compact2.jpg?amount=${amount}&addInfo=LIKEFOOD%20${orderId || ""}`;
         } else if (type === "MOMO") {

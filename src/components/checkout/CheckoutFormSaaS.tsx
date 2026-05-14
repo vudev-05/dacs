@@ -56,7 +56,7 @@ export default function CheckoutFormSaaS({
                         ) : checkout.paymentMethod === "COD" ? (
                             vi ? "Thanh toán khi nhận" : "Cash on Delivery"
                         ) : (
-                            vi ? "Chuyển khoản MBBank" : "Bank Transfer"
+                            vi ? "Thanh toán VNPay" : "VNPay"
                         )}
                     </span>
                 </motion.div>

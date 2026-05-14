@@ -35,7 +35,7 @@ export interface CheckoutAddress {
     isDefault: boolean;
 }
 
-export type PaymentMethod = "STRIPE" | "MOMO" | "BANK" | "PICKUP" | "COD";
+export type PaymentMethod = "STRIPE" | "MOMO" | "VNPAY" | "PICKUP" | "COD";
 
 export interface CheckoutVoucher {
     id: number;
@@ -420,8 +420,8 @@ export function useCheckout(language: string) {
             const sessionData = await sessionRes.json();
 
             if (sessionData.url) {
-                // Đơn hàng free ($0) hoặc chuyển khoản BANK/MOMO/COD: xóa cart ngay
-                if (!isBuyNow && (sessionData.free || paymentMethod === "BANK" || paymentMethod === "MOMO" || paymentMethod === "COD")) {
+                // Đơn hàng free ($0) hoặc chuyển khoản VNPAY/MOMO/COD: xóa cart ngay
+                if (!isBuyNow && (sessionData.free || paymentMethod === "VNPAY" || paymentMethod === "MOMO" || paymentMethod === "COD")) {
                     clearCart();
                 }
                 if (isBuyNow) {

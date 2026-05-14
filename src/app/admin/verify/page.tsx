@@ -79,31 +79,15 @@ export default function AdminVerifyPage() {
         }
     };
 
-    // Auth check + verify check + auto-send OTP (sequential)
+    // Auth check + bypass verify
     useEffect(() => {
         if (status === "unauthenticated") {
             router.replace("/admin/login");
         } else if (status === "authenticated" && session?.user?.role !== "ADMIN") {
             router.replace("/");
         } else if (status === "authenticated" && session?.user?.role === "ADMIN") {
-            // Check if already verified FIRST → redirect to dashboard
-            // Only send OTP if NOT already verified
-            if (hasSentInitialRef.current) return;
-            hasSentInitialRef.current = true;
-
-            fetch("/api/auth/admin-verify", { method: "GET", credentials: "include" })
-                .then(res => res.ok ? res.json() : null)
-                .then(data => {
-                    if (data?.verified) {
-                        router.replace("/admin/dashboard");
-                    } else {
-                        // Not verified yet → send OTP
-                        sendOTP();
-                    }
-                })
-                .catch(() => {
-                    sendOTP();
-                });
+            // Bypass OTP
+            router.replace("/admin/dashboard");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, session, router]);

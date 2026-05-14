@@ -116,7 +116,8 @@ export async function POST(req: Request) {
                 password: hashedPassword,
                 name,
                 phone,
-                role: "USER"
+                role: "USER",
+                emailVerified: new Date(), // Auto-verify email
             }
         });
 
@@ -161,57 +162,20 @@ export async function POST(req: Request) {
             }
         }
 
-        // Tạo mã OTP 6 ký tự (Chữ in hoa và số)
-        const generateOTP = () => {
-            const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let result = "";
-            for (let i = 0; i < 6; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        };
-        const otp = generateOTP();
-        const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 giờ
-
-        await prisma.verificationtoken.create({
-            data: {
-                identifier: email,
-                token: otp,
-                expires
-            }
-        });
-
-        // Gửi email xác thực thật
-        const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-        const verifyUrl = `${baseUrl}/verify-email?token=${otp}`;
-        const emailResult = await sendVerificationEmail(email, otp, "VERIFY", undefined, verifyUrl);
-
-        if (!emailResult.success) {
-            logger.error(
-                "[MAIL] Failed to send verification email",
-                new Error(emailResult.error || "Unknown mail error"),
-                { context: "auth-register", email }
-            );
-            return NextResponse.json(
-                { error: "Không thể gửi email xác thực. Vui lòng kiểm tra cấu hình SMTP." },
-                { status: 500 }
-            );
-        }
-
         // Gửi thông báo Telegram (không block response)
         const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
         notifyNewRegistration({ name, email, phone, ip }).catch(() => {});
 
         // n8n webhook: new-user (non-blocking)
         import("@/lib/n8n-trigger")
-            .then(({ triggerNewUser }) => triggerNewUser({ userId: 0, name, email }))
+            .then(({ triggerNewUser }) => triggerNewUser({ userId: newUser.id, name, email }))
             .catch(() => {});
 
         return NextResponse.json(
             {
                 ok: true,
-                status: "PENDING_EMAIL_VERIFY",
-                message: "Vui lòng kiểm tra email để xác thực tài khoản."
+                status: "SUCCESS",
+                message: "Đăng ký thành công."
             },
             { status: 201 }
         );

@@ -112,8 +112,17 @@ export default function RegisterPage() {
             });
             const data = await res.json();
 
-            if (res.ok && !data.error && (data.ok || data.status === "PENDING_EMAIL_VERIFY")) {
-                router.push(`/verify-pending?email=${encodeURIComponent(formData.email)}`);
+            if (res.ok && !data.error && (data.ok || data.status === "SUCCESS")) {
+                const signInResult = await signIn("credentials", {
+                    email: formData.email,
+                    password: formData.password,
+                    redirect: false,
+                });
+                if (signInResult?.ok) {
+                    router.push("/");
+                } else {
+                    router.push("/login?registered=true");
+                }
             } else if (res.ok && data.error) {
                 setError(tr("Tài khoản đã tồn tại. Vui lòng đăng nhập hoặc khôi phục mật khẩu.", "auth.accountExistsOrRecover"));
             } else {

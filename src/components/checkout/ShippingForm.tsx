@@ -50,8 +50,8 @@ interface ShippingFormProps {
     formErrors: Record<string, string>;
     onNext: () => void;
     isSubmitting?: boolean;
-    paymentMethod: "STRIPE" | "MOMO" | "BANK" | "PICKUP";
-    setPaymentMethod: (v: "STRIPE" | "MOMO" | "BANK" | "PICKUP") => void;
+    paymentMethod: "STRIPE" | "MOMO" | "VNPAY" | "PICKUP";
+    setPaymentMethod: (v: "STRIPE" | "MOMO" | "VNPAY" | "PICKUP") => void;
 }
 
 const inputBase =
@@ -415,9 +415,9 @@ export default function ShippingForm({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
                         { id: "STRIPE", label: "Credit Card", icon: "💳", color: "from-[#635BFF] to-[#8f88ff]" },
-                        { id: "MOMO", label: "Ví MoMo", icon: "💓", color: "from-[#A50064] to-[#d40080]" },
-                        { id: "BANK", label: vi ? "Chuyển khoản" : "Bank Transfer", icon: "🏦", color: "from-blue-600 to-blue-400" },
-                        { id: "COD", label: vi ? "Tiền mặt (COD)" : "Cash (COD)", icon: "🏠", color: "from-orange-500 to-amber-500" },
+                        { id: "MOMO", label: "Ví MoMo", icon: "👛", color: "from-[#A50064] to-[#d40080]" },
+                        { id: "VNPAY", label: vi ? "Thanh toán VNPay" : "VNPay", icon: "🏦", color: "from-[#005BAA] to-[#0092D8]" },
+                        { id: "COD", label: vi ? "Tiền mặt (COD)" : "Cash (COD)", icon: "💵", color: "from-orange-500 to-amber-500" },
                     ].map((m) => {
                         const isSelected = paymentMethod === m.id;
                         return (
@@ -456,6 +456,8 @@ export default function ShippingForm({
                     className={`w-full h-16 rounded-[22px] text-white font-[950] text-base uppercase tracking-[0.1em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.2)] ${
                         paymentMethod === "STRIPE" ? "bg-[#635BFF] hover:bg-[#5347FE]" :
                         paymentMethod === "MOMO" ? "bg-[#A50064] hover:bg-[#8e0056]" :
+                        paymentMethod === "VNPAY" ? "bg-[#005BAA] hover:bg-[#004a8b]" :
+                        paymentMethod === "COD" ? "bg-orange-500 hover:bg-orange-600" :
                         "bg-slate-900 hover:bg-black"
                     }`}
                 >
@@ -465,6 +467,12 @@ export default function ShippingForm({
                         <>
                             {paymentMethod === "STRIPE" 
                                 ? (vi ? "Thanh toán Stripe Safe" : "Pay with Stripe Safe")
+                                : paymentMethod === "MOMO"
+                                ? (vi ? "Thanh toán MoMo" : "Pay with MoMo")
+                                : paymentMethod === "VNPAY"
+                                ? (vi ? "Thanh toán VNPay" : "Pay with VNPay")
+                                : paymentMethod === "COD"
+                                ? (vi ? "Thanh toán tiền mặt" : "Cash on Delivery")
                                 : (vi ? "Hoàn tất đặt hàng" : "Complete Purchase")}
                             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </>
