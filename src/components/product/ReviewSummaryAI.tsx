@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from "react";
 import { Sparkles, Loader2, Quote, CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { useLanguage } from "@/lib/i18n/context";
 
 interface ReviewSummaryAIProps {
@@ -27,12 +27,15 @@ export default function ReviewSummaryAI({ productId }: ReviewSummaryAIProps) {
             try {
                 setIsLoading(true);
                 const res = await fetch(`/api/ai/summarize?productId=${productId}`);
-                if (!res.ok) throw new Error("Failed to fetch summary");
-                const data = await res.json();
-                setSummary(data.summary);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.summary) {
+                        setSummary(data.summary);
+                    }
+                }
             } catch (err) {
-                console.error("Review Summary Error:", err);
-                setError(true);
+                // Silent fail for AI summary
+                console.warn("Review Summary Error:", err);
             } finally {
                 setIsLoading(false);
             }
@@ -55,11 +58,7 @@ export default function ReviewSummaryAI({ productId }: ReviewSummaryAIProps) {
     if (error || !summary) return null;
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-2xl relative overflow-hidden group"
-        >
+        <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-2xl relative overflow-hidden group">
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/30 transition-all duration-700" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full -ml-12 -mb-12" />
@@ -99,6 +98,6 @@ export default function ReviewSummaryAI({ productId }: ReviewSummaryAIProps) {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 }

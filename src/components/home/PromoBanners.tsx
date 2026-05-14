@@ -15,6 +15,8 @@ export default function PromoBanners() {
             src="/traicaysay.jpeg"
             alt="Freeship promotion"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-green-900/80 to-green-800/40" />
@@ -42,6 +44,8 @@ export default function PromoBanners() {
             src="/cakho.jpeg"
             alt="Discount voucher"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-orange-900/80 to-amber-800/40" />

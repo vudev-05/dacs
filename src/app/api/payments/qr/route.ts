@@ -19,50 +19,42 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        let qrData = "";
-
-        // Generate QR code based on payment type
+        let qrResult = "";
+        
+        // Generate QR content based on payment type
         switch (type) {
             case "BANK":
+            case "VNPAY":
                 if (!bankAccount || !bankName) {
                     return NextResponse.json({ error: "Bank account details required" }, { status: 400 });
                 }
-                // Format: Banking transfer info
-                qrData = `https://img.vietqr.io/image/${bankName}-${bankAccount}-compact2.jpg?amount=${amount}&addInfo=LIKEFOOD ${orderId || ""}`;
+                // Return direct VietQR URL (no need for QRCode.toDataURL wrapper)
+                qrResult = `https://img.vietqr.io/image/${bankName}-${bankAccount}-compact2.jpg?amount=${amount}&addInfo=LIKEFOOD%20${orderId || ""}`;
                 break;
 
             case "MOMO":
                 if (!momoPhone) {
                     return NextResponse.json({ error: "MoMo phone number required" }, { status: 400 });
                 }
-                // Format: MoMo payment
-                qrData = `2|99|${momoPhone}||0|0|${amount}|LIKEFOOD ${orderId || ""}`;
+                // Full P2P format with Name
+                const momoData = `2|99|${momoPhone}|TRAN NGUYEN BAO DANG||0|0|${amount}`;
+                qrResult = await QRCode.toDataURL(momoData);
                 break;
 
             case "ZALOPAY":
                 if (!zaloPayPhone) {
                     return NextResponse.json({ error: "ZaloPay phone number required" }, { status: 400 });
                 }
-                // Format: ZaloPay payment
-                qrData = `https://zaloapp.com/pay/${zaloPayPhone}?amount=${amount}&desc=LIKEFOOD ${orderId || ""}`;
+                // Format: ZaloPay link inside QR
+                qrResult = await QRCode.toDataURL(`https://zaloapp.com/pay/${zaloPayPhone}?amount=${amount}&desc=LIKEFOOD ${orderId || ""}`);
                 break;
 
             default:
                 return NextResponse.json({ error: "Invalid payment type" }, { status: 400 });
         }
 
-        // Generate QR code as data URL
-        const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
-            width: 300,
-            margin: 2,
-            color: {
-                dark: "#000000",
-                light: "#ffffff"
-            }
-        });
-
         return NextResponse.json({
-            qrCode: qrCodeDataUrl,
+            qrCode: qrResult,
             type,
             amount,
             orderId
@@ -77,7 +69,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const type = searchParams.get("type") || "BANK";
+        const type = searchParams.get("type") || "VNPAY";
         const amount = searchParams.get("amount");
         const orderId = searchParams.get("orderId");
 
@@ -100,39 +92,33 @@ export async function GET(req: Request) {
             }
         });
 
+        logger.info("QR payment settings found", { count: settings.length, keys: settings.map(s => s.key) });
+        
         const settingsMap = settings.reduce((acc: Record<string, string>, curr) => {
             acc[curr.key] = curr.value;
             return acc;
         }, {} as Record<string, string>);
 
-        let qrCodeDataUrl = "";
+        let qrCodeUrl = "";
         const bankName = settingsMap.bank_name || "MB";
         const bankAccount = settingsMap.bank_account_number || "";
 
-        if (type === "BANK" && bankAccount) {
-            // Generate VietQR for bank transfer
-            const qrData = `https://img.vietqr.io/image/${encodeURIComponent(bankName)}-${bankAccount}-compact2.jpg?amount=${amount}&addInfo=LIKEFOOD ${orderId || ""}`;
-            qrCodeDataUrl = await QRCode.toDataURL(qrData, {
-                width: 300,
-                margin: 2
-            });
+        if ((type === "BANK" || type === "VNPAY") && bankAccount) {
+            // RETURN THE DIRECT VietQR IMAGE URL (Most reliable)
+            qrCodeUrl = `https://img.vietqr.io/image/${encodeURIComponent(bankName)}-${bankAccount}-compact2.jpg?amount=${amount}&addInfo=LIKEFOOD%20${orderId || ""}`;
         } else if (type === "MOMO") {
-            // For MoMo, we just generate a placeholder QR
-            // In production, you'd integrate with MoMo's API
-            qrCodeDataUrl = await QRCode.toDataURL(`MOMO|${amount}|${orderId || ""}`, {
-                width: 300,
-                margin: 2
-            });
-        } else if (type === "ZALOPAY") {
-            // For ZaloPay, generate placeholder QR
-            qrCodeDataUrl = await QRCode.toDataURL(`ZALOPAY|${amount}|${orderId || ""}`, {
-                width: 300,
-                margin: 2
-            });
+            // Full P2P format with Name for better recognition
+            const momoPhone = settingsMap.momo_phone || "0341011200"; 
+            const name = "TRAN NGUYEN BAO DANG";
+            const momoData = `2|99|${momoPhone}|${name}||0|0|${amount}`;
+            qrCodeUrl = await QRCode.toDataURL(momoData);
+        } else {
+            // Fallback generic QR
+            qrCodeUrl = await QRCode.toDataURL(`${type}|${amount}|${orderId || ""}`);
         }
 
         return NextResponse.json({
-            qrCode: qrCodeDataUrl,
+            qrCode: qrCodeUrl, // The frontend will use this as <img src={qrCode} />
             type,
             amount,
             orderId,

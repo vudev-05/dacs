@@ -6,23 +6,36 @@
  */
 
 import Stripe from "stripe";
+import { getSystemSettingTrimmed } from "@/lib/system-settings";
 
 let _stripe: Stripe | null = null;
 
-export function getStripe(): Stripe {
+export async function getStripe(): Promise<Stripe> {
     if (!_stripe) {
-        if (!process.env.STRIPE_SECRET_KEY) {
-            throw new Error("STRIPE_SECRET_KEY is not set");
+        let secretKey = process.env.STRIPE_SECRET_KEY;
+        
+        if (!secretKey) {
+            // Lazy fallback to database if env is missing
+            secretKey = await getSystemSettingTrimmed("stripe_secret_key");
         }
-        _stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+        if (!secretKey) {
+            throw new Error("STRIPE_SECRET_KEY is not set (checked both .env and database)");
+        }
+        
+        _stripe = new Stripe(secretKey);
     }
     return _stripe;
 }
 
 // For backwards compatibility - lazy getter
+// Note: This remains sync but will throw an error if getStripe() hasn't been called/awaited yet.
 export const stripe = new Proxy({} as Stripe, {
     get(_, prop: string | symbol) {
-        const client = getStripe();
+        if (!_stripe) {
+            throw new Error("Stripe client not initialized. Ensure getStripe() is awaited first.");
+        }
+        const client = _stripe;
         const key = prop as keyof Stripe;
         return client[key];
     },

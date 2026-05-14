@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 /**
  * LIKEFOOD - Vietnamese Specialty Marketplace
@@ -10,7 +11,7 @@ import { useEffect, useState } from "react";
  * ShippingForm – Contact & shipping information (SaaS-style redesign)
  */
 
-import { Sparkles, ChevronRight, CheckCircle2, MapPin } from "lucide-react";
+import { Sparkles, ChevronRight, CheckCircle2, MapPin, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CheckoutAddressSkeleton from "./CheckoutAddressSkeleton";
@@ -49,6 +50,8 @@ interface ShippingFormProps {
     formErrors: Record<string, string>;
     onNext: () => void;
     isSubmitting?: boolean;
+    paymentMethod: "STRIPE" | "MOMO" | "VNPAY" | "PICKUP";
+    setPaymentMethod: (v: "STRIPE" | "MOMO" | "VNPAY" | "PICKUP") => void;
 }
 
 const inputBase =
@@ -65,7 +68,7 @@ const US_STATES = [
 
 function FieldError({ msg }: { msg?: string }) {
     if (!msg) return null;
-    return <p className="mt-1 text-xs text-red-500">{msg}</p>;
+    return <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase tracking-wider pl-1">{msg}</p>;
 }
 
 export default function ShippingForm({
@@ -92,6 +95,8 @@ export default function ShippingForm({
     formErrors,
     onNext,
     isSubmitting = false,
+    paymentMethod,
+    setPaymentMethod,
 }: ShippingFormProps) {
     const vi = language === "vi";
 
@@ -111,8 +116,8 @@ export default function ShippingForm({
     const shippingMethods = [
         {
             id: "pickup",
-            name: vi ? "Đến cửa hàng nhận" : "Store Pickup",
-            time: vi ? "Nhận ngay tại cửa hàng" : "Pick up at store",
+            name: vi ? "Nhận tại cửa hàng" : "In-store Pickup",
+            time: vi ? "Nhận hàng nhanh chóng" : "Quick collection",
             price: 0,
             free: true,
             estimatedDays: 0,
@@ -121,7 +126,7 @@ export default function ShippingForm({
         {
             id: "standard",
             name: vi ? "Giao hàng tiêu chuẩn" : "Standard Shipping",
-            time: vi ? "3-5 ngày làm việc" : "3-5 business days",
+            time: vi ? "Từ 3-5 ngày" : "3-5 business days",
             price:
                 totalPrice >= FREE_SHIPPING_THRESHOLD_USD
                     ? 0
@@ -132,253 +137,219 @@ export default function ShippingForm({
         },
         {
             id: "express",
-            name: vi ? "Giao hàng nhanh" : "Express Shipping",
-            time: vi ? "1-2 ngày làm việc" : "1-2 business days",
+            name: vi ? "Giao hàng nhanh" : "Priority Express",
+            time: vi ? "Từ 1-2 ngày" : "1-2 business days",
             price: EXPRESS_SHIPPING_FEE_USD,
             free: false,
             estimatedDays: 2,
             isPickup: false,
         },
-        {
-            id: "overnight",
-            name: vi ? "Giao trong ngày" : "Same-day Delivery",
-            time: vi ? "Trong ngày (trước 12h)" : "Same day (order before 12pm)",
-            price: OVERNIGHT_SHIPPING_FEE_USD,
-            free: false,
-            estimatedDays: 1,
-            isPickup: false,
-        },
     ];
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-6 sm:space-y-8">
 
             {/* Guest notice */}
             {!isLoggedIn && (
-                <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-50 border border-amber-100">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+                <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] bg-amber-50/50 border border-amber-100/50"
+                >
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-amber-100 flex items-center justify-center shrink-0">
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+                    </div>
                     <div>
-                        <p className="text-xs font-semibold text-amber-800">
-                            {vi ? "Đang mua hàng với tư cách khách" : "Checking out as guest"}
+                        <p className="text-[10px] sm:text-xs font-black text-amber-900 uppercase tracking-wider">
+                            {vi ? "Chế độ khách hàng" : "Guest Checkout"}
                         </p>
-                        <p className="text-[11px] text-amber-600 mt-0.5">
-                            {vi ? "Nhập email để nhận xác nhận đơn hàng. " : "Enter your email to receive order confirmation. "}
-                            <Link href="/login" className="underline font-semibold hover:text-amber-700">
-                                {vi ? "Đăng nhập" : "Sign in"}
+                        <p className="text-[10px] sm:text-[11px] text-amber-700/70 font-medium mt-0.5 sm:mt-1 leading-relaxed">
+                            {vi ? "Hãy nhập email để theo dõi đơn hàng dễ dàng hơn. " : "Enter your email to receive real-time order tracking. "}
+                            <Link href="/login" className="text-amber-800 underline decoration-amber-300 underline-offset-2 font-bold hover:text-amber-900">
+                                {vi ? "Đăng nhập ngay" : "Sign in now"}
                             </Link>
                         </p>
                     </div>
-                </div>
+                </motion.div>
             )}
 
             {/* Saved addresses */}
             {isLoggedIn && (
-                <div>
-                    <div className="flex items-center justify-between mb-2">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                            {vi ? "Địa chỉ đã lưu" : "Saved addresses"}
+                <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center justify-between px-1">
+                        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                            {vi ? "Địa chỉ giao hàng" : "Shipping address"}
                         </p>
                         <Link
-                            href="/profile"
-                            className="text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors"
+                            href="/profile?tab=addresses"
+                            className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest hover:translate-x-1 transition-transform inline-flex items-center gap-1"
                         >
-                            {vi ? "Quản lý" : "Manage"}
+                            {vi ? "Thay đổi" : "Change"} <ChevronRight className="w-3 h-3" />
                         </Link>
                     </div>
 
                     {isLoadingAddresses ? (
                         <CheckoutAddressSkeleton />
-                    ) : addresses.length === 0 ? (
-                        <p className="text-xs text-slate-400">
-                            {vi
-                                ? "Chưa có địa chỉ. Thêm địa chỉ trong Profile để dùng nhanh."
-                                : "No saved addresses. Add one in Profile for quick use here."}
-                        </p>
                     ) : (
-                        <div className="grid gap-1.5">
-                            {addresses.map((addr) => (
-                                <button
-                                    key={addr.id}
-                                    type="button"
-                                    onClick={() => selectAddress(addr)}
-                                    className={`w-full text-left px-3 py-2.5 rounded-lg border text-xs transition-all ${
-                                        selectedAddressId === addr.id
-                                            ? "border-primary bg-primary/5"
-                                            : "border-slate-200 hover:border-slate-300"
-                                    }`}
-                                >
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div>
-                                            <p className="font-semibold text-slate-900 text-xs">
-                                                {addr.fullName}
-                                                {addr.isDefault && (
-                                                    <span className="ml-1.5 text-[9px] px-1 py-0.5 rounded bg-primary/10 text-primary font-medium">
-                                                        {vi ? "Mặc định" : "Default"}
-                                                    </span>
-                                                )}
-                                            </p>
-                                            <p className="text-[10px] text-slate-500 mt-0.5">
-                                                {addr.address}, {addr.city} {addr.state || ""} {addr.zipCode}
-                                            </p>
-                                            <p className="text-[10px] text-slate-500">{addr.phone}</p>
+                        <div className="grid gap-3">
+                            {addresses.length > 0 ? (
+                                addresses.map((addr) => (
+                                    <button
+                                        key={addr.id}
+                                        type="button"
+                                        onClick={() => selectAddress(addr)}
+                                        className={`group relative w-full text-left p-5 rounded-[22px] border-2 transition-all ${
+                                            selectedAddressId === addr.id
+                                                ? "border-primary bg-primary/5 shadow-md shadow-primary/5"
+                                                : "border-slate-100 hover:border-slate-200 bg-white"
+                                        }`}
+                                    >
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex items-start gap-4">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                                                    selectedAddressId === addr.id ? "bg-primary text-white" : "bg-slate-50 text-slate-400 group-hover:bg-slate-100"
+                                                }`}>
+                                                    <MapPin className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-baseline gap-2">
+                                                        <p className="font-bold text-slate-900 text-sm">
+                                                            {addr.fullName}
+                                                        </p>
+                                                        {addr.isDefault && (
+                                                            <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-slate-900 text-white">
+                                                                {vi ? "Mặc định" : "Default"}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                                                        {addr.address}<br/>
+                                                        {addr.city}, {addr.state} {addr.zipCode}
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-400 font-bold mt-2 tracking-wide">{addr.phone}</p>
+                                                </div>
+                                            </div>
+                                            <div className={`shrink-0 transition-all ${selectedAddressId === addr.id ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}>
+                                                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                                                </div>
+                                            </div>
                                         </div>
-                                        {selectedAddressId === addr.id && (
-                                            <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
-                                        )}
-                                    </div>
-                                </button>
-                            ))}
+                                    </button>
+                                ))
+                            ) : (
+                                <div className="p-10 rounded-[32px] bg-slate-50 border-2 border-dashed border-slate-200 text-center">
+                                    <MapPin className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                                    <p className="text-sm font-bold text-slate-500">
+                                        {vi ? "Chưa có địa chỉ nào" : "No saved addresses"}
+                                    </p>
+                                    <Link href="/profile?tab=addresses" className="text-xs font-black text-primary uppercase tracking-widest mt-4 inline-block hover:underline decoration-2 underline-offset-4">
+                                        {vi ? "+ Thêm ngay" : "+ Add new address"}
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             )}
 
-            {/* ── Contact Information ── */}
-            <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                    {vi ? "Thông tin liên hệ" : "Contact Information"}
-                </p>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {/* Full name */}
+            {/* ── Contact Information Form ── */}
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Họ và tên" : "Full name"}
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 pl-1">
+                            {vi ? "Tên người nhận" : "Recipient name"}
                         </label>
                         <input
                             type="text"
-                            autoComplete="name"
                             value={formData.fullName}
                             onChange={(e) => updateField("fullName", e.target.value)}
-                            placeholder={vi ? "Nguyễn Văn A" : "Jane Smith"}
-                            className={`${inputBase} ${formErrors.fullName ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
+                            placeholder={vi ? "Nhập họ và tên..." : "e.g. John Doe"}
+                            className={`${inputBase} ${formErrors.fullName ? "border-red-400 ring-4 ring-red-50" : ""}`}
                         />
                         <FieldError msg={formErrors.fullName} />
                     </div>
 
-                    {/* Email */}
                     <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">Email</label>
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 pl-1">Email</label>
                         <input
                             type="email"
-                            autoComplete="email"
                             value={formData.email}
                             onChange={(e) => updateField("email", e.target.value)}
-                            placeholder="you@example.com"
-                            className={`${inputBase} ${formErrors.email ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
+                            placeholder="hello@example.com"
+                            className={`${inputBase} ${formErrors.email ? "border-red-400 ring-4 ring-red-50" : ""}`}
                         />
                         <FieldError msg={formErrors.email} />
                     </div>
 
-                    {/* Phone */}
                     <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 pl-1">
                             {vi ? "Số điện thoại" : "Phone number"}
                         </label>
                         <input
                             type="tel"
-                            autoComplete="tel"
                             value={formData.phone}
                             onChange={(e) => updateField("phone", e.target.value)}
                             placeholder="+1 (555) 000-0000"
-                            className={`${inputBase} ${formErrors.phone ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
+                            className={`${inputBase} ${formErrors.phone ? "border-red-400 ring-4 ring-red-50" : ""}`}
                         />
                         <FieldError msg={formErrors.phone} />
                     </div>
                 </div>
             </div>
 
-            {/* ── Delivery Address (hidden when pickup) ── */}
-            {formData.shippingMethod !== "pickup" && (
-            <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                    {vi ? "Địa chỉ nhận hàng (tại Mỹ)" : "Delivery address (US only)"}
-                </p>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
-                    {/* Street address */}
-                    <div className="sm:col-span-12">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Địa chỉ" : "Street address"}
-                        </label>
-                        <input
-                            type="text"
-                            autoComplete="street-address"
-                            value={formData.address}
-                            onChange={(e) => updateField("address", e.target.value)}
-                            placeholder={vi ? "123 Đường Hương Vị..." : "123 Flavor St, Apt 4B"}
-                            className={`${inputBase} ${formErrors.address ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
-                        />
-                        <FieldError msg={formErrors.address} />
-                    </div>
-
-                    {/* City */}
-                    <div className="sm:col-span-5">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Thành phố" : "City"}
-                        </label>
-                        <input
-                            type="text"
-                            autoComplete="address-level2"
-                            value={formData.city}
-                            onChange={(e) => updateField("city", e.target.value)}
-                            placeholder="Omaha"
-                            className={`${inputBase} ${formErrors.city ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
-                        />
-                        <FieldError msg={formErrors.city} />
-                    </div>
-
-                    
-                    {/* State */}
-                    <div className="sm:col-span-3">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Bang" : "State"}
-                        </label>
-                        <select
-                            autoComplete="address-level1"
-                            value={formData.state || ""}
-                            onChange={(e) => updateField("state", e.target.value)}
-                            className={`${inputBase} ${formErrors.state ? "border-red-400 bg-red-50/30" : "border-slate-200"}`}
-                        >
-                            <option value="">{vi ? "Chon bang..." : "Select state..."}</option>
-                            {US_STATES.map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
-                        <FieldError msg={formErrors.state} />
-                    </div>
-                    {/* Zip code */}
-                    <div className="sm:col-span-4">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">ZIP Code</label>
-                        <input
-                            type="text"
-                            autoComplete="postal-code"
-                            value={formData.zipCode}
-                            onChange={(e) => updateField("zipCode", e.target.value)}
-                            placeholder="92840"
-                            maxLength={10}
-                            className={`${inputBase} border-slate-200`}
-                        />
-                    </div>
-
-                    {/* Save info checkbox */}
-                    <div className="sm:col-span-12 pt-1">
-                        <label className="inline-flex items-center gap-2 cursor-pointer">
+            {/* ── Street Address for Guests ── */}
+            {formData.shippingMethod !== "pickup" && !selectedAddressId && (
+                <div className="space-y-6 pt-2">
+                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-1">
+                        {vi ? "Địa chỉ chi tiết" : "Full Address"}
+                    </p>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
+                        <div className="sm:col-span-12">
                             <input
-                                type="checkbox"
-                                checked={saveInfo}
-                                onChange={(e) => setSaveInfo(e.target.checked)}
-                                className="w-3.5 h-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 accent-primary"
+                                type="text"
+                                value={formData.address}
+                                onChange={(e) => updateField("address", e.target.value)}
+                                placeholder={vi ? "Số nhà, tên đường..." : "123 Main St, Apt 4"}
+                                className={inputBase}
                             />
-                            <span className="text-xs text-slate-600">
-                                {vi ? "Lưu thông tin cho lần sau" : "Save this info for next time"}
-                            </span>
-                        </label>
+                        </div>
+                        <div className="sm:col-span-6">
+                            <input
+                                type="text"
+                                value={formData.city}
+                                onChange={(e) => updateField("city", e.target.value)}
+                                placeholder={vi ? "Thành phố" : "City"}
+                                className={inputBase}
+                            />
+                        </div>
+                        <div className="sm:col-span-3">
+                            <select
+                                value={formData.state || ""}
+                                onChange={(e) => updateField("state", e.target.value)}
+                                className={inputBase}
+                            >
+                                <option value="">ST</option>
+                                {US_STATES.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="sm:col-span-3">
+                            <input
+                                type="text"
+                                value={formData.zipCode}
+                                onChange={(e) => updateField("zipCode", e.target.value)}
+                                placeholder="ZIP"
+                                className={inputBase}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
 
-            {/* ── Discounts & Points ── */}
-            <div className="border-t border-slate-100 pt-4">
+            {/* ── Rewards & Coupons ── */}
+            <div className="bg-slate-50/50 rounded-[32px] p-6 border border-slate-100">
                 <VoucherAndPoints
                     language={language}
                     t={t}
@@ -392,119 +363,126 @@ export default function ShippingForm({
                 />
             </div>
 
-            <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
-                    {vi ? "Phương thức nhận hàng" : "Delivery method"}
+            {/* ── Shipping Methods ── */}
+            <div className="space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-1">
+                    {vi ? "Dịch vụ vận chuyển" : "Delivery Service"}
                 </p>
-                <div className="space-y-2">
+                <div className="grid gap-3">
                     {shippingMethods.map((method) => {
-                        const estimatedDate = method.estimatedDays > 0 ? (() => {
-                            const d = new Date();
-                            d.setDate(d.getDate() + method.estimatedDays);
-                            return d.toLocaleDateString(vi ? "vi-VN" : "en-US", {
-                                day: "numeric",
-                                month: "long",
-                            });
-                        })() : null;
                         const isSelected = formData.shippingMethod === method.id;
                         return (
-                            <div key={method.id}>
-                                <button
-                                    type="button"
-                                    onClick={() => updateField("shippingMethod", method.id)}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border-2 transition-all text-left ${
-                                        isSelected
-                                            ? "border-primary bg-primary/5"
-                                            : "border-slate-200 hover:border-slate-300 bg-white"
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-2.5">
-                                        {/* Radio dot */}
-                                        <div
-                                            className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                                                isSelected ? "border-primary" : "border-slate-300"
-                                            }`}
-                                        >
-                                            {isSelected && (
-                                                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                            )}
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-semibold text-slate-900">
-                                                {method.isPickup && <MapPin className="w-3 h-3 inline mr-1 text-primary" />}
-                                                {method.name}
-                                            </p>
-                                            <p className="text-[10px] text-slate-500">
-                                                {method.time}
-                                                {estimatedDate && (
-                                                    <>
-                                                        {" · "}
-                                                        <span className="text-primary font-medium">
-                                                            {vi ? "Dk:" : "Est:"} {estimatedDate}
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </p>
-                                        </div>
+                            <button
+                                key={method.id}
+                                type="button"
+                                onClick={() => updateField("shippingMethod", method.id)}
+                                className={`group flex items-center justify-between p-5 rounded-[22px] border-2 transition-all text-left ${
+                                    isSelected
+                                        ? "border-primary bg-primary/5 shadow-md shadow-primary/5"
+                                        : "border-slate-100 hover:border-slate-200 bg-white"
+                                }`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                                        isSelected ? "border-primary" : "border-slate-200 group-hover:border-slate-300"
+                                    }`}>
+                                        {isSelected && <div className="w-3 h-3 rounded-full bg-primary" />}
                                     </div>
-                                    <div className="text-right flex-shrink-0">
-                                        {method.free ? (
-                                            <span className="text-xs font-bold text-emerald-600">
-                                                {vi ? "Miễn phí" : "Free"}
-                                            </span>
-                                        ) : (
-                                            <span className="text-xs font-bold text-slate-900">
-                                                ${method.price.toFixed(2)}
-                                            </span>
-                                        )}
-                                    </div>
-                                </button>
-                                {/* Store Pickup info + Google Maps button */}
-                                {method.isPickup && isSelected && (
-                                    <div className="ml-6 mt-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                                        <p className="text-xs text-slate-700 font-medium">
-                                            📍 {storeAddress}
+                                    <div>
+                                        <p className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                            {method.isPickup && <MapPin className="w-3.5 h-3.5 text-primary" />}
+                                            {method.name}
                                         </p>
-                                        <p className="text-[10px] text-slate-500 mt-1">
-                                            {vi
-                                                ? "Thanh toán online qua Stripe, sau đó đến cửa hàng nhận hàng."
-                                                : "Pay online via Stripe, then visit the store to pick up your order."}
-                                        </p>
-                                        <a
-                                            href={storeMapsUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-colors"
-                                        >
-                                            <MapPin className="w-3 h-3" />
-                                            {vi ? "Chỉ đường" : "Get Directions"}
-                                        </a>
+                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">{method.time}</p>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className={`text-sm font-black ${method.free ? "text-emerald-500" : "text-slate-900"}`}>
+                                        {method.free ? (vi ? "MIỄN PHÍ" : "FREE") : `$${method.price.toFixed(2)}`}
+                                    </p>
+                                </div>
+                            </button>
                         );
                     })}
                 </div>
             </div>
 
-            <Button
-                type="button"
-                onClick={onNext}
-                disabled={isSubmitting}
-                className="w-full h-9 rounded-md bg-slate-900 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wide transition-all active:scale-[0.99] flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-                {isSubmitting ? (
-                    <>
-                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        {vi ? "Đang chuyển đến Stripe..." : "Redirecting to Stripe..."}
-                    </>
-                ) : (
-                    <>
-                        {vi ? "Thanh toán qua Stripe" : "Pay with Stripe"}
-                        <ChevronRight className="w-3.5 h-3.5" />
-                    </>
-                )}
-            </Button>
+            {/* ── Payment Methods ── */}
+            <div className="space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-1">
+                    {vi ? "Phương thức thanh toán" : "Payment approach"}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                        { id: "STRIPE", label: "Credit Card", icon: "💳", color: "from-[#635BFF] to-[#8f88ff]" },
+                        { id: "MOMO", label: "Ví MoMo", icon: "👛", color: "from-[#A50064] to-[#d40080]" },
+                        { id: "VNPAY", label: vi ? "Thanh toán VNPay" : "VNPay", icon: "🏦", color: "from-[#005BAA] to-[#0092D8]" },
+                        { id: "COD", label: vi ? "Tiền mặt (COD)" : "Cash (COD)", icon: "💵", color: "from-orange-500 to-amber-500" },
+                    ].map((m) => {
+                        const isSelected = paymentMethod === m.id;
+                        return (
+                            <button
+                                key={m.id}
+                                type="button"
+                                onClick={() => setPaymentMethod(m.id as any)}
+                                className={`group flex items-center gap-4 p-4 rounded-[20px] border-2 transition-all text-left relative overflow-hidden ${
+                                    isSelected
+                                        ? "border-primary bg-primary/5"
+                                        : "border-slate-100 hover:border-slate-200 bg-white"
+                                }`}
+                            >
+                                {isSelected && (
+                                    <div className={`absolute top-0 right-0 w-12 h-12 bg-gradient-to-br ${m.color} opacity-10 rounded-bl-[40px]`} />
+                                )}
+                                <div className="text-xl">{m.icon}</div>
+                                <div>
+                                    <p className="text-xs font-black text-slate-900 tracking-tight">{m.label}</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                        {isSelected ? (vi ? "Đang chọn" : "Selected") : (vi ? "Lựa chọn" : "Select")}
+                                    </p>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* ── Submit Button ── */}
+            <div className="pt-4">
+                <Button
+                    type="button"
+                    onClick={onNext}
+                    disabled={isSubmitting}
+                    className={`w-full h-16 rounded-[22px] text-white font-[950] text-base uppercase tracking-[0.1em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.2)] ${
+                        paymentMethod === "STRIPE" ? "bg-[#635BFF] hover:bg-[#5347FE]" :
+                        paymentMethod === "MOMO" ? "bg-[#A50064] hover:bg-[#8e0056]" :
+                        paymentMethod === "VNPAY" ? "bg-[#005BAA] hover:bg-[#004a8b]" :
+                        paymentMethod === "COD" ? "bg-orange-500 hover:bg-orange-600" :
+                        "bg-slate-900 hover:bg-black"
+                    }`}
+                >
+                    {isSubmitting ? (
+                        <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                        <>
+                            {paymentMethod === "STRIPE" 
+                                ? (vi ? "Thanh toán Stripe Safe" : "Pay with Stripe Safe")
+                                : paymentMethod === "MOMO"
+                                ? (vi ? "Thanh toán MoMo" : "Pay with MoMo")
+                                : paymentMethod === "VNPAY"
+                                ? (vi ? "Thanh toán VNPay" : "Pay with VNPay")
+                                : paymentMethod === "COD"
+                                ? (vi ? "Thanh toán tiền mặt" : "Cash on Delivery")
+                                : (vi ? "Hoàn tất đặt hàng" : "Complete Purchase")}
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                    )}
+                </Button>
+                <div className="flex items-center justify-center gap-2 mt-6 opacity-30">
+                     <Lock className="w-3 h-3" />
+                     <span className="text-[10px] font-black uppercase tracking-widest">PCI DSS Compliant & End-to-End Encrypted</span>
+                </div>
+            </div>
         </div>
     );
 }

@@ -69,7 +69,7 @@ export async function sendTelegramMessage(message: TelegramMessage): Promise<boo
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({ message: "Unknown error (non-JSON response)" }));
             logger.error("[TELEGRAM] Send message error", new Error(JSON.stringify(error)), { context: "telegram" });
             return false;
         }

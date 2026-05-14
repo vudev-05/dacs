@@ -193,7 +193,7 @@ export default function OrderSuccess({
                     </button>
                 </Link>
                 {orderId && (
-                    <Link href={`/orders/${orderId}`}>
+                    <Link href={`/profile/orders/${orderId}`}>
                         <button className="px-10 py-5 bg-white border-2 border-slate-100 text-black rounded-full font-black uppercase tracking-widest hover:border-slate-200 transition-all">
                             {vi ? "Xem lại đơn hàng" : "View Order"}
                         </button>

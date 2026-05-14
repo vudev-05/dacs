@@ -523,7 +523,7 @@ function OrderDrawer({
   if (!open) return null;
 
   const statusCfg = order ? getStatusConfig(order.status) : null;
-  const nextActions = order ? NEXT_ACTIONS[order.status] : [];
+  const nextActions = order ? (NEXT_ACTIONS[order.status] || []) : [];
 
   return (
     <>

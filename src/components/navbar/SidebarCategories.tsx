@@ -78,7 +78,7 @@ export default function SidebarCategories() {
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-7 h-7 rounded-md overflow-hidden relative border border-slate-200 shadow-sm flex-shrink-0 bg-white text-black">
-                                        <Image src={getCategoryImage(cat.slug, cat.name)} alt={cat.name} fill className="object-cover" />
+                                        <Image src={getCategoryImage(cat.slug, cat.name)} alt={cat.name} fill sizes="28px" className="object-cover" />
                                     </div>
                                     <span className={`text-[13px] font-semibold ${isActive ? "text-red-600" : "text-slate-700"}`}>
                                         {t(`categories.${cat.name}` as any) === `categories.${cat.name}` ? cat.name : t(`categories.${cat.name}` as any)}

@@ -97,47 +97,14 @@ export default withAuth(
             if (!isAdmin) {
                 return NextResponse.redirect(new URL("/", req.url));
             }
-
-            const adminAuthSession = req.cookies.get("admin_auth_session");
-            const sessionValue = adminAuthSession?.value;
-
-            if (!sessionValue) {
-                return NextResponse.redirect(new URL("/admin/verify", req.url));
-            }
-
-            const verification = await verifyAdminCookie(sessionValue);
-            if (!verification.valid || !verification.value.startsWith("verified:")) {
-                return NextResponse.redirect(new URL("/admin/verify", req.url));
-            }
-
-            const [, timestampStr] = verification.value.split(":");
-            const expiresAt = parseInt(timestampStr, 10);
-
-            if (isNaN(expiresAt) || Date.now() > expiresAt) {
-                const response = NextResponse.redirect(new URL("/admin/verify", req.url));
-                response.cookies.delete("admin_auth_session");
-                return response;
-            }
+            // 2FA has been disabled, allow access
         }
 
         if (pathname.startsWith("/api/admin/")) {
             if (!isAdmin) {
                 return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
             }
-            const adminApiSession = req.cookies.get("admin_auth_session");
-            const apiSessionValue = adminApiSession?.value;
-            if (!apiSessionValue) {
-                return NextResponse.json({ error: "Admin session required" }, { status: 401 });
-            }
-            const apiVerification = await verifyAdminCookie(apiSessionValue);
-            if (!apiVerification.valid || !apiVerification.value.startsWith("verified:")) {
-                return NextResponse.json({ error: "Admin session invalid" }, { status: 401 });
-            }
-            const [, apiTimestampStr] = apiVerification.value.split(":");
-            const apiExpiresAt = parseInt(apiTimestampStr, 10);
-            if (isNaN(apiExpiresAt) || Date.now() > apiExpiresAt) {
-                return NextResponse.json({ error: "Admin session expired" }, { status: 401 });
-            }
+            // 2FA has been disabled, allow API access
         }
 
         if (isSuperAdminOnlyRoute(pathname) && ["POST","PUT","PATCH","DELETE"].includes(method)) {
@@ -264,46 +231,7 @@ export default withAuth(
         const isAdminApiPath = pathname.startsWith("/api/admin/");
         const isAdminUiPath = pathname.startsWith("/admin") && !pathname.startsWith("/admin/login") && !pathname.startsWith("/admin/verify");
         if (isAdminUiPath || (isAdminApiPath && isAdmin)) {
-            // Sliding window: 10 phút mỗi request
-            // Absolute max: 2 giờ từ lần verify đầu tiên
-            const ABSOLUTE_MAX_MS = 2 * 60 * 60 * 1000; // 2 hours hard limit
-
-            // Check existing cookie for original verify time
-            const existingSession = req.cookies.get("admin_auth_session");
-            let originalVerifyTime = Date.now();
-
-            if (existingSession?.value) {
-                const existing = await verifyAdminCookie(existingSession.value);
-                if (existing.valid && existing.value.startsWith("verified:")) {
-                    const parts = existing.value.split(":");
-                    // Format: verified:<slidingExpiry>:<originalVerifyTime>
-                    if (parts.length >= 3) {
-                        originalVerifyTime = parseInt(parts[2], 10);
-                    }
-                }
-            }
-
-            // Check absolute expiry
-            if (Date.now() - originalVerifyTime > ABSOLUTE_MAX_MS) {
-                // Absolute expiry exceeded — force re-verify
-                const response = NextResponse.redirect(new URL("/admin/verify", req.url));
-                response.cookies.delete("admin_auth_session");
-                return response;
-            }
-
-            const expiresAt = Date.now() + 10 * 60 * 1000;
-            const rawValue = `verified:${expiresAt}:${originalVerifyTime}`;
-            const signedValue = await signAdminCookie(rawValue);
-            
-            response.cookies.set({
-                name: "admin_auth_session",
-                value: signedValue,
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: ADMIN_COOKIE_MAX_AGE,
-                path: "/",
-            });
+            // 2FA disabled - no need to handle admin_auth_session cookie
         }
 
         return response;
@@ -315,7 +243,6 @@ export default withAuth(
 
                 if (
                     pathname.startsWith("/profile") ||
-                    pathname.startsWith("/orders") ||
                     (pathname.startsWith("/admin") && pathname !== "/admin/login")
                 ) {
                     return !!token;
@@ -339,6 +266,5 @@ export const config = {
         "/api/reviews/:path*",
         "/api/payments/:path*",
         "/api/webhooks/:path*",
-        "/orders/:path*",
     ],
 };

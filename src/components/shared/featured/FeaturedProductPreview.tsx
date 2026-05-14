@@ -101,6 +101,7 @@ export default function FeaturedProductPreview({ image, onClick, side, direction
                                 src={image}
                                 alt="Preview"
                                 fill
+                                sizes="250px"
                                 className="object-cover"
                             />
                         </motion.div>
