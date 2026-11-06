@@ -20,6 +20,7 @@ import {
   History } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
+import { exportToExcel } from "@/lib/export-excel";
 
 interface InventoryProduct {
   id: number;
@@ -76,6 +77,29 @@ export default function AdminInventoryPage() {
   useEffect(() => {
     void fetchProducts();
   }, [fetchProducts]);
+
+  const handleExport = () => {
+    try {
+      if (filteredProducts.length === 0) {
+        toast.error("Không có dữ liệu tồn kho để xuất");
+        return;
+      }
+      const data = filteredProducts.map((p) => ({
+        "Mã SP": p.id,
+        "SKU": p.sku || `SKU-${p.id}`,
+        "Tên sản phẩm": p.name,
+        "Danh mục": p.category,
+        "Giá bán ($)": p.price,
+        "Tồn kho": p.inventory,
+        "Đã bán": p.soldCount,
+        "Tình trạng": p.inventory === 0 ? "Hết hàng" : p.inventory <= 5 ? "Rất thấp" : p.inventory <= 10 ? "Sắp hết" : "Còn hàng",
+      }));
+      exportToExcel(data, "Bao_Cao_Ton_Kho_LikeFood", "Tồn kho");
+      toast.success("Đã xuất file Excel tồn kho thành công!");
+    } catch {
+      toast.error("Xuất dữ liệu thất bại");
+    }
+  };
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -170,9 +194,12 @@ export default function AdminInventoryPage() {
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Làm mới
           </button>
-          <button className="px-3.5 py-2 rounded-md border border-zinc-700 bg-zinc-900 text-sm font-medium text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2">
+          <button 
+            onClick={handleExport}
+            className="px-3.5 py-2 rounded-md border border-zinc-700 bg-zinc-900 text-sm font-medium text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2"
+          >
             <Download className="h-4 w-4" />
-            Xuất dữ liệu
+            Xuất dữ liệu Excel
           </button>
         </div>
       </div>

@@ -81,7 +81,7 @@ function getCacheKey(prompt: string, task: string, model: string): string {
 
 export async function getAPIKey(): Promise<string> {
   // ★ PRIORITY: .env first (always up-to-date), DB as fallback
-  const fromEnv = (process.env.OPENAI_API_KEY ?? "").trim();
+  const fromEnv = (process.env.OPENAI_API_KEY ?? process.env.GEMINI_API_KEY ?? "").trim();
   if (fromEnv) return fromEnv;
   const fromDb = await getSystemSettingTrimmed("openai_api_key");
   return fromDb || "";
@@ -93,13 +93,19 @@ let _client: OpenAI | null = null;
 let _clientKey: string | null = null;
 
 async function getClient(): Promise<OpenAI | null> {
-  const key = await getAPIKey();
+  const geminiKey = (process.env.GEMINI_API_KEY ?? "").trim();
+  const openAiKey = (process.env.OPENAI_API_KEY ?? "").trim();
+  const dbKey = !openAiKey && !geminiKey ? await getSystemSettingTrimmed("openai_api_key") : "";
+  const key = openAiKey || geminiKey || dbKey || "";
+
   if (!key) {
-    console.warn("[AI_PROVIDER] ⚠️ OpenAI API key not configured");
     return null;
   }
   if (_client && _clientKey === key) return _client;
-  const baseURL = (process.env.OPENAI_BASE_URL ?? "").trim() || undefined;
+  let baseURL = (process.env.OPENAI_BASE_URL ?? "").trim() || undefined;
+  if (!openAiKey && geminiKey && !baseURL) {
+    baseURL = "https://generativelanguage.googleapis.com/v1beta/openai/";
+  }
   _client = new OpenAI({ apiKey: key, timeout: DEFAULT_TIMEOUT_MS, ...(baseURL ? { baseURL } : {}) });
   _clientKey = key;
   return _client;
@@ -173,10 +179,10 @@ export async function callGPT(
         model,
         usage: completion.usage
           ? {
-              prompt_tokens: completion.usage.prompt_tokens,
-              completion_tokens: completion.usage.completion_tokens,
-              total_tokens: completion.usage.total_tokens,
-            }
+            prompt_tokens: completion.usage.prompt_tokens,
+            completion_tokens: completion.usage.completion_tokens,
+            total_tokens: completion.usage.total_tokens,
+          }
           : undefined,
         latencyMs,
       };
@@ -201,7 +207,7 @@ export async function callGPT(
         success: true,
         userId: opts.userId,
         sessionId: opts.sessionId,
-      }).catch(() => {});
+      }).catch(() => { });
 
       return result;
     } catch (err: unknown) {
@@ -216,7 +222,7 @@ export async function callGPT(
 
       // Don't retry on quota errors
       if (isQuota) {
-        logAIUsage({ task: task || "unknown", model, promptTokens: 0, completionTokens: 0, totalTokens: 0, latencyMs, success: false, error: "quota_exceeded", userId: opts.userId, sessionId: opts.sessionId }).catch(() => {});
+        logAIUsage({ task: task || "unknown", model, promptTokens: 0, completionTokens: 0, totalTokens: 0, latencyMs, success: false, error: "quota_exceeded", userId: opts.userId, sessionId: opts.sessionId }).catch(() => { });
         return null;
       }
 
@@ -227,7 +233,7 @@ export async function callGPT(
       }
 
       // Log final failure
-      logAIUsage({ task: task || "unknown", model, promptTokens: 0, completionTokens: 0, totalTokens: 0, latencyMs, success: false, error: errMsg.slice(0, 200), userId: opts.userId, sessionId: opts.sessionId }).catch(() => {});
+      logAIUsage({ task: task || "unknown", model, promptTokens: 0, completionTokens: 0, totalTokens: 0, latencyMs, success: false, error: errMsg.slice(0, 200), userId: opts.userId, sessionId: opts.sessionId }).catch(() => { });
       return null;
     }
   }
@@ -388,7 +394,7 @@ export async function callGPTStream(
       if (content) {
         fullText += content;
         callbacks.onChunk(content);
-        
+
         // Count tokens (approximate)
         totalCompletionTokens += content.split(/\s+/).length * 1.3;
       }

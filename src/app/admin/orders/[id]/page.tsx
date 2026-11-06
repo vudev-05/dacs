@@ -202,10 +202,21 @@ export default function AdminOrderDetailPage() {
   return (
     <div className="min-h-screen bg-[#111113] p-6 lg:p-8">
       <div className="mx-auto max-w-[1500px] space-y-8">
-        <Link href="/admin/orders" className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-zinc-400 transition hover:text-teal-400">
-          <ArrowLeft className="h-4 w-4" />
-          Quay lại đơn hàng
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link href="/admin/orders" className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-zinc-400 transition hover:text-teal-400">
+            <ArrowLeft className="h-4 w-4" />
+            Quay lại đơn hàng
+          </Link>
+          <a
+            href={`/orders/${order.id}/invoice`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold hover:bg-teal-500 hover:text-slate-900 transition-all"
+          >
+            <FileText className="h-4 w-4" />
+            In hóa đơn (Invoice)
+          </a>
+        </div>
 
         <section className="overflow-hidden rounded-[2.5rem] border border-zinc-700/50 bg-[#111113] shadow-[0_20px_70px_rgba(0,0,0,0.5)]">
           <div className="grid gap-8 px-6 py-8 lg:grid-cols-[1.2fr_0.8fr] lg:px-10 lg:py-10">

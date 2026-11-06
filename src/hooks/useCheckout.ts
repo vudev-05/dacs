@@ -35,7 +35,7 @@ export interface CheckoutAddress {
     isDefault: boolean;
 }
 
-export type PaymentMethod = "STRIPE" | "PICKUP";
+export type PaymentMethod = "STRIPE" | "COD" | "VIETQR" | "PICKUP";
 
 export interface CheckoutVoucher {
     id: number;
@@ -103,8 +103,8 @@ export function useCheckout(language: string) {
     const [usePoints, setUsePoints] = useState(false);
     const [pointsToUse, setPointsToUse] = useState(0);
 
-    // ── Payment — Stripe only ──
-    const [paymentMethod] = useState<PaymentMethod>("STRIPE");
+    // ── Payment Method (COD, VIETQR, STRIPE) ──
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
 
     // ── Computed Values ──
     const shippingFee = useMemo(
@@ -357,7 +357,7 @@ export function useCheckout(language: string) {
                 }));
             }
 
-            // ── ALL ORDERS GO THROUGH STRIPE (including pickup) ──
+            // ── ORDER PAYLOAD (COD / VIETQR / STRIPE) ──
             const checkoutPayload = {
                 items: items.map(item => ({
                     productId: item.productId || item.id,
@@ -380,6 +380,7 @@ export function useCheckout(language: string) {
                 couponCode: selectedVoucher?.canUse ? selectedVoucher.code : null,
                 pointsToUse: usePoints ? pointsToUse : 0,
                 notes: orderNotes.trim() || `Order for ${formData.fullName}`,
+                paymentMethod,
             };
 
             const sessionRes = await fetch("/api/checkout/create-session", {
@@ -398,12 +399,11 @@ export function useCheckout(language: string) {
             const sessionData = await sessionRes.json();
 
             if (sessionData.url) {
-                // Đơn hàng free ($0): xóa cart ngay vì không qua Stripe return page
-                if (sessionData.free) {
+                // Đơn hàng free ($0), COD hoặc VietQR: xóa cart ngay lập tức
+                if (sessionData.free || sessionData.cod || sessionData.vietqr) {
                     clearCart();
                 }
-                // Đơn hàng paid: KHÔNG xóa cart ở đây — chỉ xóa khi thanh toán thành công
-                // trên Stripe return page. Nếu user hủy, giỏ hàng vẫn còn.
+                // Đơn hàng Stripe: chỉ xóa khi thanh toán thành công trên Stripe return page
                 window.location.href = sessionData.url;
                 return;
             } else {
@@ -420,14 +420,14 @@ export function useCheckout(language: string) {
         }
     }, [
         validateForm, totalPrice, items, formData,
-        selectedVoucher, usePoints, pointsToUse, saveInfo, clearCart, language, orderNotes, router,
+        selectedVoucher, usePoints, pointsToUse, saveInfo, clearCart, language, orderNotes, router, paymentMethod,
     ]);
 
     return {
         // State
         step, isSubmitting, orderId, formData, formErrors, saveInfo, addresses,
         isLoadingAddresses, selectedAddressId, selectedVoucher, showVoucherModal,
-        userPoints, usePoints, pointsToUse, paymentMethod,
+        userPoints, usePoints, pointsToUse, paymentMethod, setPaymentMethod,
         items, totalPrice, isCartEmpty, session,
 
         // Computed

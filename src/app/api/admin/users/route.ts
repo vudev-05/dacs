@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "userId and role are required" }, { status: 400 });
     }
 
-    const allowedRoles = ["USER", "ADMIN"];
+    const allowedRoles = ["USER", "STAFF", "ADMIN"];
     if (!allowedRoles.includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }

@@ -8,13 +8,13 @@
  */
 
 import { useState, Suspense, useEffect, useRef } from "react";
-import { signIn, signOut } from "next-auth/react";
+import { signIn, signOut, getProviders } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
     Lock, Mail, Loader2, CheckCircle2, AlertCircle,
-    ChefHat, ShieldCheck, Zap, Star, Eye, EyeOff
+    ChefHat, ShieldCheck, Zap, Star, Eye, EyeOff, Sparkles
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -132,6 +132,28 @@ function LoginContent() {
             setError(t('auth.connError'));
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        setError("");
+        try {
+            const providers = await getProviders();
+            if (!providers?.google) {
+                setError(
+                    isVietnamese
+                        ? "Tính năng Đăng nhập Google yêu cầu cài đặt GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET từ Google Cloud Console vào file .env. Trên localhost, bạn có thể bấm chọn tài khoản mẫu bên dưới để đăng nhập ngay!"
+                        : "Google Sign-In requires GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET in .env. On localhost, please use the quick demo accounts below."
+                );
+                return;
+            }
+            await signIn("google", { callbackUrl: "/" });
+        } catch {
+            setError(
+                isVietnamese
+                    ? "Chưa thể kết nối tới Google OAuth. Vui lòng đăng nhập bằng Email hoặc tài khoản mẫu bên dưới."
+                    : "Unable to connect to Google OAuth. Please sign in with Email or demo accounts below."
+            );
         }
     };
 
@@ -412,9 +434,9 @@ function LoginContent() {
                                             </div>
                                         </div>
 
-                                            <button
+                                        <button
                                             type="button"
-                                            onClick={() => signIn("google", { callbackUrl: "/" })}
+                                            onClick={handleGoogleSignIn}
                                             className="w-full h-14 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-3 transition-all outline-none focus:ring-4 focus:ring-slate-100 shadow-sm"
                                         >
                                             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -425,6 +447,52 @@ function LoginContent() {
                                             </svg>
                                             {tr("Tiếp tục với Google", "auth.continueWithGoogle")}
                                         </button>
+
+                                        {/* Quick Demo Accounts Helper for Council / Local Test */}
+                                        <div className="mt-4 p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                                                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                                                    {isVietnamese ? "Tài khoản test đồ án (1-Click)" : "Demo Accounts (1-Click)"}
+                                                </span>
+                                                <span className="text-[10px] text-amber-700 font-medium">Tự điền form</span>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setEmail("user@likefood.vn");
+                                                        setPassword("user123");
+                                                        setError("");
+                                                    }}
+                                                    className="py-1.5 px-2 rounded-xl bg-white border border-amber-200 text-slate-800 text-[11px] font-semibold hover:border-emerald-500 hover:text-emerald-700 hover:bg-emerald-50/50 transition shadow-sm text-center"
+                                                >
+                                                    👤 Khách hàng
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setEmail("staff@likefood.vn");
+                                                        setPassword("staff123");
+                                                        setError("");
+                                                    }}
+                                                    className="py-1.5 px-2 rounded-xl bg-white border border-amber-200 text-slate-800 text-[11px] font-semibold hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50/50 transition shadow-sm text-center"
+                                                >
+                                                    👔 Nhân viên
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setEmail("admin@likefood.vn");
+                                                        setPassword("admin123");
+                                                        setError("");
+                                                    }}
+                                                    className="py-1.5 px-2 rounded-xl bg-white border border-amber-200 text-slate-800 text-[11px] font-semibold hover:border-purple-500 hover:text-purple-700 hover:bg-purple-50/50 transition shadow-sm text-center"
+                                                >
+                                                    👑 Admin
+                                                </button>
+                                            </div>
+                                        </div>
 
                                         <button
                                             type="button"

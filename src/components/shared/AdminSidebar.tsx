@@ -37,9 +37,10 @@ import {
   MessageSquare,
   Paintbrush,
   LucideIcon,
+  RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -72,6 +73,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: "orders", label: "Đơn hàng", href: "/admin/orders", icon: ClipboardList },
       { id: "inventory", label: "Kho hàng", href: "/admin/inventory", icon: Package },
+      { id: "refunds", label: "Đổi trả hàng", href: "/admin/refunds", icon: RefreshCw },
       { id: "live-chat", label: "Trò chuyện", href: "/admin/live-chat", icon: MessageSquare },
       { id: "contact-messages", label: "Tin nhắn liên hệ", href: "/admin/contact-messages", icon: Inbox },
     ],
@@ -124,8 +126,18 @@ const NAV_GROUPS: NavGroup[] = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+
+  const isStaff = session?.user?.role === "STAFF";
+
+  // Filter groups for STAFF (staff cannot access user role management or system settings)
+  const navGroups = NAV_GROUPS.map((group) => {
+    if (!isStaff) return group;
+    const items = group.items.filter((item) => item.id !== "users" && item.id !== "settings");
+    return { ...group, items };
+  }).filter((group) => group.items.length > 0);
 
   // Check if current path matches or starts with href
   const isActive = (href: string) => {
@@ -190,15 +202,25 @@ export default function AdminSidebar() {
 
         {/* Status Indicator */}
         {!collapsed && (
-          <div className="mx-3 mt-3 flex items-center gap-2 rounded-md bg-zinc-900/50 px-2 py-1.5">
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
-            <p className="text-[10px] font-medium text-zinc-500">Hệ thống hoạt động</p>
+          <div className="mx-3 mt-3 flex items-center justify-between rounded-md bg-zinc-900/50 px-2.5 py-1.5">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+              <p className="text-[10px] font-medium text-zinc-500">
+                {isStaff ? "Nhân viên" : "Quản trị viên"}
+              </p>
+            </div>
+            <span className={cn(
+              "rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+              isStaff ? "bg-amber-500/15 text-amber-400" : "bg-sky-500/15 text-sky-400"
+            )}>
+              {session?.user?.role || "ADMIN"}
+            </span>
           </div>
         )}
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 overflow-y-auto py-3 px-2">
-          {NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.id} className="mb-4">
               {!collapsed ? (
                 <p className="mb-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">

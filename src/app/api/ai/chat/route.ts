@@ -18,6 +18,7 @@ import { trackChatbotMessage } from "@/lib/analytics/behavior";
 import { applyRateLimit, apiRateLimit, getRateLimitIdentifier } from "@/lib/ratelimit";
 import { buildAIContext } from "@/lib/ai/ai-data-reader";
 import { callGPT } from "@/lib/ai/ai-provider";
+import { generateLocalAIResponse } from "@/lib/ai/local-smart-engine";
 
 // ─── Config ──────────────────────────────────────────────────
 const AI_CHAT_WINDOW_MS = 60 * 60 * 1000;
@@ -71,6 +72,7 @@ const SYSTEM_PROMPT_VI = `Bạn là **LIKEFOOD AI** — trợ lý tư vấn ẩm
 ⚠️ QUY TẮC VÀNG (TUYỆT ĐỐI TUÂN THỦ — VI PHẠM = KHÔNG CHẤP NHẬN):
 - LUÔN dùng dữ liệu THẬT từ phần [DỮ LIỆU TỪ DATABASE]
 - KHÔNG BAO GIỜ bịa sản phẩm, giá, hoặc thông tin KHÔNG có trong data
+- ★ BẮT BUỘC ĐƯA LINK TRỰC TIẾP: Khi nhắc đến hoặc gợi ý bất kỳ sản phẩm nào, PHẢI chèn link trực tiếp dạng Markdown: [Tên sản phẩm](/products/slug) kèm 👉 [Xem chi tiết](/products/slug) (dùng slug chính xác từ database).
 - Trả lời ĐẦY ĐỦ, tối thiểu 8-15 câu cho mỗi câu hỏi sản phẩm
 - Giữ format sạch sẽ: **bold** cho tên SP, giá cả, mã giảm giá
 - ★ "cá khô" = "khô cá", "tôm khô" = "khô tôm", "mực khô" = "khô mực"
@@ -224,7 +226,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ─── 4. Gọi ChatGPT qua central provider ────────────────
-    const userPrompt = conversationHistory 
+    const userPrompt = conversationHistory
       ? `Lịch sử hội thoại gần đây:\n${conversationHistory}\n\nTin nhắn hiện tại: ${trimmedMessage}`
       : trimmedMessage;
 
@@ -250,15 +252,16 @@ export async function POST(req: NextRequest) {
 
     let aiResponse = result?.text ?? "";
 
-    // ─── 5. Fallback message ─────────────────────────────────
+    // ─── 5. Fallback to Smart Local Engine ───────────────────
     if (!aiResponse) {
-      aiResponse = language === "vi"
-        ? "Xin lỗi anh/chị, em chưa xử lý được câu hỏi này. Anh/chị thử hỏi lại cụ thể hơn nhé! 😊"
-        : "Sorry, I couldn't process that. Please try asking more specifically! 😊";
+      aiResponse = await generateLocalAIResponse(trimmedMessage, language, {
+        userId: userId ? Number(userId) : undefined,
+        history: Array.isArray(history) ? history : undefined,
+      });
     }
 
     // ─── 6. Analytics tracking (non-blocking) ────────────────
-    trackChatbotMessage(chatSessionId, userId, trimmedMessage, "AI_CHAT", aiResponse).catch(() => {});
+    trackChatbotMessage(chatSessionId, userId, trimmedMessage, "AI_CHAT", aiResponse).catch(() => { });
 
     // ─── 7. Trả response ────────────────────────────────────
     return NextResponse.json({

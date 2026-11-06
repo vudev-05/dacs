@@ -16,7 +16,7 @@ import { AdminFilterBar } from "@/components/admin/AdminSearch";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 import { useDebounce } from "@/hooks/useDebounce";
 
-type Role = "USER" | "ADMIN";
+type Role = "USER" | "STAFF" | "ADMIN";
 
 interface AdminUser {
   id: number;
@@ -27,7 +27,7 @@ interface AdminUser {
 }
 
 const PAGE_SIZE = 15;
-const ROLE_OPTIONS: Role[] = ["USER", "ADMIN"];
+const ROLE_OPTIONS: Role[] = ["USER", "STAFF", "ADMIN"];
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -96,13 +96,14 @@ export default function AdminUsersPage() {
 
   const stats = useMemo(() => ({
     admins: users.filter((user) => user.role === "ADMIN").length,
+    staff: users.filter((user) => user.role === "STAFF").length,
     members: users.filter((user) => user.role === "USER").length,
   }), [users]);
 
   return (
     <AdminPageContainer
       title="Người dùng & Phân quyền"
-      subtitle="Tìm kiếm, xem và cập nhật vai trò tài khoản ngay trong trang quản trị."
+      subtitle="Tìm kiếm, xem và cập nhật vai trò tài khoản (Admin, Nhân viên, Khách hàng)."
       action={
         <Button variant="outline" size="lg" onClick={() => void loadUsers()} disabled={isLoading}>
           <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
@@ -110,10 +111,11 @@ export default function AdminUsersPage() {
         </Button>
       }
     >
-      <div className="grid gap-4 lg:grid-cols-3">
-        <AdminCard className="p-5"><Stat label="Người dùng hiển thị" value={`${total}`} tone="text-zinc-200" /></AdminCard>
-        <AdminCard className="p-5"><Stat label="Thành viên" value={`${stats.members}`} tone="text-zinc-300" /></AdminCard>
-        <AdminCard className="p-5"><Stat label="Quản trị viên" value={`${stats.admins}`} tone="text-sky-600" /></AdminCard>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <AdminCard className="p-5"><Stat label="Tổng tài khoản" value={`${total}`} tone="text-zinc-200" /></AdminCard>
+        <AdminCard className="p-5"><Stat label="Quản trị viên (Admin)" value={`${stats.admins}`} tone="text-sky-400" /></AdminCard>
+        <AdminCard className="p-5"><Stat label="Nhân viên (Staff)" value={`${stats.staff}`} tone="text-amber-400" /></AdminCard>
+        <AdminCard className="p-5"><Stat label="Khách hàng (User)" value={`${stats.members}`} tone="text-zinc-400" /></AdminCard>
       </div>
 
       <AdminFilterBar searchQuery={search} setSearchQuery={setSearch} searchPlaceholder="Tìm theo email hoặc tên">
@@ -196,7 +198,8 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: stri
 function RoleBadge({ role }: { role: Role }) {
   const styles: Record<Role, string> = {
     USER: 'bg-zinc-700/50 text-zinc-300',
-    ADMIN: 'bg-sky-900/50 text-sky-400',
+    STAFF: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+    ADMIN: 'bg-sky-900/50 text-sky-400 border border-sky-500/30',
   };
-  return <span className={`rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.16em] ${styles[role]}`}>{role}</span>;
+  return <span className={`rounded-full px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] ${styles[role] || styles.USER}`}>{role}</span>;
 }

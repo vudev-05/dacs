@@ -32,13 +32,13 @@ export default async function AdminLayout({
 }) {
     // Server-side auth check
     const session = await getServerSession(authOptions);
-    
+
     // If not logged in: let AdminLayoutClient handle the login/verify bypass pages
-    // If logged in but not admin, redirect to home
-    if (session && session.user?.role !== "ADMIN") {
+    // If logged in but not admin or staff, redirect to home
+    if (session && session.user?.role !== "ADMIN" && session.user?.role !== "STAFF") {
         redirect("/");
     }
-    
+
     // Pass to client component for 2FA check and page rendering
     // AdminLayoutClient handles bypass for /admin/login and /admin/verify
     return <AdminLayoutClient>{children}</AdminLayoutClient>;

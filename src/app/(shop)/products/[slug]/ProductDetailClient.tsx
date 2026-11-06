@@ -11,7 +11,7 @@ import { analytics } from "@/lib/analytics/sdk";
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 import {
-    Star, Heart, Share2, ShoppingCart, Truck, 
+    Star, Heart, Share2, ShoppingCart, Truck,
     Loader2, Flame, Zap, ChevronRight, Package, ShoppingBag,
     ChevronDown, Shield, RefreshCw, CreditCard
 } from "lucide-react";
@@ -128,6 +128,13 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
+    // Auto-select first variant on load if available
+    useEffect(() => {
+        if (product?.variants && product.variants.length > 0 && !selectedVariant) {
+            setSelectedVariant(product.variants[0]);
+        }
+    }, [product, selectedVariant]);
+
     const [descExpanded, setDescExpanded] = useState(false);
     const { t, language } = useLanguage();
 
@@ -200,7 +207,7 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                 }
             }
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product?.id]);
 
     useEffect(() => {
@@ -298,8 +305,9 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
         const onSale = hasDiscount();
         return {
             productId: Number(product.id),
+            variantId: selectedVariant?.id,
             slug: product.slug || undefined,
-            name: product.name + (selectedVariant ? ` - ${selectedVariant.weight || selectedVariant.flavor || ''}` : ''),
+            name: product.name + (selectedVariant ? ` (${selectedVariant.weight || selectedVariant.flavor || ''})` : ''),
             price: currentPrice,
             originalPrice: onSale ? getOriginalPrice() : undefined,
             salePrice: onSale ? currentPrice : undefined,
@@ -355,9 +363,9 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                     title="Oops!"
                     message={
                         error === "not_found" ? t("shop.productNotFound") :
-                        error === "load_error" ? t("shop.errorLoadingProduct") :
-                        error === "network_error" ? t("shop.errorTryAgain") :
-                        error || t("shop.productNotFound")
+                            error === "load_error" ? t("shop.errorLoadingProduct") :
+                                error === "network_error" ? t("shop.errorTryAgain") :
+                                    error || t("shop.productNotFound")
                     }
                     onRetry={() => window.location.reload()}
                     retryLabel={t("common.back")}
@@ -393,11 +401,11 @@ export default function ProductDetailClient({ initialProduct, initialRelated }: 
                     />
 
                     {/* Breadcrumbs — compact */}
-                    
+
 
                     {/* ══════════ MAIN: Image + Info ══════════ */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-                        
+
                         {/* ─── Image Gallery — 5 cols ─── */}
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}

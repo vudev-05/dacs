@@ -14,7 +14,7 @@ import { decryptForDisplay } from "@/lib/encryption";
 
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user.role !== "ADMIN")) {
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -71,7 +71,7 @@ export async function GET(req: Request) {
                 new Date(o.createdAt).toLocaleString("vi-VN"),
             ]);
 
-            const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n");
+            const csv = "\uFEFF" + [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n");
 
             return new Response(csv, {
                 headers: {
@@ -123,7 +123,7 @@ export async function GET(req: Request) {
                 ];
             });
 
-            const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n");
+            const csv = "\uFEFF" + [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n");
 
             return new Response(csv, {
                 headers: {

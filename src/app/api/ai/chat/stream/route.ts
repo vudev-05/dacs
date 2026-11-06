@@ -15,7 +15,8 @@ import { logger } from "@/lib/logger";
 import { trackChatbotMessage } from "@/lib/analytics/behavior";
 import { applyRateLimit, apiRateLimit, getRateLimitIdentifier } from "@/lib/ratelimit";
 import { buildUltimateAIContext } from "@/lib/ai/ultimate-data-reader";
-import { callGPTStream } from "@/lib/ai/ai-provider";
+import { callGPTStream, getAPIKey } from "@/lib/ai/ai-provider";
+import { generateLocalAIResponse } from "@/lib/ai/local-smart-engine";
 import { detectLanguage } from "@/lib/text-utils";
 
 export const runtime = "nodejs";
@@ -70,12 +71,12 @@ export async function POST(req: NextRequest) {
     } catch {
       body = {};
     }
-    
+
     const { message, sessionId, userId, messages: msgArray, history } = body ?? {};
     let chatMessage = message;
 
-    chatSessionId = typeof sessionId === "string" && sessionId.trim() 
-      ? sessionId.trim() 
+    chatSessionId = typeof sessionId === "string" && sessionId.trim()
+      ? sessionId.trim()
       : generateSessionId();
 
     // Support both "message" and "messages" array formats
@@ -157,8 +158,8 @@ export async function POST(req: NextRequest) {
           controller.enqueue(encoder.encode(createSSEChunk("session", { sessionId: chatSessionId })));
 
           // 2. Send "thinking" indicator
-          const thinkingMsg = language === "vi" 
-            ? "🤔 LIKEFOOD AI đang tìm kiếm thông tin..." 
+          const thinkingMsg = language === "vi"
+            ? "🤔 LIKEFOOD AI đang tìm kiếm thông tin..."
             : "🔍 LIKEFOOD AI is searching for information...";
           controller.enqueue(encoder.encode(createSSEChunk("thinking", { message: thinkingMsg })));
 
@@ -177,28 +178,66 @@ export async function POST(req: NextRequest) {
 
           // 5. Stream AI response
           let fullResponse = "";
-          
-          const streamResult = await callGPTStream(
-            trimmedMessage,
-            {
-              systemMessage: systemPrompt,
-              temperature: 0.7,
-              maxTokens: 3000,
-              topP: 0.9,
-              frequencyPenalty: 0.1,
-              presencePenalty: 0.1,
-            },
-            {
-              onChunk: (chunk) => {
-                fullResponse += chunk;
-                
-                // Send accumulated content for smooth streaming
-                controller.enqueue(encoder.encode(createSSEChunk("chunk", { 
-                  content: fullResponse
-                })));
-              },
+          let modelUsed = "likefood-smart-engine";
+
+          // Check if an AI API key is configured
+          const hasApiKey = Boolean(await getAPIKey().catch(() => ""));
+
+          if (hasApiKey) {
+            try {
+              const streamResult = await callGPTStream(
+                trimmedMessage,
+                {
+                  systemMessage: systemPrompt,
+                  temperature: 0.7,
+                  maxTokens: 3000,
+                  topP: 0.9,
+                  frequencyPenalty: 0.1,
+                  presencePenalty: 0.1,
+                },
+                {
+                  onChunk: (chunk) => {
+                    fullResponse += chunk;
+
+                    // Send accumulated content for smooth streaming
+                    controller.enqueue(encoder.encode(createSSEChunk("chunk", {
+                      content: fullResponse
+                    })));
+                  },
+                }
+              );
+              if (streamResult?.model) {
+                modelUsed = streamResult.model;
+              }
+            } catch (streamErr) {
+              logger.warn("[AI_CHAT_SSE] External stream error, switching to smart local engine", {
+                error: String(streamErr),
+              });
             }
-          );
+          }
+
+          // If no external model response, use our smart local database engine
+          if (!fullResponse) {
+            const localResponse = await generateLocalAIResponse(trimmedMessage, language, {
+              userId: userId ? Number(userId) : undefined,
+              history: Array.isArray(history) ? history : undefined,
+            });
+
+            // Stream smoothly word by word
+            const words = localResponse.split(" ");
+            let accumulated = "";
+            for (let i = 0; i < words.length; i++) {
+              accumulated += (i > 0 ? " " : "") + words[i];
+              fullResponse = accumulated;
+              controller.enqueue(encoder.encode(createSSEChunk("chunk", {
+                content: fullResponse
+              })));
+
+              if (words.length > 1) {
+                await new Promise((resolve) => setTimeout(resolve, 10));
+              }
+            }
+          }
 
           // 6. Send final complete message
           controller.enqueue(encoder.encode(createSSEChunk("done", {
@@ -209,22 +248,21 @@ export async function POST(req: NextRequest) {
             confidence: 1,
             language,
             sessionId: chatSessionId,
-            source: "chatgpt-ultimate",
-            model: streamResult?.model ?? "gpt-4o",
-            tokens: streamResult?.usage?.total_tokens,
+            source: hasApiKey && modelUsed !== "likefood-smart-engine" ? "chatgpt-ultimate" : "likefood-smart-engine",
+            model: modelUsed,
             latencyMs: Date.now() - startTime,
           })));
 
           // 7. Analytics (non-blocking)
-          trackChatbotMessage(chatSessionId, userId, trimmedMessage, "AI_CHAT_ULTIMATE", fullResponse).catch(() => {});
+          trackChatbotMessage(chatSessionId, userId, trimmedMessage, "AI_CHAT_ULTIMATE", fullResponse).catch(() => { });
 
           logger.info(`[AI_CHAT] Complete in ${Date.now() - startTime}ms`);
 
         } catch (error) {
           logger.error("[AI_CHAT_SSE] Stream error", error as Error, { context: "ai-chat-sse" });
           controller.enqueue(encoder.encode(createSSEChunk("error", {
-            message: language === "vi" 
-              ? "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau nhé!" 
+            message: language === "vi"
+              ? "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau nhé!"
               : "Sorry, an error occurred. Please try again later!",
           })));
         } finally {
@@ -245,8 +283,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     logger.error("[AI_CHAT_SSE] Critical error", error as Error, { context: "ai-chat-sse" });
     return new Response(
-      createSSEChunk("error", { 
-        message: "Mình đang xử lý, bạn thử gửi lại nhé! 😊" 
+      createSSEChunk("error", {
+        message: "Mình đang xử lý, bạn thử gửi lại nhé! 😊"
       }),
       {
         status: 500,
@@ -283,16 +321,16 @@ Nếu khách hỏi cụ thể tên, giá, số lượng, giao hàng... thì tr�
 ⚠️ QUY TẮC ĐỘC QUYỀN:
 - LUÔN ĐỌC [CONVERSATION HISTORY] để hiểu ngữ cảnh. Nếu khách đang chat nối tiếp (ví dụ: "có", "ok", "mua 1 cái"), hãy duy trì mạch hội thoại dựa vào câu nói trước đó của bạn.
 - LUÔN dùng dữ liệu THẬT từ phần [DATABASE] bên dưới cho các câu hỏi về thông tin.
+- ★ BẮT BUỘC ĐƯA LINK TRỰC TIẾP: Khi nhắc đến hoặc gợi ý bất kỳ sản phẩm nào, BẮT BUỘC PHẢI đính kèm link Markdown trực tiếp: [Tên sản phẩm](/products/slug) kèm 👉 [Xem chi tiết](/products/slug) (dùng slug chính xác từ database).
 - CHỈ KHI khách hỏi TÌM KHẢO SÁT MỚI mà [DATABASE] rỗng, BẠN MỚI dùng câu: 'Mình chưa có thông tin chính xác về vấn đề này. LIKEFOOD có cung cấp nhiều đặc sản Việt Nam, mình giúp gì được cho bạn nhé?'
 - Cấm bịa đặt. Tuyệt đối dừng lại ở 1-3 câu.`
     : `You are **LIKEFOOD AI** — shopping assistant.
 🎯 WORK STYLE:
-- Polite, warm, extremly concise (1-3 sentences max)
+- Polite, warm, extremely concise (1-3 sentences max)
 - Do NOT hallucinate. Use ONLY data from [DATABASE].
+- ★ ALWAYS INCLUDE PRODUCT LINKS: When mentioning any product, ALWAYS include its direct markdown link: [Product Name](/products/slug) and 👉 [View Details](/products/slug) using the exact slug from database.
 - ALWAYS remember [CONVERSATION HISTORY] to handle follow-up answers like "yes" or "ok".
 - ONLY use fallback ("I don't have information...") if user asks for NEW items not in database.`;
-
-
 
   const historySection = conversationHistory
     ? `\n\n📜 CONVERSATION HISTORY:\n${conversationHistory}`
@@ -305,10 +343,12 @@ Nếu khách hỏi cụ thể tên, giá, số lượng, giao hàng... thì tr�
   const finalInstruction = isVietnamese
     ? `\n\n📋 HƯỚNG DẪN TRẢ LỜI:
 - Trả lời TRỰC TIẾP vào câu hỏi.
+- BẮT BUỘC chèn link trực tiếp dạng [Tên sản phẩm](/products/slug) cho mọi sản phẩm được gợi ý.
 - Tổng độ dài CỰC KỲ NGẮN (tối đa 1-3 câu).
 - Cấm nói dài dòng. Cấm bịa đặt.`
     : `\n\n📋 ANSWERING INSTRUCTIONS:
 - Answer DIRECTLY.
+- ALWAYS include direct markdown link [Product Name](/products/slug) for any recommended product.
 - MAXIMUM 1-3 sentences.
 - NO HALLUCINATIONS. NO LONG ANSWERS.`;
 

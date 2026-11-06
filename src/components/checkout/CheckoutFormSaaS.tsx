@@ -38,11 +38,12 @@ export default function CheckoutFormSaaS({
                     <div className="h-[3px] rounded-full bg-primary w-16 transition-all duration-500" />
                 </div>
                 <div className="flex items-center gap-2 text-xs font-medium">
-                    <CreditCard className="w-3.5 h-3.5 text-[#635BFF]" />
                     <span className="text-slate-500 font-semibold">
-                        {isPickup
-                            ? (vi ? "Nhận hàng • Stripe" : "Pickup • Stripe")
-                            : (vi ? "Thanh toán qua Stripe" : "Pay with Stripe")}
+                        {checkout.paymentMethod === "COD"
+                            ? (vi ? "Thanh toán khi nhận hàng (COD)" : "Cash on Delivery")
+                            : checkout.paymentMethod === "VIETQR"
+                            ? (vi ? "Chuyển khoản VietQR" : "VietQR Transfer")
+                            : (vi ? "Thanh toán Stripe" : "Stripe Card")}
                     </span>
                     {isPickup && <MapPin className="w-3 h-3 text-primary" />}
                 </div>
@@ -99,6 +100,8 @@ export default function CheckoutFormSaaS({
                         formErrors={checkout.formErrors}
                         onNext={checkout.handleOrder}
                         isSubmitting={checkout.isSubmitting}
+                        paymentMethod={checkout.paymentMethod}
+                        setPaymentMethod={checkout.setPaymentMethod}
                     />
 
                     {/* Order Notes — inline below shipping form */}

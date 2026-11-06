@@ -10,12 +10,12 @@ import { useEffect, useState } from "react";
  * ShippingForm – Contact & shipping information (SaaS-style redesign)
  */
 
-import { Sparkles, ChevronRight, CheckCircle2, MapPin } from "lucide-react";
+import { Sparkles, ChevronRight, CheckCircle2, MapPin, Banknote, QrCode, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CheckoutAddressSkeleton from "./CheckoutAddressSkeleton";
 import VoucherAndPoints from "./VoucherAndPoints";
-import type { CheckoutAddress, CheckoutFormData, CheckoutVoucher } from "@/hooks/useCheckout";
+import type { CheckoutAddress, CheckoutFormData, CheckoutVoucher, PaymentMethod } from "@/hooks/useCheckout";
 import {
     FREE_SHIPPING_THRESHOLD_USD,
     EXPRESS_SHIPPING_FEE_USD,
@@ -49,18 +49,20 @@ interface ShippingFormProps {
     formErrors: Record<string, string>;
     onNext: () => void;
     isSubmitting?: boolean;
+    paymentMethod?: PaymentMethod;
+    setPaymentMethod?: (v: PaymentMethod) => void;
 }
 
 const inputBase =
     "w-full border rounded-md px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400/70 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-white";
 
 const US_STATES = [
-    "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida",
-    "Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine",
-    "Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska",
-    "Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota",
-    "Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota",
-    "Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
+    "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+    "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska",
+    "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+    "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+    "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
 ];
 
 function FieldError({ msg }: { msg?: string }) {
@@ -92,6 +94,8 @@ export default function ShippingForm({
     formErrors,
     onNext,
     isSubmitting = false,
+    paymentMethod = "COD",
+    setPaymentMethod,
 }: ShippingFormProps) {
     const vi = language === "vi";
 
@@ -105,7 +109,7 @@ export default function ShippingForm({
                 if (data.address) setStoreAddress(data.address);
                 if (data.mapsUrl) setStoreMapsUrl(data.mapsUrl);
             })
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const shippingMethods = [
@@ -201,11 +205,10 @@ export default function ShippingForm({
                                     key={addr.id}
                                     type="button"
                                     onClick={() => selectAddress(addr)}
-                                    className={`w-full text-left px-3 py-2.5 rounded-lg border text-xs transition-all ${
-                                        selectedAddressId === addr.id
+                                    className={`w-full text-left px-3 py-2.5 rounded-lg border text-xs transition-all ${selectedAddressId === addr.id
                                             ? "border-primary bg-primary/5"
                                             : "border-slate-200 hover:border-slate-300"
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div>
@@ -289,92 +292,92 @@ export default function ShippingForm({
 
             {/* ── Delivery Address (hidden when pickup) ── */}
             {formData.shippingMethod !== "pickup" && (
-            <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                    {vi ? "Địa chỉ nhận hàng (tại Mỹ)" : "Delivery address (US only)"}
-                </p>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
-                    {/* Street address */}
-                    <div className="sm:col-span-12">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Địa chỉ" : "Street address"}
-                        </label>
-                        <input
-                            type="text"
-                            autoComplete="street-address"
-                            value={formData.address}
-                            onChange={(e) => updateField("address", e.target.value)}
-                            placeholder={vi ? "123 Đường Hương Vị..." : "123 Flavor St, Apt 4B"}
-                            className={`${inputBase} ${formErrors.address ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
-                        />
-                        <FieldError msg={formErrors.address} />
-                    </div>
-
-                    {/* City */}
-                    <div className="sm:col-span-5">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Thành phố" : "City"}
-                        </label>
-                        <input
-                            type="text"
-                            autoComplete="address-level2"
-                            value={formData.city}
-                            onChange={(e) => updateField("city", e.target.value)}
-                            placeholder="Omaha"
-                            className={`${inputBase} ${formErrors.city ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
-                        />
-                        <FieldError msg={formErrors.city} />
-                    </div>
-
-                    
-                    {/* State */}
-                    <div className="sm:col-span-3">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                            {vi ? "Bang" : "State"}
-                        </label>
-                        <select
-                            autoComplete="address-level1"
-                            value={formData.state || ""}
-                            onChange={(e) => updateField("state", e.target.value)}
-                            className={`${inputBase} ${formErrors.state ? "border-red-400 bg-red-50/30" : "border-slate-200"}`}
-                        >
-                            <option value="">{vi ? "Chon bang..." : "Select state..."}</option>
-                            {US_STATES.map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
-                        <FieldError msg={formErrors.state} />
-                    </div>
-                    {/* Zip code */}
-                    <div className="sm:col-span-4">
-                        <label className="block text-xs font-medium text-slate-700 mb-1">ZIP Code</label>
-                        <input
-                            type="text"
-                            autoComplete="postal-code"
-                            value={formData.zipCode}
-                            onChange={(e) => updateField("zipCode", e.target.value)}
-                            placeholder="92840"
-                            maxLength={10}
-                            className={`${inputBase} border-slate-200`}
-                        />
-                    </div>
-
-                    {/* Save info checkbox */}
-                    <div className="sm:col-span-12 pt-1">
-                        <label className="inline-flex items-center gap-2 cursor-pointer">
+                <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                        {vi ? "Địa chỉ nhận hàng (tại Mỹ)" : "Delivery address (US only)"}
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
+                        {/* Street address */}
+                        <div className="sm:col-span-12">
+                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                                {vi ? "Địa chỉ" : "Street address"}
+                            </label>
                             <input
-                                type="checkbox"
-                                checked={saveInfo}
-                                onChange={(e) => setSaveInfo(e.target.checked)}
-                                className="w-3.5 h-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 accent-primary"
+                                type="text"
+                                autoComplete="street-address"
+                                value={formData.address}
+                                onChange={(e) => updateField("address", e.target.value)}
+                                placeholder={vi ? "123 Đường Hương Vị..." : "123 Flavor St, Apt 4B"}
+                                className={`${inputBase} ${formErrors.address ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
                             />
-                            <span className="text-xs text-slate-600">
-                                {vi ? "Lưu thông tin cho lần sau" : "Save this info for next time"}
-                            </span>
-                        </label>
+                            <FieldError msg={formErrors.address} />
+                        </div>
+
+                        {/* City */}
+                        <div className="sm:col-span-5">
+                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                                {vi ? "Thành phố" : "City"}
+                            </label>
+                            <input
+                                type="text"
+                                autoComplete="address-level2"
+                                value={formData.city}
+                                onChange={(e) => updateField("city", e.target.value)}
+                                placeholder="Omaha"
+                                className={`${inputBase} ${formErrors.city ? "border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-400" : "border-slate-200"}`}
+                            />
+                            <FieldError msg={formErrors.city} />
+                        </div>
+
+
+                        {/* State */}
+                        <div className="sm:col-span-3">
+                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                                {vi ? "Bang" : "State"}
+                            </label>
+                            <select
+                                autoComplete="address-level1"
+                                value={formData.state || ""}
+                                onChange={(e) => updateField("state", e.target.value)}
+                                className={`${inputBase} ${formErrors.state ? "border-red-400 bg-red-50/30" : "border-slate-200"}`}
+                            >
+                                <option value="">{vi ? "Chon bang..." : "Select state..."}</option>
+                                {US_STATES.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                            <FieldError msg={formErrors.state} />
+                        </div>
+                        {/* Zip code */}
+                        <div className="sm:col-span-4">
+                            <label className="block text-xs font-medium text-slate-700 mb-1">ZIP Code</label>
+                            <input
+                                type="text"
+                                autoComplete="postal-code"
+                                value={formData.zipCode}
+                                onChange={(e) => updateField("zipCode", e.target.value)}
+                                placeholder="92840"
+                                maxLength={10}
+                                className={`${inputBase} border-slate-200`}
+                            />
+                        </div>
+
+                        {/* Save info checkbox */}
+                        <div className="sm:col-span-12 pt-1">
+                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={saveInfo}
+                                    onChange={(e) => setSaveInfo(e.target.checked)}
+                                    className="w-3.5 h-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 accent-primary"
+                                />
+                                <span className="text-xs text-slate-600">
+                                    {vi ? "Lưu thông tin cho lần sau" : "Save this info for next time"}
+                                </span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
 
             {/* ── Discounts & Points ── */}
@@ -412,18 +415,16 @@ export default function ShippingForm({
                                 <button
                                     type="button"
                                     onClick={() => updateField("shippingMethod", method.id)}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border-2 transition-all text-left ${
-                                        isSelected
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border-2 transition-all text-left ${isSelected
                                             ? "border-primary bg-primary/5"
                                             : "border-slate-200 hover:border-slate-300 bg-white"
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex items-center gap-2.5">
                                         {/* Radio dot */}
                                         <div
-                                            className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                                                isSelected ? "border-primary" : "border-slate-300"
-                                            }`}
+                                            className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isSelected ? "border-primary" : "border-slate-300"
+                                                }`}
                                         >
                                             {isSelected && (
                                                 <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -487,21 +488,144 @@ export default function ShippingForm({
                 </div>
             </div>
 
+            {/* Payment Method Selection */}
+            <div className="mb-6">
+                <label className="block text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">
+                    {vi ? "Phương thức thanh toán" : "Payment Method"}
+                </label>
+                <div className="space-y-2">
+                    {/* COD Option */}
+                    <button
+                        type="button"
+                        onClick={() => setPaymentMethod?.("COD")}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left ${paymentMethod === "COD"
+                                ? "border-emerald-600 bg-emerald-50/50 shadow-sm"
+                                : "border-slate-200 hover:border-slate-300 bg-white"
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${paymentMethod === "COD" ? "border-emerald-600" : "border-slate-300"
+                                }`}>
+                                {paymentMethod === "COD" && <div className="w-2 h-2 rounded-full bg-emerald-600" />}
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 flex-shrink-0">
+                                <Banknote className="w-4 h-4" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-slate-900">
+                                    {vi ? "Thanh toán khi nhận hàng (COD)" : "Cash on Delivery (COD)"}
+                                </p>
+                                <p className="text-[11px] text-slate-500">
+                                    {vi ? "Kiểm tra hàng rồi mới thanh toán tiền mặt" : "Pay with cash upon package arrival"}
+                                </p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                            {vi ? "Tiện lợi" : "Convenient"}
+                        </span>
+                    </button>
+
+                    {/* VietQR Option */}
+                    <button
+                        type="button"
+                        onClick={() => setPaymentMethod?.("VIETQR")}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left ${paymentMethod === "VIETQR"
+                                ? "border-blue-600 bg-blue-50/50 shadow-sm"
+                                : "border-slate-200 hover:border-slate-300 bg-white"
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${paymentMethod === "VIETQR" ? "border-blue-600" : "border-slate-300"
+                                }`}>
+                                {paymentMethod === "VIETQR" && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 flex-shrink-0">
+                                <QrCode className="w-4 h-4" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-slate-900">
+                                    {vi ? "Chuyển khoản VietQR (Ngân hàng / MoMo)" : "VietQR Bank Transfer"}
+                                </p>
+                                <p className="text-[11px] text-slate-500">
+                                    {vi ? "Quét mã QR chuyển khoản 24/7 tức thì" : "Scan QR code to transfer instantly"}
+                                </p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
+                            {vi ? "Khuyên dùng" : "Fast QR"}
+                        </span>
+                    </button>
+
+                    {/* Stripe Option */}
+                    <button
+                        type="button"
+                        onClick={() => setPaymentMethod?.("STRIPE")}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left ${paymentMethod === "STRIPE"
+                                ? "border-[#635BFF] bg-[#635BFF]/5 shadow-sm"
+                                : "border-slate-200 hover:border-slate-300 bg-white"
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${paymentMethod === "STRIPE" ? "border-[#635BFF]" : "border-slate-300"
+                                }`}>
+                                {paymentMethod === "STRIPE" && <div className="w-2 h-2 rounded-full bg-[#635BFF]" />}
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-[#635BFF]/10 flex items-center justify-center text-[#635BFF] flex-shrink-0">
+                                <CreditCard className="w-4 h-4" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-slate-900">
+                                    {vi ? "Thẻ quốc tế (Stripe)" : "International Card (Stripe)"}
+                                </p>
+                                <p className="text-[11px] text-slate-500">
+                                    Visa, MasterCard, American Express, Apple Pay
+                                </p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#635BFF] bg-[#635BFF]/10 px-2 py-0.5 rounded-full">
+                            Stripe
+                        </span>
+                    </button>
+                </div>
+            </div>
+
             <Button
                 type="button"
                 onClick={onNext}
                 disabled={isSubmitting}
-                className="w-full h-9 rounded-md bg-slate-900 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wide transition-all active:scale-[0.99] flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                className={`w-full h-11 rounded-xl text-white font-bold text-sm tracking-wide transition-all active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed ${paymentMethod === "COD"
+                        ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/25"
+                        : paymentMethod === "VIETQR"
+                            ? "bg-blue-600 hover:bg-blue-700 shadow-blue-600/25"
+                            : "bg-[#635BFF] hover:bg-[#534be0] shadow-[#635BFF]/25"
+                    }`}
             >
                 {isSubmitting ? (
                     <>
-                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        {vi ? "Đang chuyển đến Stripe..." : "Redirecting to Stripe..."}
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        {vi ? "Đang xử lý đặt hàng..." : "Processing order..."}
                     </>
                 ) : (
                     <>
-                        {vi ? "Thanh toán qua Stripe" : "Pay with Stripe"}
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        {paymentMethod === "COD" && (
+                            <>
+                                <Banknote className="w-4 h-4" />
+                                {vi ? "Xác nhận đặt hàng (COD)" : "Place Order (COD)"}
+                            </>
+                        )}
+                        {paymentMethod === "VIETQR" && (
+                            <>
+                                <QrCode className="w-4 h-4" />
+                                {vi ? "Đặt hàng & Quét mã VietQR" : "Order & Scan VietQR"}
+                            </>
+                        )}
+                        {paymentMethod === "STRIPE" && (
+                            <>
+                                <CreditCard className="w-4 h-4" />
+                                {vi ? "Thanh toán qua Stripe" : "Pay with Stripe"}
+                            </>
+                        )}
+                        <ChevronRight className="w-4 h-4" />
                     </>
                 )}
             </Button>

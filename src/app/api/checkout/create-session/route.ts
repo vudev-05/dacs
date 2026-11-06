@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
             couponCode,
             pointsToUse = 0,
             notes,
+            paymentMethod = "STRIPE",
         } = body as {
             items: CheckoutItem[];
             shippingAddress: string;
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest) {
             couponCode?: string | null;
             pointsToUse?: number;
             notes?: string;
+            paymentMethod?: "STRIPE" | "COD" | "VIETQR";
         };
 
         // Validate required fields
@@ -457,7 +459,161 @@ export async function POST(req: NextRequest) {
         }
 
         // ══════════════════════════════════════════════════════════════
-        // PAID ORDER: Total > $0 → đi qua Stripe Checkout
+        // COD / VIETQR ORDER: Tạo đơn hàng trực tiếp, không qua Stripe
+        // ══════════════════════════════════════════════════════════════
+        if (paymentMethod === "COD" || paymentMethod === "VIETQR") {
+            const isVietQr = paymentMethod === "VIETQR";
+            const order = await prisma.$transaction(async (tx) => {
+                // 1. Trừ tồn kho
+                for (const item of lineItemsData) {
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: {
+                            inventory: { decrement: item.quantity },
+                            soldCount: { increment: item.quantity },
+                        },
+                    });
+                    if (item.variantId) {
+                        await tx.productvariant.update({
+                            where: { id: item.variantId },
+                            data: { stock: { decrement: item.quantity } },
+                        });
+                    }
+                }
+
+                // 2. Xử lý voucher
+                if (validatedCouponCode) {
+                    const coupon = await tx.coupon.findUnique({ where: { code: validatedCouponCode } });
+                    if (coupon) {
+                        await tx.coupon.update({
+                            where: { id: coupon.id },
+                            data: { usedCount: { increment: 1 } },
+                        });
+                        const uv = await tx.uservoucher.findFirst({
+                            where: { userId, couponId: coupon.id, status: { not: "USED" } },
+                        });
+                        if (uv) {
+                            await tx.uservoucher.update({
+                                where: { id: uv.id },
+                                data: { status: "USED", usedAt: new Date() },
+                            });
+                        }
+                    }
+                }
+
+                // 3. Trừ điểm
+                if (validatedPointsToUse > 0) {
+                    await tx.user.updateMany({
+                        where: { id: userId, points: { gte: validatedPointsToUse } },
+                        data: { points: { decrement: validatedPointsToUse } },
+                    });
+                    await tx.pointtransaction.create({
+                        data: {
+                            userId,
+                            amount: -validatedPointsToUse,
+                            type: "SPEND",
+                            description: `Sử dụng cho đơn hàng ${isVietQr ? "VietQR" : "COD"}`,
+                        },
+                    });
+                }
+
+                // 4. Tạo đơn hàng
+                const newOrder = await tx.order.create({
+                    data: {
+                        userId,
+                        status: "PENDING",
+                        subtotal,
+                        shippingFee: calculatedShippingFee,
+                        discount: calculatedDiscount,
+                        pointsUsed: validatedPointsToUse > 0 ? validatedPointsToUse : null,
+                        pointsDiscount: pointsDiscountAmount > 0 ? pointsDiscountAmount : null,
+                        total,
+                        couponCode: validatedCouponCode || null,
+                        shippingAddress: encrypt(shippingAddress) || shippingAddress,
+                        shippingCity,
+                        shippingZipCode: shippingZipCode || "",
+                        shippingPhone: encrypt(shippingPhone) || shippingPhone,
+                        shippingMethod,
+                        paymentMethod: isVietQr ? "VIETQR" : "COD",
+                        paymentStatus: "PENDING",
+                        paymentIntentId: isVietQr ? `vietqr_${Date.now()}_${userId}` : null,
+                        notes: notes || `Order for ${fullName}`,
+                        orderItems: {
+                            create: lineItemsData.map((item) => ({
+                                productId: item.productId,
+                                variantId: item.variantId,
+                                quantity: item.quantity,
+                                price: item.unitPrice,
+                                nameSnapshot: item.name,
+                            })),
+                        },
+                    },
+                });
+
+                // 5. Ghi sự kiện
+                await tx.orderevent.create({
+                    data: {
+                        orderId: newOrder.id,
+                        status: "PENDING",
+                        note: isVietQr
+                            ? "Đơn hàng chuyển khoản VietQR — Chờ khách quét mã thanh toán"
+                            : "Đơn hàng thanh toán khi nhận hàng (COD) — Chờ giao hàng",
+                    },
+                });
+
+                // 6. Tích điểm loyalty
+                const { POINTS_PER_DOLLAR } = await import("@/lib/commerce");
+                const earnedPoints = Math.floor(subtotal * POINTS_PER_DOLLAR);
+                if (earnedPoints > 0) {
+                    await tx.user.update({
+                        where: { id: userId },
+                        data: { points: { increment: earnedPoints } },
+                    });
+                    await tx.pointtransaction.create({
+                        data: {
+                            userId,
+                            orderId: newOrder.id,
+                            amount: earnedPoints,
+                            type: "EARN",
+                            description: `Tích lũy từ đơn hàng #${newOrder.id}`,
+                        },
+                    });
+                }
+
+                return newOrder;
+            });
+
+            logger.info(`${paymentMethod} order ${order.id} created (total=$${total})`, { userId: String(userId) });
+
+            // Gửi thông báo
+            try {
+                const { createOrderNotification } = await import("@/lib/notifications");
+                await createOrderNotification(userId, order.id, "PENDING", total);
+            } catch { /* silent */ }
+
+            try {
+                const { sendOrderConfirmationEmail } = await import("@/lib/mail");
+                if (email) {
+                    await sendOrderConfirmationEmail({
+                        orderId: order.id,
+                        toEmail: email,
+                        total,
+                        status: "PENDING",
+                        createdAt: order.createdAt,
+                    });
+                }
+            } catch { /* silent */ }
+
+            return NextResponse.json({
+                url: `${appUrl}/order-success?orderId=${order.id}&payment=${isVietQr ? "vietqr" : "cod"}`,
+                orderId: order.id,
+                cod: !isVietQr,
+                vietqr: isVietQr,
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // STRIPE ORDER: Total > $0 & paymentMethod === "STRIPE"
         // ══════════════════════════════════════════════════════════════
         const stripe = getStripe();
 

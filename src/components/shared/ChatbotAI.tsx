@@ -57,14 +57,14 @@ const INITIAL_MESSAGE_EN = {
 
 const QUICK_REPLIES_VI = [
   { emoji: "🍵", text: "Gợi ý trà & cà phê" },
-  { emoji: "🎁", text: "Combo quà biếu" },
+  { emoji: "🎁", text: "Tư vấn combo & quà biếu" },
   { emoji: "🚚", text: "Phí giao hàng" },
   { emoji: "📦", text: "Theo dõi đơn hàng" },
 ];
 
 const QUICK_REPLIES_EN = [
   { emoji: "🍵", text: "Tea & Coffee suggestions" },
-  { emoji: "🎁", text: "Gift combos" },
+  { emoji: "🎁", text: "Gift combos & advice" },
   { emoji: "🚚", text: "Shipping fees" },
   { emoji: "📦", text: "Track order" },
 ];
@@ -80,13 +80,17 @@ function formatTime(date: Date) {
 function renderMarkdown(text: string) {
   const rawHtml = text
     // Links: [text](url)
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-emerald-600 underline hover:text-emerald-700" target="_blank" rel="noopener noreferrer">$1</a>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+    .replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      '<a href="$2" class="inline-flex items-center gap-0.5 font-semibold text-emerald-600 hover:text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">$1</a>'
+    )
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-800">$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/~~(.*?)~~/g, '<del class="text-slate-400 text-xs">$1</del>')
     .replace(/\n/g, '<br/>');
 
   return DOMPurify.sanitize(rawHtml, {
-    ALLOWED_TAGS: ['br', 'strong', 'em', 'a'],
+    ALLOWED_TAGS: ['br', 'strong', 'em', 'a', 'del', 'span'],
     ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
   });
 }
@@ -168,7 +172,7 @@ function MessageBubble({ message, isLast }: { message: Message; isLast: boolean 
         </div>
       </div>
 
-      
+
     </motion.div>
   );
 }
@@ -180,11 +184,10 @@ function WaitingBanner({ isVietnamese, status }: { isVietnamese: boolean; status
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`mx-3 mb-2 rounded-xl border px-3.5 py-3 ${
-        isAssigned
-          ? "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100"
-          : "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100"
-      }`}
+      className={`mx-3 mb-2 rounded-xl border px-3.5 py-3 ${isAssigned
+        ? "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100"
+        : "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100"
+        }`}
     >
       {/* Pulsing indicator */}
       <div className="flex items-center gap-2 mb-2.5">
@@ -273,7 +276,7 @@ export default function ChatbotAI() {
           localStorage.removeItem("likefood_ai_chat");
         }
       }
-    } catch {}
+    } catch { }
     setIsAiStateLoaded(true);
   }, []);
 
@@ -977,11 +980,11 @@ export default function ChatbotAI() {
                       {isLoading && <TypingIndicator />}
 
                       {/* Quick replies */}
-                      {showQuickReplies && messages.length <= 1 && !isLoading && chatMode === "ai" && (
+                      {!isLoading && chatMode === "ai" && (
                         <motion.div
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
+                          transition={{ delay: 0.15 }}
                           className="pt-2"
                         >
                           <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2 pl-10">
